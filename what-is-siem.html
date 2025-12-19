@@ -441,15 +441,27 @@
                 <h2>Interview Preparation</h2>
                 
                 <div class="info-box interview">
-                    <div class="info-box-title">💼 Interview Tip</div>
-                    <p><strong>Common Question:</strong> "Explain SIEM to a non-technical stakeholder."</p>
-                    <p><strong>Good Answer:</strong> "SIEM is like a central security operations center for your IT environment. It collects activity logs from all your systems - servers, firewalls, cloud services - and watches for patterns that indicate security threats. When it spots something suspicious, it alerts our security team so they can investigate. It also keeps records for compliance audits and incident investigations."</p>
+                    <div class="info-box-title">💼 3-Layer Answer: "What is a SIEM?"</div>
+                    
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1 — CONCEPTUAL (Start Here)</span></p>
+                    <p>"A SIEM—Security Information and Event Management—aggregates security logs from across the environment and enables threat detection through correlation. It's the central nervous system for security operations, providing the visibility teams need to detect and respond to threats."</p>
+                    <p style="color: #10b981; font-size: 0.85rem;"><em>✓ Stop. Wait for follow-up.</em></p>
+
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2 — PRACTICAL (If Asked to Elaborate)</span></p>
+                    <p>"In practice, you configure data connectors to pull logs from firewalls, endpoints, identity systems, cloud platforms. Those get normalized and parsed. Then you build detection rules that trigger alerts. Analysts triage in an incident queue, investigate using the raw logs, and track resolution. I've done this with Sentinel and Splunk."</p>
+
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3 — INTERNALS (Only If Pushed)</span></p>
+                    <p>"At the infrastructure level—collection agents, ingestion pipelines with parsing at ingest or query time, indexed storage with retention policies, and the query engine. For Sentinel: Azure Monitor Agent, DCRs, Log Analytics workspaces, KQL."</p>
                 </div>
                 
                 <div class="info-box interview">
-                    <div class="info-box-title">💼 Interview Tip</div>
-                    <p><strong>Common Question:</strong> "Why would an organization need SIEM?"</p>
-                    <p><strong>Good Answer:</strong> "Three main reasons: First, visibility - modern environments are too complex to monitor manually, and attackers exploit gaps between systems. SIEM connects the dots. Second, scale - organizations generate millions of events daily, and humans can't review them all. SIEM automates the initial analysis. Third, compliance - regulations like PCI-DSS, HIPAA, and SOC 2 require centralized logging and monitoring."</p>
+                    <div class="info-box-title">💼 3-Layer Answer: "Why do organizations need SIEM?"</div>
+                    
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1 — CONCEPTUAL</span></p>
+                    <p>"Organizations need SIEM for three reasons: visibility into complex environments, scale to handle millions of daily events, and compliance with regulations that require centralized logging."</p>
+
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2 — PRACTICAL</span></p>
+                    <p>"Without SIEM, you're blind to lateral movement—an attacker could compromise one system and pivot to others without detection. In my experience, the SIEM catches things that individual tools miss because it correlates across sources. For compliance, PCI-DSS, HIPAA, SOC 2 all require this centralized monitoring."</p>
                 </div>
                 
                 <!-- Quick Reference -->

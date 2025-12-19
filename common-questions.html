@@ -66,25 +66,43 @@
                 
                 <header class="page-header">
                     <h1 class="page-title">Common Interview Questions</h1>
-                    <p class="page-subtitle">Top 50 SIEM consultant interview questions with answers</p>
+                    <p class="page-subtitle">Key SIEM consultant interview questions using the 3-Layer Answer technique</p>
                 </header>
                 
+                <div class="info-box tip" style="margin-bottom: var(--spacing-xl);">
+                    <div class="info-box-title">⭐ Master the 3-Layer Technique First</div>
+                    <p>Before reviewing these questions, read the <a href="interview-strategy.html"><strong>Interview Strategy</strong></a> page. The key insight: <strong>start conceptual, go deeper only when asked, never volunteer Layer 3.</strong></p>
+                    <p style="margin-top: var(--spacing-sm);">Questions below show all 3 layers—but in a real interview, you deliver Layer 1 first and wait.</p>
+                </div>
                 
                 <h2>SIEM Fundamentals Questions</h2>
                 
                 <div class="info-box interview">
                     <div class="info-box-title">💼 Q1: What is SIEM and why is it important?</div>
-                    <p><strong>Answer:</strong> SIEM (Security Information and Event Management) is a central platform that collects logs from across an organization's IT environment, correlates them to detect threats, and alerts security teams to investigate. It's important because modern attacks span multiple systems - without SIEM, security teams have blind spots and can't connect the dots between related events across different sources.</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1</span> "SIEM aggregates security logs from across the environment and enables threat detection through correlation. It's the central visibility platform for security operations."</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2</span> "In practice, you configure data connectors for firewalls, endpoints, identity, cloud. Those get parsed and normalized. Detection rules trigger alerts that analysts triage in an incident queue."</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3</span> "Infrastructure level—collection agents, ingestion pipelines, indexed storage, query engines. For Sentinel: AMA, DCRs, Log Analytics, KQL."</p>
                 </div>
                 
                 <div class="info-box interview">
                     <div class="info-box-title">💼 Q2: What's the difference between SIEM and SOAR?</div>
-                    <p><strong>Answer:</strong> SIEM focuses on detection - collecting logs, correlating events, and generating alerts. SOAR (Security Orchestration, Automation, and Response) focuses on response - automating actions, orchestrating workflows, and integrating tools. They're complementary: SIEM detects the threat, SOAR helps respond to it. Many platforms now combine both - Splunk SOAR, Sentinel with Logic Apps.</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1</span> "SIEM is for detection—collecting and correlating logs to generate alerts. SOAR is for response—automating actions and orchestrating workflows. They're complementary."</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2</span> "I've worked with both—the SIEM generates the alert, the SOAR playbook automates enrichment, creates tickets, and can take containment actions like isolating a host or blocking an IP. Many platforms combine them now—Splunk SOAR, Sentinel with Logic Apps."</p>
                 </div>
                 
                 <div class="info-box interview">
                     <div class="info-box-title">💼 Q3: How would you reduce false positives?</div>
-                    <p><strong>Answer:</strong> Start by understanding why they're firing - is the logic too broad, or is the environment unique? Tuning options include: adding exclusions for known-good behavior, increasing thresholds, adding time-based conditions (business hours only), enriching with context (is this user an admin?), and correlating with other signals. Document every tuning change. For persistent issues, consider replacing signature-based rules with behavioral detection.</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1</span> "False positive reduction is about understanding why alerts fire and adding context to filter out known-good behavior while preserving detection of actual threats."</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2</span> "I analyze what's causing the FPs—is the logic too broad, or is environment-specific behavior triggering it? Tuning options: exclusions for known-good, adjusted thresholds, time-based conditions, enrichment with user context. I document every change and track FP rates over time."</p>
+                    
+                    <p style="margin-top: var(--spacing-sm);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3</span> "For persistent issues, I might move from signature to behavioral detection, use ML-based anomaly baselining, or correlate across multiple signals to increase confidence before alerting."</p>
                 </div>
                 
                 <h2>Technical Questions</h2>

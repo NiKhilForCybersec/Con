@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Strategy | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .layer-card {
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            background: var(--bg-secondary);
+        }
+        .layer-card.layer-1 { border-left: 4px solid #10b981; }
+        .layer-card.layer-2 { border-left: 4px solid #3b82f6; }
+        .layer-card.layer-3 { border-left: 4px solid #ef4444; }
+        .layer-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        .layer-1 .layer-badge { background: #10b98133; color: #10b981; }
+        .layer-2 .layer-badge { background: #3b82f633; color: #3b82f6; }
+        .layer-3 .layer-badge { background: #ef444433; color: #ef4444; }
+        .mindset-box {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+        }
+        .mindset-box h3 {
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-md);
+        }
+        .fear-reframe {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: var(--spacing-md);
+            align-items: center;
+            margin: var(--spacing-md) 0;
+        }
+        .fear-item, .reframe-item {
+            padding: var(--spacing-md);
+            border-radius: 6px;
+        }
+        .fear-item {
+            background: #ef444422;
+            border: 1px solid #ef4444;
+        }
+        .reframe-item {
+            background: #10b98122;
+            border: 1px solid #10b981;
+        }
+        .arrow {
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .fear-reframe {
+                grid-template-columns: 1fr;
+            }
+            .arrow {
+                transform: rotate(90deg);
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Interview Preparation</div>
+                    <a href="interview-strategy.html" class="nav-item active">⭐ Interview Strategy</a>
+                    <a href="common-questions.html" class="nav-item">Common Questions</a>
+                    <a href="interview-scenarios.html" class="nav-item">Scenarios</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Interview Strategy</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">The Senior Interview Strategy</h1>
+                    <p class="page-subtitle">Master the art of answering technical questions with confidence. This isn't about knowing everything—it's about controlling the conversation like a senior professional.</p>
+                </header>
+
+                <!-- SECTION 1: REFRAME YOUR FEAR -->
+                <section class="content-section">
+                    <h2>Step 1: Reframe What Is Actually Scaring You</h2>
+                    
+                    <div class="mindset-box">
+                        <h3>🎯 The Truth</h3>
+                        <p style="font-size: 1.1rem; margin-bottom: var(--spacing-md);">You are <strong>not</strong> scared of firewalls, SIEM internals, or cloud security.</p>
+                        <p>You are scared of:</p>
+                        <ul style="margin-top: var(--spacing-sm);">
+                            <li>Being asked something <strong>outside your working scope</strong></li>
+                            <li>Not knowing <strong>where to stop answering</strong></li>
+                            <li>Sounding "less senior" if you say <strong>"I'm not sure"</strong></li>
+                            <li>Being pulled into <strong>deep vendor-specific internals</strong></li>
+                        </ul>
+                        <p style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-primary); border-radius: 6px; border-left: 3px solid var(--accent-primary);">
+                            <strong>This is a boundary-management problem, not a knowledge problem.</strong>
+                        </p>
+                    </div>
+
+                    <h3>Fear → Reframe</h3>
+                    
+                    <div class="fear-reframe">
+                        <div class="fear-item">
+                            <strong>❌ Fear:</strong><br>
+                            "What if they ask about packet inspection internals?"
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="reframe-item">
+                            <strong>✅ Reframe:</strong><br>
+                            "I know how to scope my answer to what matters operationally"
+                        </div>
+                    </div>
+
+                    <div class="fear-reframe">
+                        <div class="fear-item">
+                            <strong>❌ Fear:</strong><br>
+                            "I don't know Palo Alto CLI commands by heart"
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="reframe-item">
+                            <strong>✅ Reframe:</strong><br>
+                            "I understand firewall concepts and can learn vendor specifics as needed"
+                        </div>
+                    </div>
+
+                    <div class="fear-reframe">
+                        <div class="fear-item">
+                            <strong>❌ Fear:</strong><br>
+                            "What if I say 'I don't know'?"
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="reframe-item">
+                            <strong>✅ Reframe:</strong><br>
+                            "Seniors say 'that's outside my daily scope' with confidence"
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: THE MOST IMPORTANT RULE -->
+                <section class="content-section">
+                    <h2>Step 2: The Most Important Rule</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Junior vs Senior Mindset</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     HOW INTERVIEWERS JUDGE CANDIDATES                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   JUNIOR BEHAVIOR                      SENIOR BEHAVIOR                      │
+│   ──────────────────                   ─────────────────                    │
+│                                                                             │
+│   ❌ Tries to answer everything        ✅ Defines boundaries                │
+│                                                                             │
+│   ❌ Goes deep immediately             ✅ Starts conceptual, goes deeper    │
+│                                           only when asked                   │
+│                                                                             │
+│   ❌ Panics at unknown questions       ✅ "That's outside my daily scope,   │
+│                                           but here's what I do know..."    │
+│                                                                             │
+│   ❌ Volunteers unnecessary detail     ✅ Gives clean, layered answers      │
+│                                                                             │
+│   ❌ Says "I don't know" and stops     ✅ Bridges to related knowledge      │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   💡 KEY INSIGHT:                                                           │
+│                                                                             │
+│   Senior professionals are judged MORE on how they frame their scope       │
+│   than on what they know.                                                   │
+│                                                                             │
+│   Your goal is NOT to know everything.                                      │
+│   Your goal is to CONTROL THE DEPTH of the conversation.                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: THE THREE-LAYER TECHNIQUE -->
+                <section class="content-section">
+                    <h2>Step 3: The "Three-Layer Answer" Technique</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">🎯 This Will Change Everything</div>
+                        <p>Every technical answer should have three layers. <strong>You only go deeper if explicitly asked.</strong></p>
+                    </div>
+
+                    <div class="layer-card layer-1">
+                        <span class="layer-badge">LAYER 1 — CONCEPTUAL</span>
+                        <h4>Always Safe • Start Here</h4>
+                        <p><strong>What it is, why it exists, business value.</strong></p>
+                        <p style="margin-top: var(--spacing-sm); color: var(--text-muted);">This shows you understand the "why" behind technology—a sign of senior thinking.</p>
+                        <div style="margin-top: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-primary); border-radius: 4px;">
+                            <strong>Example phrases:</strong>
+                            <ul style="margin-top: var(--spacing-sm);">
+                                <li>"A SIEM aggregates security logs to enable threat detection and incident response..."</li>
+                                <li>"The purpose of log normalization is to enable correlation across different sources..."</li>
+                                <li>"EDR exists to provide visibility and response capability at the endpoint level..."</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="layer-card layer-2">
+                        <span class="layer-badge">LAYER 2 — PRACTICAL / OPERATIONAL</span>
+                        <h4>Your Comfort Zone • Go Here When Asked</h4>
+                        <p><strong>Where it's configured, how it's typically used, common scenarios.</strong></p>
+                        <p style="margin-top: var(--spacing-sm); color: var(--text-muted);">This is your daily work. You can speak confidently here.</p>
+                        <div style="margin-top: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-primary); border-radius: 4px;">
+                            <strong>Example phrases:</strong>
+                            <ul style="margin-top: var(--spacing-sm);">
+                                <li>"In my experience with Sentinel, I typically configure this in the Analytics Rules blade..."</li>
+                                <li>"When I set up log collection, I use the Azure Monitor Agent with DCRs..."</li>
+                                <li>"The common pattern I've seen is to use scheduled queries for this detection..."</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="layer-card layer-3">
+                        <span class="layer-badge">LAYER 3 — DEEP INTERNALS</span>
+                        <h4>Optional • Only If Explicitly Required</h4>
+                        <p><strong>Packet flow, kernel behavior, ASICs, performance tuning, vendor internals.</strong></p>
+                        <p style="margin-top: var(--spacing-sm); color: var(--text-muted);">This is specialist territory. Most roles don't require it.</p>
+                        <div style="margin-top: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-primary); border-radius: 4px;">
+                            <strong>⚠️ Critical Rule:</strong>
+                            <p style="margin-top: var(--spacing-sm); color: #ef4444; font-weight: 600;">You must NEVER volunteer Layer 3.</p>
+                            <p style="margin-top: var(--spacing-sm);">If asked and you don't know: "That's getting into vendor-specific internals that I haven't needed in my operational role. I'd need to dive into the documentation for that level of detail."</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: EXAMPLES -->
+                <section class="content-section">
+                    <h2>The Three-Layer Technique in Action</h2>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example 1: "How does a SIEM work?"</div>
+                        
+                        <div class="layer-card layer-1" style="margin-top: var(--spacing-md);">
+                            <span class="layer-badge">LAYER 1 — START HERE</span>
+                            <p>"A SIEM collects security logs from across the environment, normalizes them into a common format, and enables detection through correlation rules. It's the central nervous system for security operations—providing visibility, alerting, and investigation capabilities."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #10b981;"><em>✓ Stop here. Wait for follow-up.</em></p>
+                        </div>
+
+                        <div class="layer-card layer-2">
+                            <span class="layer-badge">LAYER 2 — IF THEY ASK "Can you go deeper?"</span>
+                            <p>"In practice, you configure data connectors to ingest logs—Windows events, firewall logs, cloud audit trails. These get parsed and normalized. Then you build analytics rules—either scheduled queries or near-real-time—that trigger alerts. Analysts triage those alerts in the incident queue, investigate using the raw logs, and document findings."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #3b82f6;"><em>✓ This is your operational comfort zone.</em></p>
+                        </div>
+
+                        <div class="layer-card layer-3">
+                            <span class="layer-badge">LAYER 3 — ONLY IF EXPLICITLY PUSHED</span>
+                            <p>"At the infrastructure level, you're looking at the ingestion pipeline—Azure Monitor Agent or Logstash/Cribl for collection, parsing at ingest time or query time, storage in Log Analytics workspaces with retention policies, and the KQL engine executing queries against that data store."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #ef4444;"><em>⚠️ Don't volunteer this. Only if asked.</em></p>
+                        </div>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example 2: "Explain how firewalls work"</div>
+                        
+                        <div class="layer-card layer-1" style="margin-top: var(--spacing-md);">
+                            <span class="layer-badge">LAYER 1 — START HERE</span>
+                            <p>"Firewalls control network traffic based on rules—allowing or blocking connections based on source, destination, ports, and increasingly, application awareness. They're a fundamental control for network segmentation and perimeter security."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #10b981;"><em>✓ Stop here. Wait for follow-up.</em></p>
+                        </div>
+
+                        <div class="layer-card layer-2">
+                            <span class="layer-badge">LAYER 2 — IF THEY ASK FOR MORE</span>
+                            <p>"From a SIEM perspective, I work with firewall logs daily. I configure log forwarding via syslog, parse the traffic logs to extract source/dest IPs, ports, actions. I build detections for things like denied traffic spikes, connections to known-bad IPs, or unusual outbound patterns. The firewall team handles the rule configuration—I consume the telemetry."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #3b82f6;"><em>✓ Scoped to YOUR role.</em></p>
+                        </div>
+
+                        <div class="layer-card layer-3">
+                            <span class="layer-badge">LAYER 3 — BOUNDARY RESPONSE</span>
+                            <p>"For deep packet inspection internals or ASIC-level processing, that's really firewall engineering territory. My focus is on the security telemetry and detection side. If needed, I'd partner with the network team or reference vendor documentation."</p>
+                            <p style="margin-top: var(--spacing-sm); color: #ef4444;"><em>✓ Graceful boundary. Shows maturity.</em></p>
+                        </div>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example 3: "How would you detect lateral movement?"</div>
+                        
+                        <div class="layer-card layer-1" style="margin-top: var(--spacing-md);">
+                            <span class="layer-badge">LAYER 1 — START HERE</span>
+                            <p>"Lateral movement is when an attacker moves from one compromised system to others in the network. It's a critical phase in most attacks—especially ransomware. Detecting it early can prevent a single compromised endpoint from becoming a full breach."</p>
+                        </div>
+
+                        <div class="layer-card layer-2">
+                            <span class="layer-badge">LAYER 2 — YOUR OPERATIONAL ANSWER</span>
+                            <p>"In practice, I look for several indicators: unusual use of admin tools like PsExec, unexpected RDP connections between workstations, authentication anomalies like one account hitting many systems, and SMB traffic to admin shares. In Sentinel, I'd use KQL to correlate Windows Security events—4624 logons, 5140 share access, 7045 new services—with network telemetry from the firewall."</p>
+                        </div>
+
+                        <div class="layer-card layer-3">
+                            <span class="layer-badge">LAYER 3 — ONLY IF ASKED</span>
+                            <p>"Going deeper, you could analyze NTLM vs Kerberos authentication patterns, look for pass-the-hash indicators in the authentication logs, or correlate with EDR telemetry showing process creation on remote systems. Some of that gets into very specific MITRE techniques like T1021."</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: BOUNDARY PHRASES -->
+                <section class="content-section">
+                    <h2>Power Phrases for Setting Boundaries</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Situation</th>
+                                    <th>Senior Response</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Asked about deep vendor internals</td>
+                                    <td>"That's getting into vendor-specific internals. In my role, I focus on [your scope]. For that level of detail, I'd reference the documentation."</td>
+                                </tr>
+                                <tr>
+                                    <td>Asked about something outside your stack</td>
+                                    <td>"I haven't worked with [X] directly, but the concepts are similar to [Y] which I use daily. I'd expect to ramp up quickly."</td>
+                                </tr>
+                                <tr>
+                                    <td>Asked for exact syntax/commands</td>
+                                    <td>"I don't have the exact syntax memorized, but I know where to find it. In practice, I'd reference [docs/tool/autocomplete]."</td>
+                                </tr>
+                                <tr>
+                                    <td>Asked about something you genuinely don't know</td>
+                                    <td>"That's not something I've encountered in my operational experience. Can you tell me more about the context? I might be able to connect it to something I know."</td>
+                                </tr>
+                                <tr>
+                                    <td>Asked to go deeper than needed</td>
+                                    <td>"I can go deeper if helpful—are you looking for [specific aspect] or is the operational overview sufficient?"</td>
+                                </tr>
+                                <tr>
+                                    <td>Interviewer testing your limits</td>
+                                    <td>"That's an interesting edge case. I'd want to test that in a lab environment before giving a definitive answer."</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- SECTION 6: THE BRIDGE TECHNIQUE -->
+                <section class="content-section">
+                    <h2>The "Bridge" Technique</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">When You Don't Know → Bridge to What You Know</div>
+                        <p>Never just say "I don't know" and stop. Always bridge to related knowledge.</p>
+                        
+                        <div style="margin-top: var(--spacing-lg);">
+                            <p><strong>❌ Bad:</strong> "I don't know how CrowdStrike works."</p>
+                            <p style="margin-top: var(--spacing-md);"><strong>✅ Good:</strong> "I haven't used CrowdStrike specifically, but I've worked extensively with Cortex XDR. Both are EDR platforms with similar concepts—endpoint telemetry collection, behavioral detection, and response actions. The detection logic and investigation workflows would transfer. I'd expect to ramp up on CrowdStrike's specific UI and query language within a few weeks."</p>
+                        </div>
+
+                        <div style="margin-top: var(--spacing-lg);">
+                            <p><strong>❌ Bad:</strong> "I haven't done cloud security."</p>
+                            <p style="margin-top: var(--spacing-md);"><strong>✅ Good:</strong> "Most of my experience is with on-prem infrastructure, but the security monitoring principles are the same—you need visibility into authentication, configuration changes, and data access. I've been ramping up on Azure security through Sentinel, and I understand the shared responsibility model. The detection engineering skills transfer directly."</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 7: QUICK REFERENCE -->
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Interview Strategy Quick Reference</div>
+                        
+                        <h4>The Three Layers</h4>
+                        <ul>
+                            <li><strong style="color: #10b981;">Layer 1 (Conceptual):</strong> What & Why — Always start here</li>
+                            <li><strong style="color: #3b82f6;">Layer 2 (Practical):</strong> How you use it — Your comfort zone</li>
+                            <li><strong style="color: #ef4444;">Layer 3 (Internals):</strong> Deep details — Never volunteer</li>
+                        </ul>
+
+                        <h4>Key Mindset Shifts</h4>
+                        <ul>
+                            <li>This is boundary-management, not a knowledge test</li>
+                            <li>Seniors define scope; juniors try to answer everything</li>
+                            <li>Control the depth of conversation</li>
+                            <li>"I don't know" → Bridge to what you DO know</li>
+                        </ul>
+
+                        <h4>Power Phrases</h4>
+                        <ul>
+                            <li>"That's getting into vendor-specific internals..."</li>
+                            <li>"In my operational role, I focus on..."</li>
+                            <li>"I haven't used [X] but the concepts parallel [Y]..."</li>
+                            <li>"I'd reference documentation for that level of detail..."</li>
+                        </ul>
+
+                        <h4>Before Every Answer</h4>
+                        <ul>
+                            <li>Start at Layer 1 (conceptual)</li>
+                            <li>Wait for them to ask for more</li>
+                            <li>Only go to Layer 2 if prompted</li>
+                            <li>Never volunteer Layer 3</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="index.html" class="card-link">← Home</a>
+                    <a href="common-questions.html" class="card-link">Common Questions →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -375,17 +375,17 @@ detections. The goal is to hunt once, detect forever.
 
                 <section class="content-section">
                     <div class="info-box interview">
-                        <div class="info-box-title">💼 Interview Tip</div>
-                        <p><strong>Q: "Describe your approach to threat hunting."</strong></p>
-                        <p><strong>A:</strong> "I use hypothesis-driven hunting primarily. The process:</p>
-                        <ol>
-                            <li><strong>Form hypothesis:</strong> Based on threat intel, MITRE ATT&CK coverage gaps, or recent incidents. Example: 'Attackers may be using WMI for lateral movement that we're not detecting.'</li>
-                            <li><strong>Build hunt query:</strong> Create a query that would surface this behavior—process creation with WMI parent, remote WMI connections, etc.</li>
-                            <li><strong>Execute and analyze:</strong> Run against available data. Review results, separate true threats from benign activity.</li>
-                            <li><strong>Document findings:</strong> Whether I find something or not, document the hunt—methodology, data sources, results, recommendations.</li>
-                            <li><strong>Operationalize:</strong> If I find a pattern worth detecting, I convert the hunt query into an automated detection rule. Hunt once, detect forever.</li>
-                        </ol>
-                        <p>I prioritize hunts based on detection gaps and threat relevance to our industry. A good hunt either finds threats, improves detection, or confirms existing coverage is adequate."</p>
+                        <div class="info-box-title">💼 3-Layer Answer: "Describe your approach to threat hunting."</div>
+                        
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1 — CONCEPTUAL</span></p>
+                        <p>"Threat hunting is proactive searching for threats that evade automated detection. While SIEM alerts react to known patterns, hunting assumes something might already be in the environment and actively looks for it. It fills detection gaps and validates that existing controls work."</p>
+                        <p style="color: #10b981; font-size: 0.85rem;"><em>✓ Stop. Wait for follow-up.</em></p>
+
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2 — PRACTICAL</span></p>
+                        <p>"I use hypothesis-driven hunting. Form a hypothesis based on threat intel or MITRE gaps—'attackers may be using WMI for lateral movement.' Build a query that would surface that behavior. Execute against SIEM data, analyze results, document findings. If I find a valuable pattern, I convert it into an automated detection. Hunt once, detect forever. I prioritize hunts based on detection gaps and threats relevant to our industry."</p>
+
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3 — INTERNALS (Only If Asked)</span></p>
+                        <p>"Going deeper—I'd cover specific hunt techniques like stacking, frequency analysis, long-tail detection. Tools like Jupyter notebooks for complex analysis, MITRE ATT&CK Navigator for coverage mapping, and how to structure a formal hunting program with metrics and cadence."</p>
                     </div>
                 </section>
 

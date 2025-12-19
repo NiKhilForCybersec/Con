@@ -155,9 +155,17 @@
                 </div>
                 
                 <div class="info-box interview">
-                    <div class="info-box-title">💼 Interview Tip</div>
-                    <p><strong>Question:</strong> "How do you approach building a new detection rule?"</p>
-                    <p><strong>Answer:</strong> "I start with the threat - what attack technique am I trying to detect? I map it to MITRE ATT&CK for context. Then I identify the data source needed - do we have the right logs? I write the detection logic, starting broad then narrowing to reduce false positives. I test with atomic tests or purple team exercises to validate it catches the attack. After deployment, I monitor false positive rates for the first week and tune as needed. Every rule gets documented with its purpose, limitations, and response procedure."</p>
+                    <div class="info-box-title">💼 3-Layer Answer: "How do you build a detection rule?"</div>
+                    
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1 — CONCEPTUAL (Start Here)</span></p>
+                    <p>"Detection engineering is about translating threat intelligence into alertable logic. You identify the attack technique, determine what evidence it leaves in logs, and write rules to surface that evidence to analysts."</p>
+                    <p style="color: #10b981; font-size: 0.85rem;"><em>✓ Stop. Wait for follow-up.</em></p>
+
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2 — PRACTICAL (Your Answer)</span></p>
+                    <p>"In practice, I start with the threat—what MITRE technique am I detecting? I verify the log source exists and is ingesting. I write the query, starting broad then adding exclusions to reduce false positives. I test with atomic red team or purple team exercises. After deployment, I monitor FP rates for a week and tune. Every rule gets documented with purpose, limitations, and response steps."</p>
+
+                    <p style="margin-top: var(--spacing-md);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3 — INTERNALS (Only If Pushed)</span></p>
+                    <p>"Going deeper—I'd look at Sigma for portable rule formats, scheduled vs NRT rule trade-offs, entity behavior baselining for anomaly-based detection, and integration with the SOAR playbook for automated response."</p>
                 </div>
 
                 

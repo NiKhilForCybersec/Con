@@ -284,17 +284,17 @@ OR (index=carbonblack sourcetype=carbonblack:defense:json type="ALERT")
 
                 <section class="content-section">
                     <div class="info-box interview">
-                        <div class="info-box-title">💼 Interview Tip</div>
-                        <p><strong>Q: "How do you integrate EDR with SIEM?"</strong></p>
-                        <p><strong>A:</strong> "EDR and SIEM integration is about combining deep endpoint visibility with broad correlation:</p>
-                        <ol>
-                            <li><strong>Data flow:</strong> EDR alerts and telemetry flow to SIEM via API or syslog. I typically send alerts plus high-value telemetry (process creation, network connections) while leaving verbose data in EDR to manage volume.</li>
-                            <li><strong>Correlation value:</strong> An EDR alert alone might be low-confidence. But when SIEM correlates it with suspicious authentication, unusual data access, or network anomalies—it becomes high-confidence. This cross-source correlation is SIEM's strength.</li>
-                            <li><strong>Response automation:</strong> SOAR can trigger EDR actions based on SIEM detections. Isolate endpoints, collect forensics, block hashes—all automated based on correlation results.</li>
-                            <li><strong>Normalization:</strong> With multiple EDR platforms, I normalize to common fields (host, user, severity) enabling unified dashboards and detections that work across vendors.</li>
-                            <li><strong>Investigation workflow:</strong> SIEM alerts link to EDR console for deep-dive. Analysts pivot from correlation alert to full process tree and timeline in EDR.</li>
-                        </ol>
-                        <p>The key is avoiding duplication—don't recreate EDR detections in SIEM. Use SIEM for what EDR can't do: correlating endpoint activity with network, identity, and cloud."</p>
+                        <div class="info-box-title">💼 3-Layer Answer: "How do you integrate EDR with SIEM?"</div>
+                        
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #10b98133; color: #10b981; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 1 — CONCEPTUAL</span></p>
+                        <p>"EDR provides deep endpoint visibility. SIEM provides broad correlation across all sources. Integration combines them—endpoint alerts gain context from network, identity, and cloud activity. This cross-source correlation is what catches sophisticated attacks."</p>
+                        <p style="color: #10b981; font-size: 0.85rem;"><em>✓ Stop. Wait for follow-up.</em></p>
+
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #3b82f633; color: #3b82f6; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 2 — PRACTICAL</span></p>
+                        <p>"In practice, I configure EDR to send alerts plus high-value telemetry to SIEM—process creation, network connections—while leaving verbose data in EDR to manage volume. I build correlation rules that combine EDR alerts with identity anomalies or network indicators. SOAR can then trigger EDR actions like isolation based on correlation results. For investigation, SIEM alerts link to EDR for deep process-tree analysis."</p>
+
+                        <p style="margin-top: var(--spacing-md);"><span style="background: #ef444433; color: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">LAYER 3 — INTERNALS (Only If Asked)</span></p>
+                        <p>"At the integration level—API vs syslog trade-offs, field normalization across vendors to common schema, retention tiering between SIEM hot storage and EDR native storage, and the specific connector configuration for each platform."</p>
                     </div>
                 </section>
 
