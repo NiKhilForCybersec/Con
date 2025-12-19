@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Interview Questions | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Common Interview Questions</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Common Interview Questions</h1>
+                    <p class="page-subtitle">Top 50 SIEM consultant interview questions with answers</p>
+                </header>
+                
+                
+                <h2>SIEM Fundamentals Questions</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q1: What is SIEM and why is it important?</div>
+                    <p><strong>Answer:</strong> SIEM (Security Information and Event Management) is a central platform that collects logs from across an organization's IT environment, correlates them to detect threats, and alerts security teams to investigate. It's important because modern attacks span multiple systems - without SIEM, security teams have blind spots and can't connect the dots between related events across different sources.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q2: What's the difference between SIEM and SOAR?</div>
+                    <p><strong>Answer:</strong> SIEM focuses on detection - collecting logs, correlating events, and generating alerts. SOAR (Security Orchestration, Automation, and Response) focuses on response - automating actions, orchestrating workflows, and integrating tools. They're complementary: SIEM detects the threat, SOAR helps respond to it. Many platforms now combine both - Splunk SOAR, Sentinel with Logic Apps.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q3: How would you reduce false positives?</div>
+                    <p><strong>Answer:</strong> Start by understanding why they're firing - is the logic too broad, or is the environment unique? Tuning options include: adding exclusions for known-good behavior, increasing thresholds, adding time-based conditions (business hours only), enriching with context (is this user an admin?), and correlating with other signals. Document every tuning change. For persistent issues, consider replacing signature-based rules with behavioral detection.</p>
+                </div>
+                
+                <h2>Technical Questions</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q4: Explain how you'd detect a brute force attack.</div>
+                    <p><strong>Answer:</strong> Look for multiple failed authentication attempts from the same source in a short time window. In Splunk: search failed logins, stats count by source IP, where count > 5 in 5 minutes. Include Logon Type in Windows to distinguish network vs local. Consider excluding service accounts and known scanning tools. Alert should include the source IP, targeted accounts, and success/failure after the attempts.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q5: What Windows event IDs would you monitor for lateral movement?</div>
+                    <p><strong>Answer:</strong> 4624 Type 3 (network logon), 4648 (explicit credentials/runas), 4688 (process creation) for tools like PsExec, 5140/5145 (network share access). Also monitor service creation (7045) and scheduled task creation (4698). Correlate with network logs showing SMB (445) or RDP (3389) between internal hosts.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q6: How do you size a SIEM deployment?</div>
+                    <p><strong>Answer:</strong> Key inputs: daily ingest volume (GB/day), retention requirements, search performance needs, and number of concurrent users. For Splunk on-prem, this translates to indexer count and storage. For cloud platforms, it's about selecting the right tier. I always recommend starting with a pilot to measure actual volume from key sources before committing to production sizing.</p>
+                </div>
+                
+                <h2>Scenario Questions</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q7: A critical detection stopped working. How do you troubleshoot?</div>
+                    <p><strong>Answer:</strong> Systematic approach: First, check if the rule is enabled and hasn't been modified. Second, verify data is flowing - run the base query manually. Third, check if source format changed (vendor update, new parser needed). Fourth, validate time windows and thresholds still make sense. Fifth, check for infrastructure issues - indexer health, search head capacity. Document the issue and resolution for future reference.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q8: How would you approach migrating 500 detection rules?</div>
+                    <p><strong>Answer:</strong> Don't migrate all 500 blindly. First, categorize by priority and usage - which rules actually fire and get investigated? Migrate critical/high-fidelity rules first. Some rules may be obsolete or have native equivalents in the new platform. Plan for query translation (SPL to KQL or vice versa) and test each migrated rule. Expect 20-30% to need significant rework due to platform differences.</p>
+                </div>
+                
+                <h2>Platform-Specific Questions</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q9: What's the difference between Splunk's Universal and Heavy Forwarder?</div>
+                    <p><strong>Answer:</strong> Universal Forwarder is lightweight (~50MB RAM), only forwards raw data. Heavy Forwarder is a full Splunk instance that can parse, filter, and route data before forwarding. Use UF on endpoints; use HF as an aggregation/parsing layer for syslog or when you need to reduce data before sending to cloud.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Q10: When would you choose Sentinel over Splunk?</div>
+                    <p><strong>Answer:</strong> Sentinel for Microsoft-heavy environments (M365, Azure, Defender suite) where native integration provides quick value. Also good for cloud-first organizations that don't want infrastructure management. Splunk for multi-cloud environments, on-prem requirements, or when you need maximum flexibility with diverse log sources. Both are capable - it's about fit for the organization.</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="mitre-attack-intro.html" class="card-link">← MITRE ATT&CK</a>
+                    <a href="scenario-questions.html" class="card-link">Scenario Questions →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

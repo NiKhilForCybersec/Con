@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splunk Hybrid | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Splunk Hybrid deployments - combining cloud and on-premises components for data residency, federated search, and migration scenarios.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item active">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+                    <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Splunk Hybrid</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Splunk Hybrid</h1>
+                    <p class="page-subtitle">Combining cloud and on-premises Splunk for complex requirements</p>
+                </header>
+                
+                <!-- What is Hybrid -->
+                <h2>What is Splunk Hybrid?</h2>
+                
+                <p>Splunk Hybrid combines Splunk Cloud with on-premises Splunk components. This isn't a specific product - it's an architecture pattern that addresses real-world constraints.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Why Hybrid?</div>
+                    <p>Organizations choose hybrid when they need the benefits of cloud (managed infrastructure, scaling) but have constraints that prevent a full cloud deployment:</p>
+                    <ul>
+                        <li>Data that cannot leave the premises (regulatory, contractual)</li>
+                        <li>Need to search across cloud and on-prem data together</li>
+                        <li>Migration in progress (transitioning from on-prem to cloud)</li>
+                        <li>On-prem systems that can't reach the internet</li>
+                    </ul>
+                </div>
+                
+                <!-- Common Hybrid Patterns -->
+                <h2>Common Hybrid Patterns</h2>
+                
+                <h3>Pattern 1: Cloud Backend + On-Prem Collection</h3>
+                
+                <p>Most common pattern - use Splunk Cloud for indexing and search, but collect data on-premises:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Cloud Backend + On-Prem Collection</div>
+                    <pre><code>
+┌─────────────────────────────────────────────────────────────────────┐
+│                     ON-PREMISES                                      │
+│                                                                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                          │
+│  │ Windows  │  │ Linux    │  │ Network  │                          │
+│  │ Servers  │  │ Servers  │  │ Devices  │                          │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘                          │
+│       │             │             │                                  │
+│       ▼             ▼             ▼                                  │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │              HEAVY FORWARDER (On-Prem)                        │   │
+│  │  • Receives syslog from network devices                       │   │
+│  │  • Aggregates from Universal Forwarders                       │   │
+│  │  • Parses/filters before forwarding                           │   │
+│  │  • Handles data that needs on-prem processing                 │   │
+│  └────────────────────────────┬─────────────────────────────────┘   │
+│                               │                                      │
+└───────────────────────────────┼──────────────────────────────────────┘
+                                │
+                                │  Encrypted (TLS)
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     SPLUNK CLOUD                                     │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  Indexers → Storage → Search Heads → Enterprise Security      │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <h3>Pattern 2: Federated Search</h3>
+                
+                <p>Search across both cloud and on-prem indexes from a single search head:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Federated Search Architecture</div>
+                    <pre><code>
+┌─────────────────────────────────────────────────────────────────────┐
+│                      SPLUNK CLOUD                                    │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  Cloud Indexers (general security data)                      │    │
+│  │  • Firewall logs                                             │    │
+│  │  • Cloud audit logs                                          │    │
+│  │  • EDR data                                                  │    │
+│  └────────────────────────────┬────────────────────────────────┘    │
+└───────────────────────────────┼──────────────────────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    │    SEARCH HEAD        │
+                    │    (Federated)        │
+                    │                       │
+                    │  Searches BOTH        │
+                    │  cloud and on-prem    │
+                    │  simultaneously       │
+                    └───────────┬───────────┘
+                                │
+┌───────────────────────────────┼──────────────────────────────────────┐
+│                      ON-PREMISES                                     │
+│  ┌────────────────────────────┴────────────────────────────────┐    │
+│  │  On-Prem Indexers (sensitive data that can't leave)         │    │
+│  │  • PCI cardholder data                                      │    │
+│  │  • Healthcare records                                       │    │
+│  │  • Classified/restricted data                               │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <h3>Pattern 3: Migration Transition</h3>
+                
+                <p>Running both environments during migration:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Phase</th>
+                                <th>On-Prem Role</th>
+                                <th>Cloud Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phase 1</strong></td>
+                                <td>Primary - all data and users</td>
+                                <td>Pilot - limited sources</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 2</strong></td>
+                                <td>Some sources, historical data</td>
+                                <td>New sources, some users</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 3</strong></td>
+                                <td>Historical only (read-only)</td>
+                                <td>Primary for all new data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phase 4</strong></td>
+                                <td>Decommissioned</td>
+                                <td>Fully migrated</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Data Residency Considerations -->
+                <h2>Data Residency Considerations</h2>
+                
+                <p>One of the primary drivers for hybrid is data residency - certain data cannot leave specific locations:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🏦</div>
+                        <h3 class="card-title">Financial Services</h3>
+                        <p class="card-description">PCI-DSS may require cardholder data to stay in specific environments. Many banks have internal policies against cloud storage of transaction data.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🏥</div>
+                        <h3 class="card-title">Healthcare</h3>
+                        <p class="card-description">HIPAA allows cloud storage but some organizations keep PHI on-premises. Regional regulations (GDPR, provincial health laws) may restrict transfers.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🏛️</div>
+                        <h3 class="card-title">Government</h3>
+                        <p class="card-description">Classified or sensitive data often cannot leave government networks. Splunk has FedRAMP options, but some agencies stay on-prem.</p>
+                    </div>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Hybrid Strategy for Data Residency</div>
+                    <p>Keep sensitive data on-prem, send everything else to cloud:</p>
+                    <ul>
+                        <li><strong>On-Prem Indexers:</strong> PCI data, PHI, classified info</li>
+                        <li><strong>Cloud Indexers:</strong> Firewall logs, endpoint data, cloud audit logs</li>
+                        <li><strong>Federated Search:</strong> Analysts search both from one interface</li>
+                    </ul>
+                </div>
+                
+                <!-- Technical Implementation -->
+                <h2>Technical Implementation</h2>
+                
+                <h3>Federated Search Setup</h3>
+                
+                <p>To search across cloud and on-prem:</p>
+                
+                <ol>
+                    <li><strong>Establish connectivity:</strong> Search heads need network access to both indexer clusters</li>
+                    <li><strong>Configure distributed search:</strong> Add on-prem indexers as search peers</li>
+                    <li><strong>Certificate management:</strong> Both environments need trusted certificates</li>
+                    <li><strong>Index naming:</strong> Use consistent naming so searches work across both</li>
+                </ol>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Federated Search Considerations</div>
+                    <ul>
+                        <li><strong>Latency:</strong> Searching on-prem from cloud (or vice versa) adds network latency</li>
+                        <li><strong>Bandwidth:</strong> Large result sets transfer over WAN</li>
+                        <li><strong>Firewall rules:</strong> Need to allow search traffic between environments</li>
+                        <li><strong>Time sync:</strong> Both environments must have synchronized time</li>
+                    </ul>
+                </div>
+                
+                <h3>Data Routing with Heavy Forwarders</h3>
+                
+                <p>Heavy Forwarders can route data to different destinations based on rules:</p>
+                
+                <pre><code># outputs.conf on Heavy Forwarder
+
+# Default: send to Splunk Cloud
+[tcpout:cloud]
+server = inputs1.mycompany.splunkcloud.com:9997
+sslCertPath = $SPLUNK_HOME/etc/auth/cloud_cert.pem
+
+# Route sensitive data to on-prem
+[tcpout:onprem]
+server = indexer1.internal:9997, indexer2.internal:9997
+
+# Routing rules in transforms.conf
+[route_pci_onprem]
+REGEX = sourcetype=pci_.*
+DEST_KEY = _TCP_ROUTING
+FORMAT = onprem</code></pre>
+                
+                <!-- Migration Path -->
+                <h2>Migration Path: On-Prem to Cloud</h2>
+                
+                <p>Many hybrid deployments are transitional - the goal is full cloud. Here's a typical approach:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Step</th>
+                                <th>Action</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Pilot</strong></td>
+                                <td>Set up Splunk Cloud, send one source type (e.g., firewall logs)</td>
+                                <td>2-4 weeks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Parallel Run</strong></td>
+                                <td>Send all data to both environments, compare</td>
+                                <td>4-8 weeks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Migrate Users</strong></td>
+                                <td>Move dashboards, saved searches, alerts to cloud</td>
+                                <td>2-4 weeks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. ES Migration</strong></td>
+                                <td>Rebuild or migrate correlation searches, notables</td>
+                                <td>4-8 weeks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Cutover</strong></td>
+                                <td>Stop sending to on-prem, users work in cloud only</td>
+                                <td>1 week</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Retention Period</strong></td>
+                                <td>Keep on-prem read-only for historical searches</td>
+                                <td>Based on retention</td>
+                            </tr>
+                            <tr>
+                                <td><strong>7. Decommission</strong></td>
+                                <td>Archive and shut down on-prem infrastructure</td>
+                                <td>1-2 weeks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "When would you recommend a hybrid Splunk deployment?"</p>
+                    <p><strong>Good Answer:</strong> "Three main scenarios. First, data residency - when regulations or contracts require certain data to stay on-premises, like PCI cardholder data or healthcare records, but you want cloud benefits for everything else. Second, migration transitions - running both environments during a phased move from on-prem to cloud. Third, air-gapped environments - when some systems can't reach the internet at all, you need on-prem collection that forwards to cloud when possible. The key architecture component is usually Heavy Forwarders on-prem that can route data to different destinations based on sensitivity."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "How does federated search work in Splunk?"</p>
+                    <p><strong>Good Answer:</strong> "Federated search lets a search head query multiple indexer clusters simultaneously. You configure the search head with search peers in both environments - cloud and on-prem. When an analyst runs a search, the search head distributes it to all peers, collects results, and aggregates them. Key considerations are network connectivity and latency between environments, consistent index naming, synchronized time, and firewall rules to allow search traffic. It's powerful for hybrid but adds complexity."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Splunk Hybrid Quick Reference</div>
+                    
+                    <h4>Common Hybrid Patterns</h4>
+                    <ul>
+                        <li><strong>Cloud Backend + On-Prem HF:</strong> Collection on-prem, indexing in cloud</li>
+                        <li><strong>Federated Search:</strong> Search across both environments</li>
+                        <li><strong>Migration Transition:</strong> Parallel run during migration</li>
+                    </ul>
+                    
+                    <h4>Data Routing Decision</h4>
+                    <ul>
+                        <li>Can data leave premises? → Yes: Cloud | No: On-Prem</li>
+                        <li>Subject to PCI/HIPAA/classified? → Usually On-Prem</li>
+                        <li>General security telemetry? → Usually Cloud</li>
+                    </ul>
+                    
+                    <h4>Key Components</h4>
+                    <ul>
+                        <li><strong>Heavy Forwarder:</strong> On-prem aggregation and routing</li>
+                        <li><strong>Federated Search Head:</strong> Searches both environments</li>
+                        <li><strong>outputs.conf:</strong> Defines routing rules</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="splunk-cloud.html" class="card-link">← Splunk Cloud</a>
+                    <a href="sentinel-overview.html" class="card-link">Microsoft Sentinel →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

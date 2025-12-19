@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Optimization | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Operations</div>
+                    <a href="siem-architecture.html" class="nav-item">Architecture</a>
+                    <a href="performance-optimization.html" class="nav-item active">Performance</a>
+                    <a href="cost-optimization.html" class="nav-item">Cost Optimization</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Performance Optimization</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Performance Optimization</h1>
+                    <p class="page-subtitle">A slow SIEM is an unusable SIEM. Performance optimization ensures searches complete quickly, dashboards load fast, and real-time detection works reliably under load.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Performance Bottlenecks</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Common Performance Issues</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SIEM PERFORMANCE BOTTLENECKS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  INGESTION                    SEARCH/QUERY                STORAGE           │
+│  ┌─────────────────┐         ┌─────────────────┐        ┌──────────────┐   │
+│  │ • Queue backlog │         │ • Slow queries  │        │ • Disk I/O   │   │
+│  │ • Parsing CPU   │         │ • Full scans    │        │ • Retention  │   │
+│  │ • Network       │         │ • No time bounds│        │   growth     │   │
+│  │   saturation    │         │ • Expensive     │        │ • Index      │   │
+│  │ • Dropped events│         │   operations    │        │   bloat      │   │
+│  └─────────────────┘         └─────────────────┘        └──────────────┘   │
+│                                                                             │
+│  ROOT CAUSES:                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Unoptimized queries (wildcards, no index, full regex)             │   │
+│  │ • Missing or poor indexing strategy                                  │   │
+│  │ • Oversized data collection (logging everything)                     │   │
+│  │ • Inefficient detection rules running too frequently                 │   │
+│  │ • Insufficient hardware for data volume                              │   │
+│  │ • Poor data model design                                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Splunk Query Optimization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Before and After Optimization</div>
+                        <pre><code>// ❌ SLOW - Full scan with late filtering
+index=* | search user=admin | stats count by host
+
+// ✅ FAST - Early filtering, specific index
+index=authentication user=admin | stats count by host
+
+// ❌ SLOW - Wildcard at start
+index=windows CommandLine=*mimikatz*
+
+// ✅ FAST - Avoid leading wildcards
+index=windows CommandLine=*mimikatz.exe 
+| where match(CommandLine, "(?i)mimikatz")
+
+// ❌ SLOW - Unbounded time range
+index=firewall | stats count by src_ip
+
+// ✅ FAST - Time bounded
+index=firewall earliest=-24h | stats count by src_ip</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Use Summary Indexing</div>
+                        <pre><code>// Create summary index for repeated queries
+| tstats count where index=firewall by src_ip, dest_ip, _time span=1h
+| collect index=firewall_summary
+
+// Query summary instead of raw data
+index=firewall_summary | stats sum(count) by src_ip, dest_ip</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: tstats for Indexed Fields</div>
+                        <pre><code>// Standard search - searches raw events
+index=windows EventCode=4624 | stats count by user
+
+// tstats - uses indexed metadata (10-100x faster)
+| tstats count where index=windows EventCode=4624 by user</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>KQL Query Optimization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Optimization Techniques</div>
+                        <pre><code>// ❌ SLOW - Filtering after expansion
+SecurityEvent
+| extend AllData = strcat(EventData, Computer, Account)
+| where AllData has "admin"
+
+// ✅ FAST - Filter first, then extend
+SecurityEvent
+| where EventData has "admin" or Account has "admin"
+| extend AllData = strcat(EventData, Computer, Account)
+
+// ❌ SLOW - Contains is expensive
+SecurityEvent | where ProcessName contains "power"
+
+// ✅ FAST - Use has for substring, has_cs for case-sensitive
+SecurityEvent | where ProcessName has "power"
+
+// ❌ SLOW - Parse everything
+SigninLogs | extend Parsed = parse_json(tostring(DeviceDetail))
+
+// ✅ FAST - Filter first, then parse
+SigninLogs 
+| where ResultType != 0
+| extend Parsed = parse_json(tostring(DeviceDetail))</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Materialized Views</div>
+                        <pre><code>// Create materialized view for common aggregations
+.create materialized-view DailySigninSummary on table SigninLogs
+{
+    SigninLogs
+    | summarize 
+        SuccessCount = countif(ResultType == 0),
+        FailureCount = countif(ResultType != 0)
+      by UserPrincipalName, bin(TimeGenerated, 1d)
+}
+
+// Query the materialized view (much faster)
+DailySigninSummary
+| where TimeGenerated > ago(7d)
+| summarize TotalSuccess = sum(SuccessCount) by UserPrincipalName</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Index Optimization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk Index Design</div>
+                        <pre><code># indexes.conf optimization
+
+[security_windows]
+homePath = $SPLUNK_DB/security_windows/db
+coldPath = $SPLUNK_DB/security_windows/colddb
+thawedPath = $SPLUNK_DB/security_windows/thaweddb
+maxDataSize = auto_high_volume    # Optimize for high volume
+maxHotBuckets = 10                # More concurrent writes
+maxWarmDBCount = 100              # Control warm bucket count
+frozenTimePeriodInSecs = 7776000  # 90 days retention
+
+# Separate high-volume sources
+[security_network]
+# Network logs - different retention, different tuning
+
+[security_endpoint]
+# EDR data - may need different settings</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Index Separation Strategy</div>
+                        <ul>
+                            <li><strong>By retention:</strong> Separate indexes for different retention periods</li>
+                            <li><strong>By volume:</strong> High-volume sources in dedicated indexes</li>
+                            <li><strong>By access pattern:</strong> Frequently searched vs rarely accessed</li>
+                            <li><strong>By compliance:</strong> PCI/HIPAA data in separate indexes</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Rule Optimization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Efficient Scheduled Search</div>
+                        <pre><code>// ❌ INEFFICIENT - Runs every 5 min, searches 24h
+// Schedule: */5 * * * *
+// Time range: -24h
+index=authentication action=failure | stats count by user | where count > 100
+
+// ✅ EFFICIENT - Runs every 5 min, searches only new data
+// Schedule: */5 * * * *
+// Time range: -10m (with buffer)
+index=authentication action=failure earliest=-10m 
+| stats count by user 
+| where count > 10  // Adjusted threshold for shorter window</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Analytics Rule Optimization</div>
+                        <pre><code>// ❌ INEFFICIENT - Joins two large tables
+SecurityEvent
+| join kind=inner (
+    SigninLogs | where TimeGenerated > ago(24h)
+) on Account
+
+// ✅ EFFICIENT - Filter before join, use lookup
+let SuspiciousUsers = SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType != 0
+| distinct UserPrincipalName;
+SecurityEvent
+| where TimeGenerated > ago(1h)
+| where Account in (SuspiciousUsers)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Performance Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Search Performance Analysis</div>
+                        <pre><code>index=_audit action=search info=completed
+| eval search_time = total_run_time
+| eval scan_count = scan_count
+| stats avg(search_time) as avg_time, 
+        max(search_time) as max_time,
+        avg(scan_count) as avg_scanned
+  by user, search
+| where avg_time > 60
+| sort -avg_time</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Indexing Queue Health</div>
+                        <pre><code>index=_internal sourcetype=splunkd component=Metrics group=queue
+| eval queue_fill = current_size / max_size * 100
+| stats avg(queue_fill) as avg_fill, max(queue_fill) as max_fill by name
+| where avg_fill > 50
+| sort -avg_fill</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you optimize SIEM performance?"</strong></p>
+                        <p><strong>A:</strong> "Performance optimization is multi-layered:</p>
+                        <ol>
+                            <li><strong>Query optimization:</strong> Filter early, avoid wildcards at start, bound time ranges. Using tstats in Splunk or has vs contains in KQL makes huge differences.</li>
+                            <li><strong>Index design:</strong> Separate indexes by volume and retention. High-volume sources shouldn't compete with security logs for resources.</li>
+                            <li><strong>Summary/acceleration:</strong> For repeated queries, use data models, summary indexes, or materialized views. Search pre-aggregated data, not raw events.</li>
+                            <li><strong>Detection tuning:</strong> Scheduled searches should only search new data, not re-scan history. Match search window to schedule frequency.</li>
+                            <li><strong>Capacity planning:</strong> Monitor queue depths, search times, and disk I/O. Scale before hitting limits.</li>
+                            <li><strong>Data reduction:</strong> Don't ingest what you don't need. Filter at collection, not at search time.</li>
+                        </ol>
+                        <p>I always establish baseline metrics first—you can't improve what you don't measure."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Performance Quick Reference</div>
+                        <h4>Query Speed Tips</h4>
+                        <ul>
+                            <li>Filter early in query</li>
+                            <li>Avoid leading wildcards</li>
+                            <li>Bound time ranges</li>
+                            <li>Use indexed fields</li>
+                            <li>tstats > stats in Splunk</li>
+                            <li>has > contains in KQL</li>
+                        </ul>
+                        <h4>Target Metrics</h4>
+                        <ul>
+                            <li>Dashboard load: < 10 seconds</li>
+                            <li>Ad-hoc search: < 30 seconds</li>
+                            <li>Correlation rule: < 60 seconds</li>
+                            <li>Queue fill: < 50%</li>
+                        </ul>
+                        <h4>Red Flags</h4>
+                        <ul>
+                            <li>index=* (scan everything)</li>
+                            <li>*term* (double wildcard)</li>
+                            <li>No time bound</li>
+                            <li>regex on large datasets</li>
+                            <li>Large joins without filters</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-architecture.html" class="card-link">← SIEM Architecture</a>
+                    <a href="cost-optimization.html" class="card-link">Cost Optimization →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

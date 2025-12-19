@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Sentinel Overview | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Understand Microsoft Sentinel architecture, components, and when to choose it as your cloud-native SIEM solution.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item active">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Deployments</div>
+                    <a href="deployment-approach.html" class="nav-item">Deployment Approach</a>
+                    <a href="sentinel-deployment.html" class="nav-item">Sentinel Deployment</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Query Languages</div>
+                    <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+                    <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Microsoft Sentinel</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Microsoft Sentinel</h1>
+                    <p class="page-subtitle">Cloud-native SIEM and SOAR built on Azure</p>
+                </header>
+                
+                <!-- What is Sentinel -->
+                <h2>What is Microsoft Sentinel?</h2>
+                
+                <p>Microsoft Sentinel is a cloud-native SIEM (Security Information and Event Management) and SOAR (Security Orchestration, Automation, and Response) solution built on Azure. Unlike traditional SIEMs that require infrastructure management, Sentinel is fully serverless.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Characteristics</div>
+                    <ul>
+                        <li><strong>Cloud-Native:</strong> No servers to manage - runs entirely in Azure</li>
+                        <li><strong>Pay-per-use:</strong> Cost based on data ingested (GB/day)</li>
+                        <li><strong>Built-in SOAR:</strong> Logic Apps for automated response</li>
+                        <li><strong>Microsoft Integration:</strong> Native connectors to M365, Defender, Azure</li>
+                        <li><strong>KQL Query Language:</strong> Same language used across Azure monitoring</li>
+                    </ul>
+                </div>
+                
+                <!-- Sentinel Architecture -->
+                <h2>Sentinel Architecture</h2>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Microsoft Sentinel Architecture</div>
+                    <pre><code>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         DATA SOURCES                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │  Microsoft   │  │    Azure     │  │  On-Premises │  │   Third    │  │
+│  │  365 / M365  │  │   Services   │  │   Systems    │  │   Party    │  │
+│  │  Defender    │  │   (VMs,etc)  │  │   (via AMA)  │  │   (APIs)   │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────┬─────┘  │
+│         │                 │                 │                 │        │
+└─────────┼─────────────────┼─────────────────┼─────────────────┼────────┘
+          │                 │                 │                 │
+          ▼                 ▼                 ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       DATA CONNECTORS                                    │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │  Native Connectors  │  AMA/DCR  │  Syslog/CEF  │  API Connectors  │  │
+│  │  (One-click setup)  │  (Agent)  │  (Forwarder) │  (Custom/REST)   │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                   LOG ANALYTICS WORKSPACE                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐│
+│  │                     Data Storage & Query Engine                      ││
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 ││
+│  │  │   Tables    │  │  Retention  │  │    KQL      │                 ││
+│  │  │(SecurityEvt,│  │  (Hot 90d,  │  │   Search    │                 ││
+│  │  │ Syslog,etc) │  │  Archive 7y)│  │   Engine    │                 ││
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                 ││
+│  └─────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      MICROSOFT SENTINEL                                  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐         │
+│  │ Analytics Rules │  │   Workbooks     │  │   Incidents     │         │
+│  │ (Detections)    │  │  (Dashboards)   │  │   (Alerts)      │         │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘         │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐         │
+│  │   Hunting       │  │   Notebooks     │  │   Playbooks     │         │
+│  │   (Threat Hunt) │  │   (Jupyter)     │  │   (Logic Apps)  │         │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘         │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐         │
+│  │   Watchlists    │  │ Threat Intel    │  │   UEBA          │         │
+│  │   (Lookup Data) │  │   (IOCs)        │  │   (Behavior)    │         │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘         │
+└─────────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <!-- Core Components -->
+                <h2>Core Components</h2>
+                
+                <h3>Log Analytics Workspace</h3>
+                
+                <p>The foundation of Sentinel - where all data is stored and queried:</p>
+                
+                <ul>
+                    <li><strong>Tables:</strong> Data organized by type (SecurityEvent, Syslog, SigninLogs, etc.)</li>
+                    <li><strong>Retention:</strong> Interactive (hot) + archive tiers</li>
+                    <li><strong>Query:</strong> KQL (Kusto Query Language) for all analysis</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Workspace = Your SIEM Database</div>
+                    <p>Think of Log Analytics Workspace as your SIEM's database. Sentinel is the security layer on top that adds detection rules, incident management, and automation.</p>
+                </div>
+                
+                <h3>Data Connectors</h3>
+                
+                <p>How data gets into Sentinel:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Connector Type</th>
+                                <th>How It Works</th>
+                                <th>Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Native (Service-to-Service)</strong></td>
+                                <td>One-click enable, API-based</td>
+                                <td>M365 Defender, Azure AD, Azure Activity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure Monitor Agent (AMA)</strong></td>
+                                <td>Agent on VMs, uses Data Collection Rules</td>
+                                <td>Windows Events, Linux Syslog</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Syslog/CEF Forwarder</strong></td>
+                                <td>Linux forwarder receives and sends</td>
+                                <td>Firewalls, network devices</td>
+                            </tr>
+                            <tr>
+                                <td><strong>REST API/Custom</strong></td>
+                                <td>Push data via Data Collector API or custom connector</td>
+                                <td>Custom apps, unsupported sources</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Analytics Rules</h3>
+                
+                <p>Detection rules that create incidents when conditions are met:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rule Type</th>
+                                <th>Description</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Scheduled</strong></td>
+                                <td>KQL query runs on schedule (every 5min to 14 days)</td>
+                                <td>Most detection rules</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NRT (Near Real-Time)</strong></td>
+                                <td>Runs every minute, limited KQL</td>
+                                <td>Critical detections needing fast response</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fusion</strong></td>
+                                <td>ML-based correlation of multiple alerts</td>
+                                <td>Advanced multi-stage attack detection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Microsoft Security</strong></td>
+                                <td>Creates incidents from other Defender products</td>
+                                <td>Integrate MDE, MDO, MCAS alerts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Playbooks (Logic Apps)</h3>
+                
+                <p>Automated response workflows triggered by incidents:</p>
+                
+                <ul>
+                    <li>Enrich incidents with external data</li>
+                    <li>Send notifications (Teams, email, ticketing)</li>
+                    <li>Take containment actions (disable user, isolate host)</li>
+                    <li>Integrate with third-party tools</li>
+                </ul>
+                
+                <!-- Microsoft Ecosystem Integration -->
+                <h2>Microsoft Ecosystem Integration</h2>
+                
+                <p>Sentinel's biggest strength is native integration with the Microsoft security stack:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Microsoft Security Ecosystem</div>
+                    <pre><code>
+                        ┌─────────────────────┐
+                        │  MICROSOFT SENTINEL │
+                        │    (SIEM / SOAR)    │
+                        └──────────┬──────────┘
+                                   │
+         ┌─────────────────────────┼─────────────────────────┐
+         │                         │                         │
+         ▼                         ▼                         ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│    DEFENDER     │    │    DEFENDER     │    │    DEFENDER     │
+│  FOR ENDPOINT   │    │   FOR OFFICE    │    │  FOR IDENTITY   │
+│     (MDE)       │    │    365 (MDO)    │    │     (MDI)       │
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ Endpoint EDR    │    │ Email security  │    │ AD threat       │
+│ Device control  │    │ Phishing        │    │ detection       │
+│ Vuln management │    │ Safe attachments│    │ Lateral movement│
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                         │                         │
+         ▼                         ▼                         ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│    DEFENDER     │    │   ENTRA ID      │    │     PURVIEW     │
+│   FOR CLOUD     │    │   PROTECTION    │    │      (DLP)      │
+│   APPS (MCAS)   │    │                 │    │                 │
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ SaaS security   │    │ Risky sign-ins  │    │ Data protection │
+│ Shadow IT       │    │ Conditional     │    │ Insider risk    │
+│ App governance  │    │ Access          │    │ Compliance      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                    </code></pre>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 The Microsoft XDR Story</div>
+                    <p><strong>Microsoft 365 Defender</strong> provides XDR capabilities across the Defender products with automatic correlation.</p>
+                    <p><strong>Sentinel</strong> extends this by adding non-Microsoft sources and providing the SIEM layer for broader visibility, compliance, and custom detection.</p>
+                    <p><strong>Unified Security Operations Portal</strong> now combines both in a single interface.</p>
+                </div>
+                
+                <!-- When to Choose Sentinel -->
+                <h2>When to Choose Sentinel</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sentinel Strengths</th>
+                                <th>Sentinel Challenges</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>✅ Native Microsoft integration</td>
+                                <td>⚠️ Azure-only (no on-prem option)</td>
+                            </tr>
+                            <tr>
+                                <td>✅ No infrastructure to manage</td>
+                                <td>⚠️ Cost can grow quickly with high data volumes</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Pay-per-use pricing model</td>
+                                <td>⚠️ Some features require Azure expertise</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Built-in SOAR with Logic Apps</td>
+                                <td>⚠️ Less mature than Splunk for non-MS sources</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Growing content hub and community</td>
+                                <td>⚠️ KQL learning curve for SPL users</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 When Sentinel is the Right Choice</div>
+                    <ul>
+                        <li>Microsoft-heavy environment (M365, Azure, Defender suite)</li>
+                        <li>Cloud-first or cloud-only strategy</li>
+                        <li>No dedicated SIEM infrastructure team</li>
+                        <li>Want unified Microsoft security operations</li>
+                        <li>Prefer OpEx over CapEx</li>
+                    </ul>
+                </div>
+                
+                <!-- Cost Model -->
+                <h2>Cost Model</h2>
+                
+                <p>Sentinel costs are based on data ingestion:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pricing Tier</th>
+                                <th>Description</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Pay-As-You-Go</strong></td>
+                                <td>Per GB ingested per day</td>
+                                <td>Small/variable workloads</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Commitment Tiers</strong></td>
+                                <td>Discounted rates for committed GB/day</td>
+                                <td>Predictable workloads (100+ GB/day)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Cost Optimization Tips</div>
+                    <ul>
+                        <li><strong>Basic Logs:</strong> Use for high-volume, low-value data (80% cheaper but limited query)</li>
+                        <li><strong>Data Collection Rules:</strong> Filter at ingestion to reduce volume</li>
+                        <li><strong>Archive tier:</strong> Move old data to archive for long-term retention</li>
+                        <li><strong>Free data sources:</strong> Some Microsoft data is free (Azure Activity, Office Activity)</li>
+                        <li><strong>Commitment tiers:</strong> Commit to daily volume for significant discounts</li>
+                    </ul>
+                </div>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "Explain Microsoft Sentinel architecture."</p>
+                    <p><strong>Good Answer:</strong> "Sentinel is built on Azure Log Analytics Workspace, which provides the data storage and KQL query engine. Data flows in through data connectors - native connectors for Microsoft services, Azure Monitor Agent for VMs, syslog forwarders for network devices, and REST APIs for custom sources. On top of the workspace, Sentinel adds security features: Analytics Rules for detection, Incidents for alert management, Workbooks for visualization, and Playbooks using Logic Apps for automated response. The key architectural point is that it's fully serverless - you don't manage any infrastructure."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "When would you choose Sentinel over Splunk?"</p>
+                    <p><strong>Good Answer:</strong> "Sentinel makes sense for Microsoft-heavy environments. If the organization is using M365, Azure, and Defender products, Sentinel's native integration means faster deployment and better correlation. It's also ideal for cloud-first organizations that don't want to manage SIEM infrastructure. The pay-per-use model works well for smaller or variable workloads. Splunk is stronger when you need more flexibility with non-Microsoft sources, have existing Splunk expertise, or need on-premises deployment for data residency requirements."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Sentinel Quick Reference</div>
+                    
+                    <h4>Core Components</h4>
+                    <ul>
+                        <li><strong>Log Analytics Workspace:</strong> Data storage and query</li>
+                        <li><strong>Data Connectors:</strong> Get data into Sentinel</li>
+                        <li><strong>Analytics Rules:</strong> Detection logic (KQL-based)</li>
+                        <li><strong>Incidents:</strong> Grouped alerts for investigation</li>
+                        <li><strong>Playbooks:</strong> Logic Apps for automation</li>
+                    </ul>
+                    
+                    <h4>Analytics Rule Types</h4>
+                    <ul>
+                        <li><strong>Scheduled:</strong> KQL query on schedule</li>
+                        <li><strong>NRT:</strong> Near real-time (every minute)</li>
+                        <li><strong>Fusion:</strong> ML-based multi-signal correlation</li>
+                        <li><strong>Microsoft Security:</strong> From other Defender products</li>
+                    </ul>
+                    
+                    <h4>Key Tables</h4>
+                    <ul>
+                        <li><code>SecurityEvent</code> - Windows Security logs</li>
+                        <li><code>Syslog</code> - Linux/network syslog</li>
+                        <li><code>SigninLogs</code> - Azure AD sign-ins</li>
+                        <li><code>AuditLogs</code> - Azure AD audit</li>
+                        <li><code>CommonSecurityLog</code> - CEF data</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="splunk-hybrid.html" class="card-link">← Splunk Hybrid</a>
+                    <a href="platform-comparison.html" class="card-link">Platform Comparison →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

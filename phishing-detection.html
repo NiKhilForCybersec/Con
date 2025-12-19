@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="email-security.html" class="nav-item">Email Security</a>
+                    <a href="phishing-detection.html" class="nav-item active">Phishing Detection</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Phishing Detection</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Phishing Detection & Response</h1>
+                    <p class="page-subtitle">Phishing remains the most common initial access vector. Detecting phishing attempts, tracking user clicks, and correlating with subsequent activity are essential SIEM capabilities.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Phishing Attack Types</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Phishing Attack Vectors</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PHISHING ATTACK TYPES                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CREDENTIAL PHISHING              MALWARE DELIVERY                          │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ • Fake login pages  │         │ • Macro-enabled documents   │           │
+│  │ • OAuth consent     │         │ • ISO/IMG attachments       │           │
+│  │ • QR code phishing  │         │ • Password-protected ZIPs   │           │
+│  │ • MFA fatigue       │         │ • HTML smuggling            │           │
+│  │ • AiTM proxy        │         │ • OneNote attachments       │           │
+│  └─────────────────────┘         │ • LNK files                 │           │
+│                                  └─────────────────────────────┘           │
+│                                                                             │
+│  BEC / IMPERSONATION             CALLBACK PHISHING                          │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ • CEO fraud         │         │ • Fake invoice calls        │           │
+│  │ • Invoice redirect  │         │ • IT support scams          │           │
+│  │ • Vendor compromise │         │ • Subscription renewal      │           │
+│  │ • Gift card scams   │         │ • BazarCall campaigns       │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  DETECTION OPPORTUNITIES:                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Email gateway → URL clicks → Credential submission → Account        │   │
+│  │ warnings         tracking      form detection        compromise     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Email-Based Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Phishing Emails Delivered</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where ThreatTypes has "Phish"
+| where DeliveryAction == "Delivered"
+| project TimeGenerated, RecipientEmailAddress, SenderFromAddress,
+          Subject, ThreatTypes, DeliveryAction, DeliveryLocation
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: URL Click Tracking</div>
+                        <pre><code>// Track clicks on URLs from emails
+UrlClickEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "ClickBlocked" or ActionType == "ClickAllowed"
+| extend ClickResult = iff(ActionType == "ClickBlocked", "Blocked", "Allowed")
+| summarize 
+    TotalClicks = count(),
+    BlockedClicks = countif(ActionType == "ClickBlocked"),
+    UniqueUsers = dcount(AccountUpn)
+  by Url, ClickResult
+| where TotalClicks > 5
+| order by TotalClicks desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: SPF/DKIM/DMARC Failures</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where AuthenticationDetails has "fail"
+| extend SPF = extractjson("$.SPF", AuthenticationDetails)
+| extend DKIM = extractjson("$.DKIM", AuthenticationDetails)
+| extend DMARC = extractjson("$.DMARC", AuthenticationDetails)
+| where SPF == "fail" or DKIM == "fail" or DMARC == "fail"
+| project TimeGenerated, SenderFromAddress, RecipientEmailAddress,
+          Subject, SPF, DKIM, DMARC, SenderIPv4</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Post-Click Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Phishing Click to Compromise</div>
+                        <pre><code>// Correlate URL clicks with subsequent risky sign-ins
+let PhishClicks = UrlClickEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "ClickAllowed"
+| project ClickTime = TimeGenerated, UserEmail = AccountUpn, ClickedUrl = Url;
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where RiskLevelDuringSignIn != "none"
+| project SigninTime = TimeGenerated, UserEmail = UserPrincipalName, 
+          RiskLevel = RiskLevelDuringSignIn, IPAddress
+| join kind=inner PhishClicks on UserEmail
+| where SigninTime between (ClickTime .. datetime_add('hour', 2, ClickTime))
+| project ClickTime, SigninTime, UserEmail, ClickedUrl, RiskLevel, IPAddress</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Credential Submission Detection</div>
+                        <pre><code>// Detect form submissions to suspicious domains
+index=proxy http_method=POST content_type="*form*"
+| where NOT url_domain IN (trusted_domains_lookup)
+| eval url_age = now() - domain_creation_date
+| where url_age < 604800  // Domain less than 7 days old
+| stats count as submissions,
+        values(user) as affected_users,
+        dc(user) as user_count
+  by url_domain
+| where submissions > 0
+| sort -user_count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>OAuth Phishing Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious OAuth Consent</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Consent to application"
+| extend AppName = TargetResources[0].displayName
+| extend AppId = TargetResources[0].id
+| extend Permissions = TargetResources[0].modifiedProperties
+| mv-expand Permissions
+| where Permissions.displayName == "ConsentAction.Permissions"
+| extend GrantedPermissions = tostring(Permissions.newValue)
+| where GrantedPermissions has_any ("Mail.Read", "Mail.Send", 
+        "Files.ReadWrite.All", "User.Read.All")
+| extend ConsentingUser = InitiatedBy.user.userPrincipalName
+| project TimeGenerated, ConsentingUser, AppName, AppId, GrantedPermissions
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>User-Reported Phishing</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Analyze Reported Emails</div>
+                        <pre><code>// When users report phishing, check who else received it
+let ReportedSender = "attacker@phishing-domain.com";
+let ReportedSubject = "Urgent: Your account";
+EmailEvents
+| where TimeGenerated > ago(7d)
+| where SenderFromAddress == ReportedSender 
+     or Subject has ReportedSubject
+| summarize 
+    Recipients = make_set(RecipientEmailAddress),
+    RecipientCount = dcount(RecipientEmailAddress),
+    DeliveredCount = countif(DeliveryAction == "Delivered")
+| extend RemediationNeeded = iff(DeliveredCount > 0, true, false)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Check for Clicks on Reported URL</div>
+                        <pre><code>let ReportedUrl = "https://phishing-site.com/login";
+UrlClickEvents
+| where TimeGenerated > ago(7d)
+| where Url has ReportedUrl
+| summarize 
+    ClickCount = count(),
+    Clickers = make_set(AccountUpn),
+    BlockedCount = countif(ActionType == "ClickBlocked")
+| extend AtRiskUsers = ClickCount - BlockedCount</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phishing Indicators</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Indicator</th>
+                                    <th>Detection Method</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>New sender domain</strong></td>
+                                    <td>First email from domain to org</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lookalike domain</strong></td>
+                                    <td>Edit distance from known domains</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Young domain</strong></td>
+                                    <td>WHOIS creation date < 30 days</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SPF/DKIM/DMARC fail</strong></td>
+                                    <td>Email authentication failure</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reply-to mismatch</strong></td>
+                                    <td>Reply-to differs from From</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Urgency keywords</strong></td>
+                                    <td>"Urgent", "Immediate", "Expire"</td>
+                                    <td>Low</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect and respond to phishing in a SIEM?"</strong></p>
+                        <p><strong>A:</strong> "Phishing detection requires multiple layers:</p>
+                        <ol>
+                            <li><strong>Email gateway integration:</strong> I ingest email security logs—delivered phishing, blocked attempts, threat verdicts. This shows what got through.</li>
+                            <li><strong>URL click tracking:</strong> When users click links, I track it. Correlating email delivery with Safe Links clicks shows who interacted with threats.</li>
+                            <li><strong>Post-click correlation:</strong> The real question is: did the user get compromised? I correlate URL clicks with sign-in anomalies, password changes, or OAuth consents that follow within hours.</li>
+                            <li><strong>User reporting:</strong> When a user reports phishing, I immediately search for other recipients and check for clicks. One report can protect many users.</li>
+                            <li><strong>Remediation tracking:</strong> I track which delivered emails got remediated (ZAP, manual deletion) to ensure complete cleanup.</li>
+                            <li><strong>BEC patterns:</strong> Beyond technical indicators, I look for BEC patterns—display name impersonation, wire transfer requests, unusual reply-to addresses.</li>
+                        </ol>
+                        <p>The goal is not just blocking emails—it's understanding the full attack lifecycle from delivery to potential compromise."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Phishing Detection Quick Reference</div>
+                        <h4>High-Risk Indicators</h4>
+                        <ul>
+                            <li>Domain age < 30 days</li>
+                            <li>Lookalike/typosquat domains</li>
+                            <li>Failed email authentication</li>
+                            <li>Credential harvesting pages</li>
+                            <li>OAuth consent requests</li>
+                        </ul>
+                        <h4>Response Actions</h4>
+                        <ul>
+                            <li>Block sender domain</li>
+                            <li>ZAP delivered emails</li>
+                            <li>Reset clicked user passwords</li>
+                            <li>Revoke OAuth tokens</li>
+                            <li>Block URL in proxy</li>
+                        </ul>
+                        <h4>Key M365 Tables</h4>
+                        <ul>
+                            <li>EmailEvents</li>
+                            <li>EmailUrlInfo</li>
+                            <li>UrlClickEvents</li>
+                            <li>EmailAttachmentInfo</li>
+                            <li>AuditLogs (OAuth)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="email-security.html" class="card-link">← Email Security</a>
+                    <a href="detection-engineering.html" class="card-link">Detection Engineering →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

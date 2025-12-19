@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovery & Assessment | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="siem-data-flow.html" class="nav-item">Data Flow</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Methodology</a>
+                    <a href="discovery-assessment.html" class="nav-item active">Discovery & Assessment</a>
+                    <a href="log-migration.html" class="nav-item">Log Migration</a>
+                    <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+                    <a href="query-translation.html" class="nav-item">Query Translation</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows</a>
+                    <a href="linux-logs.html" class="nav-item">Linux</a>
+                    <a href="network-logs.html" class="nav-item">Network</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="migration-methodology.html">Migrations</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Discovery & Assessment</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Discovery & Assessment</h1>
+                    <p class="page-subtitle">The foundation of every successful SIEM migration is understanding what you're migrating from. Discovery isn't just an inventory exercise—it's risk identification, effort estimation, and success criteria definition.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Why Discovery Matters</h2>
+                    <p>I've seen migrations fail because teams skipped proper discovery. They assumed they knew their environment, underestimated content complexity, and ended up with a 6-month project that took 18 months.</p>
+                    
+                    <p>Discovery answers critical questions:</p>
+                    <ul>
+                        <li><strong>What data are we collecting?</strong> Sources, volumes, collection methods</li>
+                        <li><strong>What content exists?</strong> Rules, dashboards, reports, lookups</li>
+                        <li><strong>What's actually being used?</strong> Active vs dormant content</li>
+                        <li><strong>Who depends on this?</strong> Users, teams, integrations</li>
+                        <li><strong>What are the risks?</strong> Gaps, dependencies, blockers</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Discovery Framework</h2>
+                    <p>I structure discovery into five parallel workstreams:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Discovery Workstreams</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DISCOVERY PHASE (2-4 Weeks)                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │  DATA       │  │  CONTENT    │  │  USERS &    │  │ INTEGRATION │        │
+│  │  SOURCES    │  │  INVENTORY  │  │  ACCESS     │  │  MAPPING    │        │
+│  ├─────────────┤  ├─────────────┤  ├─────────────┤  ├─────────────┤        │
+│  │ • Log types │  │ • Rules     │  │ • Users     │  │ • Ticketing │        │
+│  │ • Volumes   │  │ • Dashboards│  │ • Roles     │  │ • SOAR      │        │
+│  │ • Methods   │  │ • Reports   │  │ • Teams     │  │ • Threat    │        │
+│  │ • Parsing   │  │ • Lookups   │  │ • Workflows │  │   Intel     │        │
+│  │ • Retention │  │ • Macros    │  │ • Training  │  │ • APIs      │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+│                                                                             │
+│                         ┌─────────────────────┐                             │
+│                         │  OPERATIONAL        │                             │
+│                         │  ASSESSMENT         │                             │
+│                         ├─────────────────────┤                             │
+│                         │ • Performance       │                             │
+│                         │ • Pain points       │                             │
+│                         │ • Improvement goals │                             │
+│                         └─────────────────────┘                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Source Inventory</h2>
+                    <p>This is the most critical workstream. You need complete visibility into what data flows through your SIEM.</p>
+                    
+                    <h3>What to Document</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Why It Matters</th>
+                                    <th>How to Collect</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Source Name</strong></td>
+                                    <td>Identification and documentation</td>
+                                    <td>Manual inventory + CMDB</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Source Type</strong></td>
+                                    <td>Categorization (Windows, Network, Cloud)</td>
+                                    <td>Existing SIEM metadata</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Collection Method</strong></td>
+                                    <td>Determines migration approach</td>
+                                    <td>Architecture review</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Daily Volume</strong></td>
+                                    <td>Sizing, licensing, cost estimation</td>
+                                    <td>SIEM internal metrics</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Retention Requirement</strong></td>
+                                    <td>Storage planning, compliance</td>
+                                    <td>Policy review</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Business Criticality</strong></td>
+                                    <td>Migration wave prioritization</td>
+                                    <td>Stakeholder interviews</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dependencies</strong></td>
+                                    <td>Rules, dashboards that use this source</td>
+                                    <td>Content analysis</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Data Source Template</h3>
+                    <div class="diagram">
+                        <div class="diagram-title">Example: Log Source Documentation</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LOG SOURCE: Palo Alto Firewall - PA-5260 Cluster                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  IDENTIFICATION                                                             │
+│  ├─ Source Type: Network Security / Firewall                               │
+│  ├─ Vendor: Palo Alto Networks                                             │
+│  ├─ Log Types: Traffic, Threat, URL, WildFire, Auth                        │
+│  └─ Environment: Production Perimeter                                      │
+│                                                                             │
+│  COLLECTION                                                                 │
+│  ├─ Method: Syslog over TLS (TCP 6514)                                     │
+│  ├─ Destination: Heavy Forwarder cluster (syslog-hf01/02)                  │
+│  ├─ Format: CEF (Common Event Format)                                      │
+│  └─ Timezone: UTC                                                          │
+│                                                                             │
+│  VOLUME & RETENTION                                                         │
+│  ├─ Daily Ingest: ~18 GB/day (average), 35 GB/day (peak)                   │
+│  ├─ Event Rate: ~2,500 EPS average                                         │
+│  ├─ Hot Retention: 90 days                                                 │
+│  └─ Archive: 1 year (compliance requirement)                               │
+│                                                                             │
+│  DEPENDENCIES                                                               │
+│  ├─ Detection Rules: 14 active correlation rules                           │
+│  ├─ Dashboards: 3 (SOC Overview, Threat Intel, Egress)                     │
+│  ├─ Reports: Weekly blocked threats, Monthly summary                       │
+│  └─ Integrations: Threat intel lookup, GeoIP enrichment                    │
+│                                                                             │
+│  MIGRATION NOTES                                                            │
+│  ├─ Priority: Wave 1 (Critical - primary perimeter visibility)             │
+│  ├─ Target Collection: Sentinel via AMA + Syslog Forwarder                 │
+│  ├─ Parsing: Use built-in PAN-OS solution                                  │
+│  └─ Risk: High volume - validate ingestion capacity                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Extracting Volume Metrics</h3>
+                    <p>Use your existing SIEM to quantify data sources:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk: Daily Volume by Sourcetype</div>
+                        <pre><code>index=* earliest=-30d latest=now
+| eval GB=round(bytes/1024/1024/1024, 2)
+| stats sum(GB) as total_GB by sourcetype
+| sort -total_GB
+| eval daily_avg_GB = round(total_GB/30, 2)
+| table sourcetype, daily_avg_GB, total_GB</code></pre>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sentinel: Daily Volume by Table</div>
+                        <pre><code>Usage
+| where TimeGenerated > ago(30d)
+| where IsBillable == true
+| summarize TotalGB = sum(Quantity) / 1000 by DataType
+| extend DailyAvgGB = round(TotalGB / 30, 2)
+| order by TotalGB desc
+| project DataType, DailyAvgGB, TotalGB</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Content Inventory</h2>
+                    <p>Detection rules, dashboards, and reports represent significant investment. Understanding what exists—and what's actually used—determines migration effort.</p>
+                    
+                    <h3>Content Categories</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Content Type</th>
+                                    <th>Migration Effort</th>
+                                    <th>Key Considerations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Detection Rules</strong></td>
+                                    <td>High (2-8 hrs each)</td>
+                                    <td>Query translation, schema mapping, threshold tuning</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dashboards</strong></td>
+                                    <td>Medium (1-4 hrs each)</td>
+                                    <td>Visualization recreation, data availability</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scheduled Reports</strong></td>
+                                    <td>Medium (1-2 hrs each)</td>
+                                    <td>Query translation, scheduling, distribution</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lookup Tables</strong></td>
+                                    <td>Low-Medium</td>
+                                    <td>Data migration, format conversion</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Macros/Functions</strong></td>
+                                    <td>Medium</td>
+                                    <td>Often embedded in rules - identify dependencies</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Response Playbooks</strong></td>
+                                    <td>High</td>
+                                    <td>Complete rebuild in new SOAR platform</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>The Active vs Dormant Challenge</h3>
+                    <p>Most organizations have significant "dark matter" in their SIEM—content that exists but provides no value:</p>
+                    
+                    <ul>
+                        <li><strong>Rules that never fire</strong> - Detection logic doesn't match current data</li>
+                        <li><strong>Rules that always fire</strong> - So noisy they're auto-closed or ignored</li>
+                        <li><strong>Disabled rules</strong> - Turned off months ago, never re-enabled</li>
+                        <li><strong>Orphan dashboards</strong> - Created for a project, never used since</li>
+                    </ul>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ The 80/20 Reality</div>
+                        <p>In my experience, <strong>80% of detection value comes from 20% of rules</strong>. During discovery, I identify that critical 20% for priority migration. The rest gets evaluated—many won't be migrated at all.</p>
+                    </div>
+
+                    <h3>Rule Usage Analysis</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk ES: Rule Firing Frequency</div>
+                        <pre><code>| rest /services/saved/searches 
+| search is_scheduled=1 alert.track=1
+| table title, disabled, next_scheduled_time
+| join title [
+    search index=notable earliest=-90d
+    | stats count, latest(_time) as last_fired by rule_name
+    | rename rule_name as title
+]
+| eval status=case(
+    disabled=1, "Disabled",
+    isnull(count), "Never Fires",
+    count < 5, "Rarely Fires",
+    count > 1000, "Very Noisy",
+    true(), "Active"
+)
+| table title, status, count, last_fired</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Stakeholder Interviews</h2>
+                    <p>Technical discovery isn't enough. You need to understand how people use the SIEM and what they need from the migration.</p>
+                    
+                    <h3>Key Interview Questions</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Stakeholder</th>
+                                    <th>Questions to Ask</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SOC Analysts</strong></td>
+                                    <td>
+                                        • Which dashboards do you use daily?<br>
+                                        • What alerts do you actually investigate vs auto-close?<br>
+                                        • What's frustrating about the current SIEM?<br>
+                                        • What capabilities are you missing?
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Detection Engineers</strong></td>
+                                    <td>
+                                        • Which rules are your highest value?<br>
+                                        • What rules have you wanted to build but couldn't?<br>
+                                        • What's the typical rule development lifecycle?<br>
+                                        • Are there rules with complex dependencies?
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SIEM Admins</strong></td>
+                                    <td>
+                                        • What are current performance pain points?<br>
+                                        • Which integrations are most critical?<br>
+                                        • What undocumented configurations exist?<br>
+                                        • What would you do differently in a new deployment?
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Management</strong></td>
+                                    <td>
+                                        • What reports do you need for executives/board?<br>
+                                        • What compliance requirements affect SIEM?<br>
+                                        • What's the acceptable downtime during migration?<br>
+                                        • What does success look like?
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Integration Mapping</h2>
+                    <p>Modern SIEMs don't exist in isolation. Map all integration points:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Common SIEM Integration Points</div>
+                        <pre><code>
+                              ┌─────────────────────┐
+                              │       SIEM          │
+                              └──────────┬──────────┘
+                                         │
+    ┌────────────────────────────────────┼────────────────────────────────────┐
+    │                                    │                                    │
+    ▼                                    ▼                                    ▼
+┌───────────┐                     ┌───────────────┐                    ┌───────────┐
+│ INBOUND   │                     │  BI-DIRECT    │                    │ OUTBOUND  │
+├───────────┤                     ├───────────────┤                    ├───────────┤
+│• Threat   │                     │• SOAR/XSOAR   │                    │• Ticketing│
+│  Intel    │                     │• EDR Console  │                    │  (SNOW,   │
+│  Feeds    │                     │• Asset/CMDB   │                    │  Jira)    │
+│• Vuln     │                     │• Identity     │                    │• Email/   │
+│  Scanner  │                     │  Provider     │                    │  Slack    │
+│• GeoIP    │                     │               │                    │• Webhook  │
+│  Database │                     │               │                    │  APIs     │
+└───────────┘                     └───────────────┘                    └───────────┘
+                        </code></pre>
+                    </div>
+                    
+                    <p>For each integration, document:</p>
+                    <ul>
+                        <li><strong>Integration type:</strong> API, syslog, file, database</li>
+                        <li><strong>Direction:</strong> Inbound, outbound, bidirectional</li>
+                        <li><strong>Criticality:</strong> Will SOC function without it?</li>
+                        <li><strong>Migration path:</strong> Native connector available? Custom build?</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Risk Identification</h2>
+                    <p>Discovery should surface risks that could derail migration:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Risk Category</th>
+                                    <th>Example Risks</th>
+                                    <th>Mitigation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Data</strong></td>
+                                    <td>Custom parsing that's undocumented; sources with no native connector</td>
+                                    <td>Document all parsing; identify custom connector requirements early</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Content</strong></td>
+                                    <td>Complex correlation rules; heavy macro usage</td>
+                                    <td>Budget extra translation time; plan for rewrites</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>People</strong></td>
+                                    <td>Key person dependency; team unfamiliar with target platform</td>
+                                    <td>Knowledge transfer; early training investment</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Process</strong></td>
+                                    <td>Change management bottlenecks; audit requirements</td>
+                                    <td>Engage change board early; plan for audit continuity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Technical</strong></td>
+                                    <td>Network restrictions; authentication complexity</td>
+                                    <td>Validate connectivity; plan auth integration</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Discovery Deliverables</h2>
+                    <p>At the end of discovery, I produce:</p>
+                    
+                    <ol>
+                        <li><strong>Data Source Inventory</strong> - Complete catalog with volumes and migration approach</li>
+                        <li><strong>Content Assessment</strong> - Rules, dashboards, reports with priority rating</li>
+                        <li><strong>Integration Map</strong> - All connections with migration path</li>
+                        <li><strong>Risk Register</strong> - Identified risks with mitigation plans</li>
+                        <li><strong>Effort Estimate</strong> - Realistic timeline and resource requirements</li>
+                        <li><strong>Migration Waves</strong> - Proposed phasing based on dependencies and priority</li>
+                    </ol>
+                    
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you approach discovery for a SIEM migration?"</strong></p>
+                        <p><strong>A:</strong> "I run five parallel workstreams: data source inventory with volumes and collection methods, content inventory focusing on active versus dormant rules, stakeholder interviews to understand actual usage and pain points, integration mapping for all connected systems, and risk identification. The key insight I always look for is the 80/20 rule—which 20% of detection content provides 80% of the value? That drives migration prioritization. Discovery typically takes 2-4 weeks and produces a realistic effort estimate with identified risks."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Discovery Checklist</div>
+                        <h4>Data Sources</h4>
+                        <ul>
+                            <li>☐ Complete inventory of all log sources</li>
+                            <li>☐ Daily/monthly volume per source</li>
+                            <li>☐ Collection method documented</li>
+                            <li>☐ Retention requirements confirmed</li>
+                            <li>☐ Custom parsing identified</li>
+                        </ul>
+                        <h4>Content</h4>
+                        <ul>
+                            <li>☐ Detection rules inventoried with usage metrics</li>
+                            <li>☐ Dashboards listed with ownership</li>
+                            <li>☐ Reports documented with recipients</li>
+                            <li>☐ Lookups and enrichment sources identified</li>
+                            <li>☐ SOAR playbooks documented</li>
+                        </ul>
+                        <h4>Stakeholders</h4>
+                        <ul>
+                            <li>☐ SOC team interviewed</li>
+                            <li>☐ Detection engineers consulted</li>
+                            <li>☐ SIEM admins engaged</li>
+                            <li>☐ Management requirements captured</li>
+                        </ul>
+                        <h4>Integration & Risk</h4>
+                        <ul>
+                            <li>☐ All integrations mapped</li>
+                            <li>☐ Risks identified and documented</li>
+                            <li>☐ Migration waves proposed</li>
+                            <li>☐ Effort estimate completed</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="migration-methodology.html" class="card-link">← Migration Methodology</a>
+                    <a href="log-migration.html" class="card-link">Log Migration →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

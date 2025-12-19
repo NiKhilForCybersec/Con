@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item">Cloud Monitoring</a>
+                    <a href="container-security.html" class="nav-item active">Container Security</a>
+                    <a href="azure-security.html" class="nav-item">Azure Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="cloud-security-monitoring.html">Cloud Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Container Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Container Security Monitoring</h1>
+                    <p class="page-subtitle">Containers and Kubernetes introduce new attack surfaces and require specialized monitoring. Understanding container-specific threats enables effective detection in cloud-native environments.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Container Threat Landscape</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Kubernetes Attack Surface</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    KUBERNETES/CONTAINER ATTACK VECTORS                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  SUPPLY CHAIN              RUNTIME                    KUBERNETES API        │
+│  ┌─────────────────┐      ┌─────────────────┐        ┌──────────────────┐  │
+│  │ • Malicious     │      │ • Container     │        │ • Exposed API    │  │
+│  │   base images   │      │   escape        │        │ • RBAC misconfig │  │
+│  │ • Vulnerable    │      │ • Crypto mining │        │ • Secrets access │  │
+│  │   dependencies  │      │ • Reverse shell │        │ • Pod creation   │  │
+│  │ • Typosquatting │      │ • Privilege     │        │ • Namespace      │  │
+│  │   packages      │      │   escalation    │        │   lateral move   │  │
+│  └─────────────────┘      └─────────────────┘        └──────────────────┘  │
+│                                                                             │
+│  NETWORK                   PERSISTENCE                 DATA                 │
+│  ┌─────────────────┐      ┌─────────────────┐        ┌──────────────────┐  │
+│  │ • Pod-to-pod    │      │ • Malicious     │        │ • Secret         │  │
+│  │   lateral move  │      │   deployment    │        │   extraction     │  │
+│  │ • Service       │      │ • CronJob abuse │        │ • PV/PVC access  │  │
+│  │   exploitation  │      │ • DaemonSet     │        │ • ConfigMap leak │  │
+│  │ • Ingress abuse │      │   injection     │        │ • etcd access    │  │
+│  └─────────────────┘      └─────────────────┘        └──────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Kubernetes Audit Logs</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious K8s API Calls</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| extend Verb = tostring(AuditLog.verb)
+| extend Resource = tostring(AuditLog.objectRef.resource)
+| extend Namespace = tostring(AuditLog.objectRef.namespace)
+| extend User = tostring(AuditLog.user.username)
+| where Verb in ("create", "delete", "patch")
+| where Resource in ("secrets", "configmaps", "pods", "deployments", "daemonsets")
+| where Namespace != "kube-system"
+| summarize 
+    ActionCount = count(),
+    Resources = make_set(Resource)
+  by User, Verb
+| where ActionCount > 10
+| order by ActionCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Secret Access Monitoring</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| where tostring(AuditLog.objectRef.resource) == "secrets"
+| where tostring(AuditLog.verb) in ("get", "list", "watch")
+| extend User = tostring(AuditLog.user.username)
+| extend SecretName = tostring(AuditLog.objectRef.name)
+| extend Namespace = tostring(AuditLog.objectRef.namespace)
+| where User !startswith "system:"  // Exclude system accounts
+| summarize 
+    AccessCount = count(),
+    SecretsAccessed = make_set(SecretName, 10)
+  by User, Namespace
+| order by AccessCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Privileged Container Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Pod Creation</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| where tostring(AuditLog.verb) == "create"
+| where tostring(AuditLog.objectRef.resource) == "pods"
+| extend RequestObject = tostring(AuditLog.requestObject)
+| where RequestObject has "privileged" and RequestObject has "true"
+| extend User = tostring(AuditLog.user.username)
+| extend PodName = tostring(AuditLog.objectRef.name)
+| extend Namespace = tostring(AuditLog.objectRef.namespace)
+| project TimeGenerated, User, Namespace, PodName</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Host Path Volume Mounts</div>
+                        <pre><code>// Detect pods mounting sensitive host paths
+AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| where tostring(AuditLog.verb) == "create"
+| where tostring(AuditLog.objectRef.resource) == "pods"
+| extend RequestObject = tostring(AuditLog.requestObject)
+| where RequestObject has "hostPath"
+| where RequestObject has_any ("/etc", "/var/run/docker.sock", 
+                               "/var/log", "/root", "/proc")
+| extend User = tostring(AuditLog.user.username)
+| extend Namespace = tostring(AuditLog.objectRef.namespace)
+| project TimeGenerated, User, Namespace, RequestObject</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Container Runtime Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Container Escape Indicators</div>
+                        <pre><code>index=kubernetes OR index=falco
+| where container_id!=""
+| where process_name IN ("mount", "nsenter", "unshare", "chroot")
+    OR file_path LIKE "%/proc/%/ns/%"
+    OR file_path="/var/run/docker.sock"
+    OR syscall IN ("setns", "unshare", "clone")
+| stats count by container_id, container_name, process_name, 
+        file_path, pod_name, namespace
+| where count > 0</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Falco Rules: Container Threats</div>
+                        <pre><code># Falco rule examples for container security
+- rule: Container Drift Detected
+  desc: Detect new executable in container after start
+  condition: >
+    spawned_process and container and
+    not proc.pname in (container_entrypoint) and
+    proc.name != proc.pname
+  output: "New executable in container (user=%user.name command=%proc.cmdline)"
+  priority: WARNING
+
+- rule: Outbound Connection to C2
+  desc: Detect container connecting to known bad IP
+  condition: >
+    outbound and container and
+    fd.sip in (known_c2_ips)
+  output: "Container connecting to C2 (container=%container.name ip=%fd.sip)"
+  priority: CRITICAL
+
+- rule: Crypto Mining Process
+  desc: Detect crypto mining activity
+  condition: >
+    spawned_process and container and
+    (proc.name in (miners) or 
+     proc.cmdline contains "stratum+tcp" or
+     proc.cmdline contains "cryptonight")
+  output: "Crypto mining detected (container=%container.name cmd=%proc.cmdline)"
+  priority: CRITICAL</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>RBAC Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Cluster Admin Bindings</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| where tostring(AuditLog.verb) == "create"
+| where tostring(AuditLog.objectRef.resource) in 
+        ("clusterrolebindings", "rolebindings")
+| extend RequestObject = parse_json(tostring(AuditLog.requestObject))
+| extend RoleRef = tostring(RequestObject.roleRef.name)
+| where RoleRef in ("cluster-admin", "admin", "edit")
+| extend User = tostring(AuditLog.user.username)
+| extend BindingName = tostring(AuditLog.objectRef.name)
+| project TimeGenerated, User, BindingName, RoleRef</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Service Account Token Use</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| extend User = tostring(AuditLog.user.username)
+| extend UserGroups = tostring(AuditLog.user.groups)
+| where User startswith "system:serviceaccount:"
+| where UserGroups !has "system:serviceaccounts"  // Unusual group
+| summarize 
+    ActionCount = count(),
+    Verbs = make_set(tostring(AuditLog.verb)),
+    Resources = make_set(tostring(AuditLog.objectRef.resource))
+  by User
+| where ActionCount > 100
+| order by ActionCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Network Policy Violations</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Pod-to-Pod Unusual Traffic</div>
+                        <pre><code>// Azure CNI flow logs
+AzureNetworkAnalytics_CL
+| where TimeGenerated > ago(1h)
+| where FlowType_s == "AzurePublic" or FlowType_s == "ExternalPublic"
+| where SrcIP_s startswith "10."  // Internal pod
+| where DestIP_s !startswith "10."  // External destination
+| extend PodInfo = extract(@"pod-([^-]+)-([^-]+)", 0, SrcIP_s)
+| summarize 
+    BytesOut = sum(OutboundBytes_d),
+    Connections = count()
+  by SrcIP_s, DestIP_s, DestPort_d
+| where BytesOut > 100000000  // Over 100MB
+| order by BytesOut desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Image Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Unauthorized Image Registry</div>
+                        <pre><code>AzureDiagnostics
+| where Category == "kube-audit"
+| extend AuditLog = parse_json(log_s)
+| where tostring(AuditLog.verb) == "create"
+| where tostring(AuditLog.objectRef.resource) == "pods"
+| extend RequestObject = tostring(AuditLog.requestObject)
+| extend Images = extract_all(@"image[\"']:\s*[\"']([^\"']+)", RequestObject)
+| mv-expand Image = Images
+| extend ImageString = tostring(Image)
+| where ImageString !startswith "mycompany.azurecr.io/"  // Not from approved registry
+| where ImageString !startswith "mcr.microsoft.com/"
+| project TimeGenerated, ImageString, 
+          User = tostring(AuditLog.user.username),
+          Namespace = tostring(AuditLog.objectRef.namespace)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Image Vulnerability Alerts</div>
+                        <pre><code>index=container_security sourcetype=trivy OR sourcetype=aqua
+| where severity IN ("CRITICAL", "HIGH")
+| stats count by image_name, vulnerability_id, severity, package_name
+| where count > 0
+| sort -severity, -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you monitor security in a Kubernetes environment?"</strong></p>
+                        <p><strong>A:</strong> "Kubernetes security monitoring requires a layered approach:</p>
+                        <ol>
+                            <li><strong>Kubernetes audit logs:</strong> The API server logs all requests. I monitor for sensitive operations—secret access, privileged pod creation, RBAC changes, and exec into pods. These tell me WHO is doing WHAT to the cluster.</li>
+                            <li><strong>Runtime security:</strong> Tools like Falco monitor syscalls inside containers. I detect container escape attempts (mounting /proc, accessing docker.sock), crypto mining, and reverse shells. This catches threats the API audit misses.</li>
+                            <li><strong>Network monitoring:</strong> I look for pod-to-pod traffic that violates expected patterns, egress to suspicious destinations, and lateral movement between namespaces. Network policies should be enforced and violations detected.</li>
+                            <li><strong>Image security:</strong> Before runtime, I integrate vulnerability scanning. At runtime, I alert on pods using images from unauthorized registries or with known critical CVEs.</li>
+                            <li><strong>RBAC analysis:</strong> I monitor for overly permissive role bindings, especially cluster-admin grants. Service accounts with excessive permissions are common attack paths.</li>
+                        </ol>
+                        <p>The challenge is volume—Kubernetes generates massive audit logs. I use sampling for normal operations and alert on sensitive resources and anomalies."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Container Security Quick Reference</div>
+                        <h4>High-Risk K8s API Actions</h4>
+                        <ul>
+                            <li>create/delete secrets</li>
+                            <li>exec into pods</li>
+                            <li>create privileged pods</li>
+                            <li>modify RBAC bindings</li>
+                            <li>create daemonsets</li>
+                        </ul>
+                        <h4>Container Escape Indicators</h4>
+                        <ul>
+                            <li>Mount /proc/*/ns/*</li>
+                            <li>Access docker.sock</li>
+                            <li>nsenter, unshare commands</li>
+                            <li>CAP_SYS_ADMIN capability</li>
+                            <li>hostPID: true</li>
+                        </ul>
+                        <h4>Runtime Security Tools</h4>
+                        <ul>
+                            <li>Falco - Syscall monitoring</li>
+                            <li>Trivy - Image scanning</li>
+                            <li>Aqua/Prisma - Full platform</li>
+                            <li>Kube-bench - CIS benchmarks</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="cloud-security-monitoring.html" class="card-link">← Cloud Monitoring</a>
+                    <a href="azure-security.html" class="card-link">Azure Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Identity Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Identity Logs</h1>
+                    <p class="page-subtitle">Active Directory, Azure AD, and identity provider logging</p>
+                </header>
+                
+                
+                <h2>Identity Logs Overview</h2>
+                
+                <p>Identity is the new perimeter. Identity logs are among the most valuable for detecting account compromise, lateral movement, and privilege escalation.</p>
+                
+                <h3>Key Identity Sources</h3>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>What It Covers</th>
+                                <th>Key Events</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Active Directory (DC logs)</strong></td>
+                                <td>On-prem authentication, group changes</td>
+                                <td>4624, 4625, 4768, 4769, 4728, 4732</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure AD / Entra ID</strong></td>
+                                <td>Cloud identity, SSO, Conditional Access</td>
+                                <td>SigninLogs, AuditLogs, RiskyUsers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Okta</strong></td>
+                                <td>Third-party IdP</td>
+                                <td>authentication, user lifecycle, app access</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duo</strong></td>
+                                <td>MFA</td>
+                                <td>MFA success/failure, bypass, enrollment</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Azure AD / Entra ID Logs</h2>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Tables in Sentinel</div>
+                    <ul>
+                        <li><strong>SigninLogs:</strong> Interactive user sign-ins</li>
+                        <li><strong>AADNonInteractiveUserSignInLogs:</strong> App/service sign-ins</li>
+                        <li><strong>AuditLogs:</strong> Directory changes, app consent</li>
+                        <li><strong>AADRiskyUsers:</strong> Identity Protection risk scores</li>
+                        <li><strong>AADServicePrincipalSignInLogs:</strong> Service principal auth</li>
+                    </ul>
+                </div>
+                
+                <h2>Critical Identity Events</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Why It Matters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Failed logins</strong></td>
+                                <td>Password spray, brute force</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MFA bypass/failure</strong></td>
+                                <td>Attacker trying to circumvent MFA</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Impossible travel</strong></td>
+                                <td>Login from two locations too far apart</td>
+                            </tr>
+                            <tr>
+                                <td><strong>New device/location</strong></td>
+                                <td>Potential credential theft</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Privilege elevation</strong></td>
+                                <td>User added to admin group</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Service account misuse</strong></td>
+                                <td>Interactive login from service account</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How would you detect a compromised account?"</p>
+                    <p><strong>Answer:</strong> "Multiple signals: impossible travel alerts (login from NYC then London 30 minutes later), successful login after multiple failures from different IPs (password spray success), MFA prompt flood followed by approval (MFA fatigue attack), login from new device combined with sensitive actions like password reset or forwarding rule creation. I also look for behavioral anomalies - user accessing systems they've never touched, downloading unusual amounts of data, or logging in at unusual times."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="network-logs.html" class="card-link">← Network Logs</a>
+                    <a href="cloud-logs.html" class="card-link">Cloud Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sigma Rules | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="sigma-rules.html" class="nav-item active">Sigma Rules</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="detection-fundamentals.html">Detection</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Sigma Rules</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Sigma Rules</h1>
+                    <p class="page-subtitle">Sigma is a generic signature format for SIEM systems. Write detection logic once, convert to any SIEM query language. Essential for portable, shareable detection content.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>What is Sigma?</h2>
+                    <p>Sigma is to SIEM what YARA is to malware detection and Snort is to network traffic. It provides a vendor-agnostic way to describe detection logic that can be converted to platform-specific queries.</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Sigma Workflow</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SIGMA ECOSYSTEM                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐                                                        │
+│  │   SIGMA RULE    │    Generic YAML format describing detection logic      │
+│  │   (.yml file)   │                                                        │
+│  └────────┬────────┘                                                        │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                        │
+│  │   SIGMA CLI     │    Conversion tool (sigmac / pySigma)                  │
+│  │   + Backend     │                                                        │
+│  └────────┬────────┘                                                        │
+│           │                                                                 │
+│     ┌─────┴─────┬─────────────┬─────────────┬─────────────┐                │
+│     ▼           ▼             ▼             ▼             ▼                │
+│ ┌───────┐  ┌────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐           │
+│ │Splunk │  │Sentinel│   │Elastic  │   │QRadar   │   │Chronicle│           │
+│ │ SPL   │  │  KQL   │   │  EQL    │   │  AQL    │   │  YARA-L │           │
+│ └───────┘  └────────┘   └─────────┘   └─────────┘   └─────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sigma Rule Structure</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Basic Sigma Rule Template</div>
+                        <pre><code>title: Suspicious PowerShell Download Cradle
+id: 3b6ab547-8ec2-4991-b9d2-2b06702a48d7
+status: experimental
+description: Detects PowerShell download cradle commands commonly used by attackers
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+author: Security Team
+date: 2024/03/15
+modified: 2024/03/20
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - attack.command_and_control
+    - attack.t1105
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_powershell:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_commands:
+        CommandLine|contains:
+            - 'downloadstring'
+            - 'downloadfile'
+            - 'downloaddata'
+            - 'invoke-webrequest'
+            - 'iwr '
+            - 'wget '
+            - 'curl '
+            - 'Net.WebClient'
+            - 'Start-BitsTransfer'
+    condition: selection_powershell and selection_commands
+falsepositives:
+    - Legitimate administrative scripts
+    - Software deployment tools
+level: medium</code></pre>
+                    </div>
+
+                    <h3>Key Fields Explained</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Purpose</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>title</code></td>
+                                    <td>Descriptive name for the rule</td>
+                                    <td>Suspicious PowerShell Download</td>
+                                </tr>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>Unique UUID for tracking</td>
+                                    <td>3b6ab547-8ec2-4991-b9d2...</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>Rule maturity level</td>
+                                    <td>experimental, test, stable</td>
+                                </tr>
+                                <tr>
+                                    <td><code>logsource</code></td>
+                                    <td>What logs the rule applies to</td>
+                                    <td>category: process_creation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>detection</code></td>
+                                    <td>The actual detection logic</td>
+                                    <td>Field matches and conditions</td>
+                                </tr>
+                                <tr>
+                                    <td><code>level</code></td>
+                                    <td>Severity/priority</td>
+                                    <td>low, medium, high, critical</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tags</code></td>
+                                    <td>MITRE ATT&CK mapping</td>
+                                    <td>attack.t1059.001</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Logic Syntax</h2>
+                    
+                    <h3>Field Modifiers</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Modifier</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>|contains</code></td>
+                                    <td>Substring match</td>
+                                    <td><code>CommandLine|contains: 'mimikatz'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|startswith</code></td>
+                                    <td>Prefix match</td>
+                                    <td><code>Image|startswith: 'C:\Windows\'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|endswith</code></td>
+                                    <td>Suffix match</td>
+                                    <td><code>Image|endswith: '\cmd.exe'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|all</code></td>
+                                    <td>All values must match</td>
+                                    <td><code>CommandLine|contains|all: ['-enc', '-w hidden']</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|base64offset</code></td>
+                                    <td>Match in base64 encoded data</td>
+                                    <td><code>CommandLine|base64offset: 'IEX'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|re</code></td>
+                                    <td>Regular expression</td>
+                                    <td><code>CommandLine|re: '\\\\[0-9]{1,3}\\.'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>|cidr</code></td>
+                                    <td>CIDR notation for IPs</td>
+                                    <td><code>DestinationIp|cidr: '10.0.0.0/8'</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Condition Logic</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Condition Examples</div>
+                        <pre><code># Simple AND
+condition: selection1 and selection2
+
+# OR conditions
+condition: selection1 or selection2
+
+# NOT (exclusion)
+condition: selection and not filter
+
+# Counting
+condition: selection | count() > 5
+
+# Aggregation with grouping
+condition: selection | count(TargetUserName) by SourceIp > 10
+
+# Timeframe
+condition: selection | count() > 5
+timeframe: 5m</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Log Source Categories</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Typical Sources</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>process_creation</code></td>
+                                    <td>New process started</td>
+                                    <td>Sysmon 1, Windows 4688</td>
+                                </tr>
+                                <tr>
+                                    <td><code>network_connection</code></td>
+                                    <td>Network connections</td>
+                                    <td>Sysmon 3</td>
+                                </tr>
+                                <tr>
+                                    <td><code>file_event</code></td>
+                                    <td>File creation/modification</td>
+                                    <td>Sysmon 11</td>
+                                </tr>
+                                <tr>
+                                    <td><code>registry_event</code></td>
+                                    <td>Registry changes</td>
+                                    <td>Sysmon 12, 13, 14</td>
+                                </tr>
+                                <tr>
+                                    <td><code>dns_query</code></td>
+                                    <td>DNS lookups</td>
+                                    <td>Sysmon 22</td>
+                                </tr>
+                                <tr>
+                                    <td><code>image_load</code></td>
+                                    <td>DLL/module loads</td>
+                                    <td>Sysmon 7</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ps_script</code></td>
+                                    <td>PowerShell script blocks</td>
+                                    <td>Windows 4104</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Example Rules</h2>
+                    
+                    <h3>Credential Dumping Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sigma: LSASS Memory Access</div>
+                        <pre><code>title: LSASS Memory Access by Non-System Process
+id: 0d894093-71bc-43c3-8c4d-ecfc28dcf5d9
+status: stable
+description: Detects process accessing LSASS memory, potential credential dumping
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+tags:
+    - attack.credential_access
+    - attack.t1003.001
+logsource:
+    category: process_access
+    product: windows
+detection:
+    selection:
+        TargetImage|endswith: '\lsass.exe'
+        GrantedAccess|contains:
+            - '0x1010'
+            - '0x1038'
+            - '0x1438'
+            - '0x143a'
+    filter_system:
+        SourceImage|startswith:
+            - 'C:\Windows\System32\'
+            - 'C:\Windows\SysWOW64\'
+    filter_av:
+        SourceImage|contains:
+            - '\MsMpEng.exe'
+            - '\MRT.exe'
+    condition: selection and not filter_system and not filter_av
+falsepositives:
+    - Legitimate security tools
+    - Anti-virus software
+level: high</code></pre>
+                    </div>
+
+                    <h3>Persistence Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sigma: Scheduled Task Creation</div>
+                        <pre><code>title: Suspicious Scheduled Task Created
+id: 92626dac-9b73-4034-85ae-2a09c9e4f4de
+status: experimental
+description: Detects creation of scheduled tasks via command line
+tags:
+    - attack.persistence
+    - attack.t1053.005
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_schtasks:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    selection_suspicious:
+        CommandLine|contains:
+            - '/sc minute'
+            - '/sc hourly'
+            - '/sc onlogon'
+            - '/sc onstart'
+            - 'powershell'
+            - 'cmd /c'
+            - 'wscript'
+            - 'cscript'
+            - 'mshta'
+            - 'rundll32'
+    condition: selection_schtasks and selection_suspicious
+falsepositives:
+    - Administrative scripts
+    - Software installation
+level: medium</code></pre>
+                    </div>
+
+                    <h3>Defense Evasion Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sigma: Windows Defender Disabled</div>
+                        <pre><code>title: Windows Defender Disabled via Registry
+id: a64e4f23-8bb4-4a6a-bb9f-1f8d8c6c6b5c
+status: stable
+description: Detects disabling of Windows Defender via registry modification
+tags:
+    - attack.defense_evasion
+    - attack.t1562.001
+logsource:
+    category: registry_set
+    product: windows
+detection:
+    selection:
+        TargetObject|contains:
+            - '\SOFTWARE\Microsoft\Windows Defender\'
+            - '\SOFTWARE\Policies\Microsoft\Windows Defender\'
+        TargetObject|endswith:
+            - '\DisableAntiSpyware'
+            - '\DisableRealtimeMonitoring'
+            - '\DisableBehaviorMonitoring'
+            - '\DisableOnAccessProtection'
+        Details: 'DWORD (0x00000001)'
+    condition: selection
+falsepositives:
+    - Legitimate administrative action
+    - Group Policy changes
+level: high</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Converting Sigma Rules</h2>
+                    
+                    <h3>Using pySigma (Modern)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">pySigma Conversion</div>
+                        <pre><code># Install pySigma
+pip install pysigma pysigma-backend-splunk pysigma-backend-microsoft365defender
+
+# Convert to Splunk SPL
+sigma convert -t splunk -p sysmon rule.yml
+
+# Convert to Microsoft Sentinel KQL
+sigma convert -t microsoft365defender rule.yml
+
+# Convert with pipeline (field mapping)
+sigma convert -t splunk -p sysmon -p splunk-windows rule.yml
+
+# Batch convert directory
+sigma convert -t splunk -p sysmon rules/*.yml > all_rules.spl</code></pre>
+                    </div>
+
+                    <h3>Conversion Example Output</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sigma → Splunk SPL</div>
+                        <pre><code># Original Sigma
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains: 'downloadstring'
+    condition: selection
+
+# Converted to SPL
+index=* sourcetype="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+EventCode=1
+| where like(Image, "%\\powershell.exe")
+| where like(CommandLine, "%downloadstring%")</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sigma → KQL</div>
+                        <pre><code># Converted to KQL (Sentinel)
+DeviceProcessEvents
+| where FileName endswith "powershell.exe"
+| where ProcessCommandLine contains "downloadstring"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sigma Rule Repositories</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Repository</th>
+                                    <th>Description</th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SigmaHQ</strong></td>
+                                    <td>Official community rules</td>
+                                    <td>github.com/SigmaHQ/sigma</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MITRE CAR</strong></td>
+                                    <td>Cyber Analytics Repository</td>
+                                    <td>car.mitre.org</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Elastic Detection Rules</strong></td>
+                                    <td>Elastic's detection content</td>
+                                    <td>github.com/elastic/detection-rules</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Splunk Security Content</strong></td>
+                                    <td>Splunk's detection library</td>
+                                    <td>github.com/splunk/security_content</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Best Practices</h2>
+                    
+                    <h3>Writing Good Sigma Rules</h3>
+                    <ul>
+                        <li><strong>Be specific:</strong> Narrow detection to reduce false positives while catching the technique</li>
+                        <li><strong>Document thoroughly:</strong> Include references, false positive sources, and MITRE mapping</li>
+                        <li><strong>Use field modifiers wisely:</strong> <code>|endswith</code> for executables, <code>|contains</code> for command lines</li>
+                        <li><strong>Test before deploying:</strong> Convert and validate in your environment</li>
+                        <li><strong>Include filters:</strong> Anticipate common false positive sources</li>
+                        <li><strong>Set appropriate level:</strong> High/critical for high-confidence, low-FP rules only</li>
+                    </ul>
+
+                    <h3>Common Mistakes</h3>
+                    <ul>
+                        <li>Overly broad matches (too many FPs)</li>
+                        <li>Case-sensitive matching where case-insensitive is needed</li>
+                        <li>Missing field modifiers (exact match vs contains)</li>
+                        <li>Not accounting for path variations (System32 vs SysWOW64)</li>
+                        <li>Forgetting to map to MITRE ATT&CK</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What is Sigma and why would you use it?"</strong></p>
+                        <p><strong>A:</strong> "Sigma is a vendor-agnostic detection rule format—think of it as a universal language for SIEM detections. I use it for several reasons:</p>
+                        <ol>
+                            <li><strong>Portability:</strong> Write a detection once, convert to any SIEM. This is invaluable for migrations—I can take all my Splunk detections to Sentinel without rewriting from scratch.</li>
+                            <li><strong>Community sharing:</strong> The SigmaHQ repository has thousands of community-contributed rules mapped to MITRE ATT&CK. Instead of writing everything from scratch, I can leverage proven detections.</li>
+                            <li><strong>Documentation:</strong> Sigma's YAML format enforces good documentation—title, description, references, false positive notes, severity level. This makes rules maintainable.</li>
+                            <li><strong>Testing:</strong> I can test detection logic independent of the SIEM, then deploy to any platform.</li>
+                        </ol>
+                        <p>In practice, I use Sigma as my detection development format, maintain a library in version control, and convert to platform-specific queries for deployment."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Sigma Quick Reference</div>
+                        <h4>Common Modifiers</h4>
+                        <ul>
+                            <li><code>|contains</code> - Substring match</li>
+                            <li><code>|endswith</code> - Suffix match</li>
+                            <li><code>|startswith</code> - Prefix match</li>
+                            <li><code>|all</code> - All values must match</li>
+                            <li><code>|re</code> - Regular expression</li>
+                        </ul>
+                        <h4>Log Source Categories</h4>
+                        <ul>
+                            <li>process_creation (Sysmon 1)</li>
+                            <li>network_connection (Sysmon 3)</li>
+                            <li>file_event (Sysmon 11)</li>
+                            <li>registry_event (Sysmon 12-14)</li>
+                            <li>dns_query (Sysmon 22)</li>
+                        </ul>
+                        <h4>Status Levels</h4>
+                        <ul>
+                            <li>experimental - New, needs testing</li>
+                            <li>test - Undergoing validation</li>
+                            <li>stable - Production-ready</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="mitre-attack-intro.html" class="card-link">← MITRE ATT&CK</a>
+                    <a href="use-case-development.html" class="card-link">Use Case Development →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

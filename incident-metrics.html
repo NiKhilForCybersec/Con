@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Metrics | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Operations</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="siem-metrics.html" class="nav-item">SIEM Metrics</a>
+                    <a href="incident-metrics.html" class="nav-item active">Incident Metrics</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Incident Metrics</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Incident Metrics & KPIs</h1>
+                    <p class="page-subtitle">Measuring incident response effectiveness requires the right metrics. Track detection speed, response efficiency, and program maturity to demonstrate value and drive improvement.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Core Incident Metrics</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Incident Response Timeline</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    INCIDENT RESPONSE TIMELINE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Event     Detection    Triage      Response    Containment   Recovery     │
+│  Occurs    Alert        Starts      Begins      Complete      Complete     │
+│    │          │           │            │            │            │          │
+│    ▼          ▼           ▼            ▼            ▼            ▼          │
+│  ──●──────────●───────────●────────────●────────────●────────────●──────►  │
+│    │          │           │            │            │            │          │
+│    │◄── MTTD ─►│          │            │            │            │          │
+│    │          │◄─ MTTA ──►│            │            │            │          │
+│    │          │           │◄── MTTR ──►│            │            │          │
+│    │          │           │            │◄─ MTTC ───►│            │          │
+│    │          │           │            │            │◄── MTTRec─►│          │
+│    │                                                             │          │
+│    │◄──────────────────── Dwell Time ───────────────────────────►│          │
+│                                                                             │
+│  MTTD = Mean Time to Detect                                                 │
+│  MTTA = Mean Time to Acknowledge/Triage                                     │
+│  MTTR = Mean Time to Respond                                                │
+│  MTTC = Mean Time to Contain                                                │
+│  MTTRec = Mean Time to Recover                                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>KPI Calculations</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: MTTD and MTTR</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status == "Closed"
+| extend EventTime = todatetime(FirstActivityTime)
+| extend DetectionTime = CreatedTime
+| extend ResponseTime = todatetime(FirstModifiedTime)
+| extend ClosedTime = ClosedTime
+| extend MTTD_hours = datetime_diff('hour', DetectionTime, EventTime)
+| extend MTTR_hours = datetime_diff('hour', ClosedTime, DetectionTime)
+| summarize 
+    AvgMTTD = avg(MTTD_hours),
+    AvgMTTR = avg(MTTR_hours),
+    P90_MTTD = percentile(MTTD_hours, 90),
+    P90_MTTR = percentile(MTTR_hours, 90),
+    IncidentCount = count()
+  by Severity
+| order by Severity</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Incident Volume Trends</div>
+                        <pre><code>index=incidents status=closed
+| timechart span=1w count by severity
+| addtotals</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: SLA Compliance</div>
+                        <pre><code>index=incidents status=closed
+| eval sla_target = case(
+    severity="Critical", 4,    // 4 hours
+    severity="High", 24,       // 24 hours
+    severity="Medium", 72,     // 3 days
+    severity="Low", 168        // 7 days
+)
+| eval response_hours = (response_time - created_time) / 3600
+| eval sla_met = if(response_hours <= sla_target, 1, 0)
+| stats 
+    count as total_incidents,
+    sum(sla_met) as within_sla,
+    avg(response_hours) as avg_response_hours
+  by severity
+| eval sla_compliance = round(within_sla / total_incidents * 100, 1) . "%"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Benchmark Targets</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Good</th>
+                                    <th>Average</th>
+                                    <th>Needs Work</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MTTD (Critical)</strong></td>
+                                    <td>&lt; 1 hour</td>
+                                    <td>1-24 hours</td>
+                                    <td>&gt; 24 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTR (Critical)</strong></td>
+                                    <td>&lt; 4 hours</td>
+                                    <td>4-24 hours</td>
+                                    <td>&gt; 24 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Alert True Positive Rate</strong></td>
+                                    <td>&gt; 80%</td>
+                                    <td>60-80%</td>
+                                    <td>&lt; 60%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SLA Compliance</strong></td>
+                                    <td>&gt; 95%</td>
+                                    <td>85-95%</td>
+                                    <td>&lt; 85%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Escalation Rate</strong></td>
+                                    <td>10-20%</td>
+                                    <td>20-30%</td>
+                                    <td>&gt; 30% or &lt; 5%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Incident Reopen Rate</strong></td>
+                                    <td>&lt; 5%</td>
+                                    <td>5-10%</td>
+                                    <td>&gt; 10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Coverage</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: MITRE Coverage Analysis</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(90d)
+| mv-expand Tactics
+| mv-expand Techniques
+| summarize AlertCount = count() by 
+    Tactic = tostring(Tactics),
+    Technique = tostring(Techniques)
+| join kind=rightouter (
+    externaldata(Tactic:string, Technique:string, TechniqueName:string)
+    [@"https://attack.mitre.org/techniques/enterprise"]
+) on Tactic, Technique
+| extend Coverage = iff(isnotnull(AlertCount), "Covered", "Gap")
+| summarize 
+    CoveredTechniques = countif(Coverage == "Covered"),
+    TotalTechniques = count()
+  by Tactic
+| extend CoveragePercent = round(CoveredTechniques * 100.0 / TotalTechniques, 1)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Executive Reporting</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Monthly Executive Summary</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalIncidents = count(),
+    Critical = countif(Severity == "High"),
+    TruePositives = countif(Classification == "TruePositive"),
+    AvgResponseHours = avg(datetime_diff('hour', ClosedTime, CreatedTime))
+| extend TruePositiveRate = round(TruePositives * 100.0 / TotalIncidents, 1)
+| extend Summary = strcat(
+    "📊 Monthly Security Summary\n",
+    "Total Incidents: ", TotalIncidents, "\n",
+    "Critical: ", Critical, "\n",
+    "True Positive Rate: ", TruePositiveRate, "%\n",
+    "Avg Response: ", round(AvgResponseHours, 1), " hours"
+)</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Executive Dashboard Elements</div>
+                        <ul>
+                            <li><strong>Risk Posture:</strong> Red/Yellow/Green status</li>
+                            <li><strong>Incident Trend:</strong> Month-over-month comparison</li>
+                            <li><strong>MTTD/MTTR:</strong> Are we getting faster?</li>
+                            <li><strong>Coverage:</strong> What threats can we detect?</li>
+                            <li><strong>Value:</strong> Incidents prevented/contained</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What metrics do you use to measure SOC effectiveness?"</strong></p>
+                        <p><strong>A:</strong> "I focus on metrics that drive improvement:</p>
+                        <ol>
+                            <li><strong>MTTD (Mean Time to Detect):</strong> How quickly do we spot threats? This measures detection capability. Industry average is still 200+ days; goal is hours.</li>
+                            <li><strong>MTTR (Mean Time to Respond):</strong> Once detected, how fast do we contain? Critical incidents should be hours, not days.</li>
+                            <li><strong>True Positive Rate:</strong> What percentage of alerts are real? Below 60% indicates tuning problems and analyst fatigue.</li>
+                            <li><strong>SLA Compliance:</strong> Are we meeting response commitments? Track by severity to ensure critical issues get priority.</li>
+                            <li><strong>Coverage:</strong> What can we detect? I map detections to MITRE ATT&CK to identify gaps.</li>
+                            <li><strong>Trending:</strong> Are we improving? Month-over-month trends matter more than absolute numbers.</li>
+                        </ol>
+                        <p>I avoid vanity metrics like 'events processed' that don't indicate security outcomes."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Incident Metrics Quick Reference</div>
+                        <h4>Core KPIs</h4>
+                        <ul>
+                            <li>MTTD - Time to detect</li>
+                            <li>MTTA - Time to acknowledge</li>
+                            <li>MTTR - Time to respond</li>
+                            <li>MTTC - Time to contain</li>
+                            <li>Dwell Time - Total exposure</li>
+                        </ul>
+                        <h4>Quality Metrics</h4>
+                        <ul>
+                            <li>True positive rate</li>
+                            <li>False positive rate</li>
+                            <li>Alert-to-incident ratio</li>
+                            <li>Escalation rate</li>
+                            <li>Reopen rate</li>
+                        </ul>
+                        <h4>Volume Metrics</h4>
+                        <ul>
+                            <li>Incidents per month</li>
+                            <li>Incidents by severity</li>
+                            <li>Incidents per analyst</li>
+                            <li>Alerts per incident</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-metrics.html" class="card-link">← SIEM Metrics</a>
+                    <a href="incident-response.html" class="card-link">Incident Response →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

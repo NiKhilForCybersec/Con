@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Modeling | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Strategy</div>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="threat-modeling.html" class="nav-item active">Threat Modeling</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Threat Modeling</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Threat Modeling for Detection</h1>
+                    <p class="page-subtitle">Threat modeling identifies what threats matter to your organization and guides detection engineering priorities. Understanding your adversaries enables focused, effective security monitoring.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Threat Modeling Process</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Detection-Focused Threat Model</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THREAT MODELING FOR SIEM                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  STEP 1: IDENTIFY CROWN JEWELS                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ What are we protecting?                                              │   │
+│  │ • Customer PII database                                              │   │
+│  │ • Source code repositories                                           │   │
+│  │ • Financial systems                                                  │   │
+│  │ • Intellectual property                                              │   │
+│  │ • Executive communications                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STEP 2: IDENTIFY THREAT ACTORS                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Who would target us?                                                 │   │
+│  │ • Nation-state (industry espionage)                                  │   │
+│  │ • Cybercrime (ransomware, BEC)                                       │   │
+│  │ • Insider (data theft, sabotage)                                     │   │
+│  │ • Hacktivist (reputation damage)                                     │   │
+│  │ • Opportunistic (exposed vulnerabilities)                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STEP 3: MAP ATTACK PATHS                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ How would they reach crown jewels?                                   │   │
+│  │ • Phishing → Workstation → AD → Database Server                     │   │
+│  │ • Exposed RDP → Lateral Movement → File Server                      │   │
+│  │ • Supply Chain → Trusted App → Internal Network                     │   │
+│  │ • Insider → Direct Access → Exfiltration                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STEP 4: DERIVE DETECTION REQUIREMENTS                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ What must we detect?                                                 │   │
+│  │ • Initial access attempts (phishing, exploitation)                   │   │
+│  │ • Lateral movement (PsExec, RDP, admin shares)                      │   │
+│  │ • Credential access (LSASS, Kerberoasting)                          │   │
+│  │ • Data staging and exfiltration                                      │   │
+│  │ • Insider anomalies (after-hours, unusual access)                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Threat Actor Profiles</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Actor Type</th>
+                                    <th>Motivation</th>
+                                    <th>Typical TTPs</th>
+                                    <th>Detection Focus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Nation-State</strong></td>
+                                    <td>Espionage, IP theft</td>
+                                    <td>Spearphishing, 0-days, supply chain, living-off-the-land</td>
+                                    <td>Persistence, slow exfil, unusual C2</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ransomware</strong></td>
+                                    <td>Financial extortion</td>
+                                    <td>RDP brute force, Cobalt Strike, AD compromise</td>
+                                    <td>Lateral movement, shadow copy deletion</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>BEC/Fraud</strong></td>
+                                    <td>Financial theft</td>
+                                    <td>Phishing, inbox rules, impersonation</td>
+                                    <td>Mail forwarding, payment redirects</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Insider</strong></td>
+                                    <td>Theft, sabotage, fraud</td>
+                                    <td>Legitimate access abuse, data hoarding</td>
+                                    <td>Behavioral anomalies, bulk access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Opportunistic</strong></td>
+                                    <td>Easy targets</td>
+                                    <td>Exploit public vulns, credential stuffing</td>
+                                    <td>Scanning, brute force, exploit attempts</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Attack Path Analysis</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Ransomware Attack Path</div>
+                        <pre><code>
+ATTACK PATH: Ransomware via Phishing
+
+Step 1: Initial Access
+├── Technique: Spearphishing attachment (T1566.001)
+├── Target: Employee workstation
+├── Detection: Email gateway alerts, suspicious attachment execution
+└── Log Sources: Email logs, EDR
+
+Step 2: Execution
+├── Technique: Malicious macro, PowerShell (T1059.001)
+├── Target: Employee workstation
+├── Detection: Encoded PowerShell, macro execution
+└── Log Sources: EDR, Windows event logs
+
+Step 3: Persistence
+├── Technique: Scheduled task (T1053.005)
+├── Target: Compromised workstation
+├── Detection: New scheduled task creation
+└── Log Sources: Windows event 4698
+
+Step 4: Discovery
+├── Technique: AD enumeration (T1087)
+├── Target: Active Directory
+├── Detection: BloodHound, heavy LDAP queries
+└── Log Sources: DC logs, EDR
+
+Step 5: Credential Access
+├── Technique: LSASS dump (T1003.001)
+├── Target: Memory
+├── Detection: LSASS access from unusual process
+└── Log Sources: EDR, Sysmon event 10
+
+Step 6: Lateral Movement
+├── Technique: PsExec, RDP (T1021)
+├── Target: Servers, domain controllers
+├── Detection: New services, admin share access
+└── Log Sources: Windows event 7045, 5140
+
+Step 7: Impact
+├── Technique: Data encryption (T1486)
+├── Target: File servers, databases
+├── Detection: Shadow copy deletion, mass file changes
+└── Log Sources: Windows event 4663, EDR
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>STRIDE for Detection</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STRIDE Category</th>
+                                    <th>Threat</th>
+                                    <th>Detection Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Spoofing</strong></td>
+                                    <td>Identity impersonation</td>
+                                    <td>Impossible travel, anomalous sign-ins</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tampering</strong></td>
+                                    <td>Data/config modification</td>
+                                    <td>File integrity monitoring, config changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Repudiation</strong></td>
+                                    <td>Denying actions</td>
+                                    <td>Comprehensive audit logging</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Information Disclosure</strong></td>
+                                    <td>Data exposure</td>
+                                    <td>DLP alerts, unusual data access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Denial of Service</strong></td>
+                                    <td>Availability impact</td>
+                                    <td>Resource exhaustion, service failures</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Elevation of Privilege</strong></td>
+                                    <td>Unauthorized access</td>
+                                    <td>Privilege escalation, role changes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Gap Analysis</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Detection Coverage Assessment</div>
+                        <pre><code>// Map existing detections to threat model
+let ThreatModel = datatable(AttackPath:string, Technique:string, Priority:string)
+[
+    "Ransomware", "T1566.001", "Critical",
+    "Ransomware", "T1059.001", "Critical",
+    "Ransomware", "T1003.001", "Critical",
+    "Ransomware", "T1021.002", "High",
+    "Ransomware", "T1486", "Critical",
+    "BEC", "T1566.001", "Critical",
+    "BEC", "T1564.008", "High",  // Inbox rules
+    "Insider", "T1048", "Critical"  // Exfiltration
+];
+let ExistingDetections = SecurityAlert
+| where TimeGenerated > ago(90d)
+| distinct AlertName, Tactics, Techniques
+| mv-expand Technique = Techniques
+| project AlertName, Technique = tostring(Technique);
+ThreatModel
+| join kind=leftouter ExistingDetections on Technique
+| summarize 
+    DetectionCount = countif(isnotnull(AlertName)),
+    Detections = make_set(AlertName)
+  by AttackPath, Technique, Priority
+| extend CoverageStatus = iff(DetectionCount > 0, "✅ Covered", "❌ Gap")
+| order by Priority, AttackPath</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you prioritize detection engineering efforts?"</strong></p>
+                        <p><strong>A:</strong> "I use threat modeling to focus detection efforts:</p>
+                        <ol>
+                            <li><strong>Identify crown jewels:</strong> What data/systems would hurt most if compromised? Detection priorities flow from business risk.</li>
+                            <li><strong>Profile threat actors:</strong> Who realistically targets our industry? A healthcare org focuses on ransomware and insider threats. A defense contractor focuses on nation-state.</li>
+                            <li><strong>Map attack paths:</strong> How would adversaries reach crown jewels? This creates a prioritized list of techniques to detect.</li>
+                            <li><strong>Assess current coverage:</strong> I map existing detections against the threat model. Gaps in high-priority paths get immediate attention.</li>
+                            <li><strong>Leverage threat intel:</strong> What are threat actors actually doing right now? Recent campaigns inform near-term priorities.</li>
+                            <li><strong>Continuous refinement:</strong> Threat models aren't static. New threats, new assets, new adversary TTPs require updates.</li>
+                        </ol>
+                        <p>Without threat modeling, you're building detections randomly. With it, every detection maps to real risk."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Threat Modeling Quick Reference</div>
+                        <h4>Key Questions</h4>
+                        <ul>
+                            <li>What are we protecting?</li>
+                            <li>Who would attack us?</li>
+                            <li>How would they attack?</li>
+                            <li>What must we detect?</li>
+                            <li>What gaps exist?</li>
+                        </ul>
+                        <h4>Common Frameworks</h4>
+                        <ul>
+                            <li>STRIDE (threat categories)</li>
+                            <li>MITRE ATT&CK (techniques)</li>
+                            <li>Kill Chain (attack phases)</li>
+                            <li>PASTA (risk-centric)</li>
+                        </ul>
+                        <h4>Prioritization Factors</h4>
+                        <ul>
+                            <li>Asset criticality</li>
+                            <li>Threat likelihood</li>
+                            <li>Detection feasibility</li>
+                            <li>Current coverage gaps</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="mitre-attack-intro.html" class="card-link">← MITRE ATT&CK</a>
+                    <a href="detection-engineering.html" class="card-link">Detection Engineering →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

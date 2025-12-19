@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCP Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item">Cloud Overview</a>
+                    <a href="azure-security.html" class="nav-item">Azure Security</a>
+                    <a href="aws-security.html" class="nav-item">AWS Security</a>
+                    <a href="gcp-security.html" class="nav-item active">GCP Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">GCP Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">GCP Security Monitoring</h1>
+                    <p class="page-subtitle">Google Cloud Platform provides Cloud Audit Logs, Security Command Center, and VPC Flow Logs for comprehensive security monitoring. Integration with SIEM enables detection of cloud-native threats.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>GCP Security Log Sources</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">GCP Security Logging Architecture</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    GCP SECURITY LOG SOURCES                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CLOUD AUDIT LOGS                 SECURITY SERVICES                         │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ Admin Activity      │         │ Security Command Center     │           │
+│  │ • API calls         │         │ • Vulnerability findings    │           │
+│  │ • Config changes    │         │ • Threat detection          │           │
+│  │ • Always enabled    │         │ • Misconfig alerts          │           │
+│  │                     │         │                             │           │
+│  │ Data Access         │         │ Event Threat Detection      │           │
+│  │ • Read operations   │         │ • Malware, cryptomining    │           │
+│  │ • Must be enabled   │         │ • Suspicious behavior       │           │
+│  │                     │         │                             │           │
+│  │ System Events       │         │ Chronicle SIEM              │           │
+│  │ • GCP system actions│         │ • Native Google SIEM        │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  NETWORK LOGS                     COMPUTE LOGS                              │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ VPC Flow Logs       │         │ GCE Instance Logs           │           │
+│  │ • Network traffic   │         │ • Serial console output     │           │
+│  │                     │         │                             │           │
+│  │ Firewall Rules Logs │         │ GKE Audit Logs              │           │
+│  │ • Allow/deny actions│         │ • Kubernetes API calls      │           │
+│  │                     │         │                             │           │
+│  │ Cloud NAT Logs      │         │ Cloud Functions Logs        │           │
+│  │ Load Balancer Logs  │         │ Cloud Run Logs              │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud Audit Log Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: IAM Policy Changes</div>
+                        <pre><code>index=gcp_audit logName="*cloudaudit.googleapis.com*"
+| where methodName IN ("SetIamPolicy", "CreateServiceAccount", 
+        "CreateServiceAccountKey", "SetOrgPolicy")
+| stats count, values(methodName) as actions,
+        values(resource.labels.project_id) as projects
+  by protoPayload.authenticationInfo.principalEmail, 
+     protoPayload.requestMetadata.callerIp
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Service Account Key Creation</div>
+                        <pre><code>index=gcp_audit methodName="google.iam.admin.v1.CreateServiceAccountKey"
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| eval target_sa = 'protoPayload.request.name'
+| eval caller_ip = 'protoPayload.requestMetadata.callerIp'
+| table _time, actor, target_sa, caller_ip, 
+        protoPayload.response.keyType</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Firewall Rule Changes</div>
+                        <pre><code>index=gcp_audit resource.type="gce_firewall_rule"
+| where methodName IN ("v1.compute.firewalls.insert", 
+        "v1.compute.firewalls.update", "v1.compute.firewalls.delete")
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| eval rule_name = 'protoPayload.resourceName'
+| eval action = case(
+    match(methodName, "insert"), "Created",
+    match(methodName, "update"), "Modified",
+    match(methodName, "delete"), "Deleted"
+)
+| table _time, actor, action, rule_name</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Security Command Center</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: SCC Findings Analysis</div>
+                        <pre><code>index=gcp_scc
+| eval severity = 'finding.severity'
+| eval category = 'finding.category'
+| eval resource = 'finding.resourceName'
+| where severity IN ("HIGH", "CRITICAL")
+| stats count by severity, category, resource
+| sort -severity, -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Event Threat Detection Alerts</div>
+                        <pre><code>index=gcp_scc source.name="*event-threat-detection*"
+| eval finding_class = 'finding.findingClass'
+| eval indicator = 'finding.indicator.signatures{}.memoryHashSignature.binaryFamily'
+| where finding_class IN ("THREAT", "VULNERABILITY")
+| stats count, values(finding.category) as threat_types
+  by finding.resourceName
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GCS Bucket Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Public Bucket Detection</div>
+                        <pre><code>index=gcp_audit methodName="storage.setIamPermissions"
+| where 'protoPayload.serviceData.policyDelta.bindingDeltas{}.member' 
+        IN ("allUsers", "allAuthenticatedUsers")
+| eval bucket = 'resource.labels.bucket_name'
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| table _time, actor, bucket, 
+        protoPayload.serviceData.policyDelta.bindingDeltas{}.role</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Unusual GCS Data Access</div>
+                        <pre><code>index=gcp_audit resource.type="gcs_bucket" 
+    methodName="storage.objects.get"
+| eval bucket = 'resource.labels.bucket_name'
+| eval object = 'protoPayload.resourceName'
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| stats count as downloads, dc(object) as unique_objects 
+  by actor, bucket
+| where downloads > 100 OR unique_objects > 50
+| sort -downloads</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>VPC Flow Logs</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Suspicious Outbound Traffic</div>
+                        <pre><code>index=gcp_vpcflow
+| where reporter="SRC"
+| where NOT (dest_ip LIKE "10.%" OR dest_ip LIKE "192.168.%" 
+        OR dest_ip LIKE "172.16.%")
+| stats sum(bytes_sent) as total_bytes,
+        dc(dest_ip) as unique_destinations
+  by src_ip, connection.dest_port
+| where total_bytes > 1000000000 OR unique_destinations > 100
+| sort -total_bytes</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Lateral Movement Detection</div>
+                        <pre><code>index=gcp_vpcflow
+| where src_ip LIKE "10.%" AND dest_ip LIKE "10.%"
+| where connection.dest_port IN (22, 3389, 445, 5985)
+| stats count, dc(dest_ip) as targets, values(dest_ip) as destinations
+  by src_ip
+| where targets > 10
+| sort -targets</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GKE Security Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: GKE Privileged Pod Creation</div>
+                        <pre><code>index=gcp_audit resource.type="k8s_cluster"
+    methodName="io.k8s.core.v1.pods.create"
+| spath path=protoPayload.request.spec.containers{}.securityContext.privileged 
+    output=privileged
+| where privileged="true"
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| eval pod_name = 'protoPayload.resourceName'
+| table _time, actor, pod_name, resource.labels.cluster_name</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: GKE Secret Access</div>
+                        <pre><code>index=gcp_audit resource.type="k8s_cluster"
+| where methodName LIKE "%secrets%"
+| where methodName IN ("io.k8s.core.v1.secrets.get", 
+        "io.k8s.core.v1.secrets.list")
+| eval actor = 'protoPayload.authenticationInfo.principalEmail'
+| where NOT match(actor, "system:")
+| stats count, values(protoPayload.resourceName) as secrets
+  by actor, resource.labels.cluster_name
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Key Detection Scenarios</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Threat</th>
+                                    <th>GCP Log Source</th>
+                                    <th>Detection Logic</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Credential Theft</strong></td>
+                                    <td>Admin Activity Logs</td>
+                                    <td>Service account key creation, IAM changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Exfiltration</strong></td>
+                                    <td>Data Access Logs, VPC Flow</td>
+                                    <td>Large GCS downloads, unusual egress</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cryptomining</strong></td>
+                                    <td>Event Threat Detection</td>
+                                    <td>High CPU instances, mining pool connections</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Privilege Escalation</strong></td>
+                                    <td>Admin Activity Logs</td>
+                                    <td>Role bindings to owner/editor</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Public Exposure</strong></td>
+                                    <td>Admin Activity Logs</td>
+                                    <td>allUsers/allAuthenticatedUsers permissions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you monitor GCP for security threats?"</strong></p>
+                        <p><strong>A:</strong> "GCP security monitoring leverages multiple log types:</p>
+                        <ol>
+                            <li><strong>Cloud Audit Logs:</strong> Admin Activity logs are always on and capture all API calls. I focus on IAM changes, service account key creation, and firewall modifications.</li>
+                            <li><strong>Data Access Logs:</strong> Must be enabled per-service. Critical for detecting data exfiltration from GCS, BigQuery, or other data stores.</li>
+                            <li><strong>Security Command Center:</strong> Provides built-in threat detection and misconfiguration findings. I integrate SCC findings with SIEM for correlation.</li>
+                            <li><strong>VPC Flow Logs:</strong> Network visibility for lateral movement, data exfiltration, and C2 detection. Sample rate balances cost vs visibility.</li>
+                            <li><strong>GKE Audit Logs:</strong> Kubernetes-specific monitoring for privileged pods, secret access, and RBAC changes.</li>
+                            <li><strong>Chronicle integration:</strong> For GCP-heavy environments, Google's Chronicle SIEM provides native integration and threat detection.</li>
+                        </ol>
+                        <p>The key is enabling Data Access logs for sensitive resources and correlating across log types."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 GCP Security Quick Reference</div>
+                        <h4>Critical Audit Events</h4>
+                        <ul>
+                            <li>SetIamPolicy (permission changes)</li>
+                            <li>CreateServiceAccountKey</li>
+                            <li>compute.firewalls.insert</li>
+                            <li>storage.setIamPermissions</li>
+                            <li>compute.instances.setMetadata</li>
+                        </ul>
+                        <h4>Log Types</h4>
+                        <ul>
+                            <li>Admin Activity (always on)</li>
+                            <li>Data Access (must enable)</li>
+                            <li>System Event (auto)</li>
+                            <li>Policy Denied (must enable)</li>
+                        </ul>
+                        <h4>SCC Finding Categories</h4>
+                        <ul>
+                            <li>VULNERABILITY</li>
+                            <li>MISCONFIGURATION</li>
+                            <li>THREAT</li>
+                            <li>OBSERVATION</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="aws-security.html" class="card-link">← AWS Security</a>
+                    <a href="cloud-security-monitoring.html" class="card-link">Cloud Overview →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

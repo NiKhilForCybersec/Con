@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Attack Techniques | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Windows Security</div>
+                    <a href="active-directory.html" class="nav-item">Active Directory</a>
+                    <a href="windows-attack-techniques.html" class="nav-item active">Attack Techniques</a>
+                    <a href="windows-hardening.html" class="nav-item">Hardening</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="windows-logs.html">Windows Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Attack Techniques</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Windows Attack Techniques</h1>
+                    <p class="page-subtitle">Understanding how attackers operate on Windows systems is essential for building effective detections. This guide covers the most common attack techniques, their indicators, and detection strategies.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Attack Lifecycle on Windows</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Typical Attack Chain</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         WINDOWS ATTACK LIFECYCLE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. INITIAL ACCESS           2. EXECUTION              3. PERSISTENCE       │
+│  ┌─────────────────┐        ┌─────────────────┐       ┌─────────────────┐  │
+│  │ • Phishing      │   ──►  │ • PowerShell    │  ──►  │ • Scheduled     │  │
+│  │ • Exploit       │        │ • WMI           │       │   Tasks         │  │
+│  │ • Valid creds   │        │ • Macro         │       │ • Registry      │  │
+│  │ • Supply chain  │        │ • Scripting     │       │ • Services      │  │
+│  └─────────────────┘        └─────────────────┘       └─────────────────┘  │
+│                                                                             │
+│  4. PRIVILEGE ESC           5. DEFENSE EVASION        6. CRED ACCESS       │
+│  ┌─────────────────┐        ┌─────────────────┐       ┌─────────────────┐  │
+│  │ • Token manip   │   ──►  │ • Disable AV    │  ──►  │ • LSASS dump    │  │
+│  │ • UAC bypass    │        │ • Clear logs    │       │ • SAM dump      │  │
+│  │ • Exploit vuln  │        │ • Timestomp     │       │ • Kerberoast    │  │
+│  │ • DLL hijack    │        │ • Obfuscation   │       │ • Keylogging    │  │
+│  └─────────────────┘        └─────────────────┘       └─────────────────┘  │
+│                                                                             │
+│  7. DISCOVERY               8. LATERAL MOVEMENT       9. EXFILTRATION      │
+│  ┌─────────────────┐        ┌─────────────────┐       ┌─────────────────┐  │
+│  │ • AD enum       │   ──►  │ • PsExec        │  ──►  │ • Archive data  │  │
+│  │ • Network scan  │        │ • WMI           │       │ • C2 channel    │  │
+│  │ • Share enum    │        │ • RDP           │       │ • Cloud upload  │  │
+│  │ • Process list  │        │ • SMB           │       │ • Staged        │  │
+│  └─────────────────┘        └─────────────────┘       └─────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Execution Techniques</h2>
+                    
+                    <h3>PowerShell Abuse (T1059.001)</h3>
+                    <p>PowerShell is the most common execution method due to its power and ubiquity.</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Indicator</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>-EncodedCommand</strong></td>
+                                    <td>Base64 encoded script</td>
+                                    <td><code>powershell -enc SQBFAFgA...</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>-ExecutionPolicy Bypass</strong></td>
+                                    <td>Bypass script restrictions</td>
+                                    <td><code>powershell -ep bypass</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DownloadString</strong></td>
+                                    <td>Download and execute</td>
+                                    <td><code>IEX(New-Object Net.WebClient).DownloadString(...)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>-NoProfile -WindowStyle Hidden</strong></td>
+                                    <td>Stealth execution</td>
+                                    <td><code>powershell -nop -w hidden</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Invoke-Expression (IEX)</strong></td>
+                                    <td>Execute string as code</td>
+                                    <td><code>IEX $payload</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious PowerShell Detection</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where NewProcessName endswith "\\powershell.exe" 
+     or NewProcessName endswith "\\pwsh.exe"
+| where CommandLine has_any (
+    "-enc", "-encoded", "encodedcommand",
+    "bypass", "-ep ", "-executionpolicy",
+    "downloadstring", "downloadfile",
+    "iex", "invoke-expression",
+    "-nop", "-noprofile",
+    "-w hidden", "-windowstyle hidden",
+    "webclient", "bitstransfer",
+    "frombase64string", "decompress"
+)
+| extend Indicators = extract_all(@"(-enc|-encoded|bypass|downloadstring|iex|hidden)", CommandLine)
+| project TimeGenerated, Computer, SubjectUserName, CommandLine, Indicators</code></pre>
+                    </div>
+
+                    <h3>WMI Execution (T1047)</h3>
+                    <p>Windows Management Instrumentation for remote execution:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: WMI Remote Execution</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where NewProcessName endswith "\\wmic.exe"
+| where CommandLine has_any ("process call create", "/node:", "wmic /node")
+| project TimeGenerated, Computer, SubjectUserName, CommandLine
+
+// Or detect WMI provider host spawning suspicious processes
+| where ParentProcessName endswith "\\WmiPrvSE.exe"
+| where NewProcessName has_any ("cmd.exe", "powershell.exe", "mshta.exe")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Credential Access Techniques</h2>
+                    
+                    <h3>LSASS Memory Dump (T1003.001)</h3>
+                    <p>Attackers dump LSASS to extract credentials from memory:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">LSASS Dumping Methods</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         LSASS CREDENTIAL THEFT                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  COMMON TOOLS                        DETECTION POINTS                       │
+│  ┌────────────────────────┐         ┌────────────────────────────────────┐ │
+│  │ • Mimikatz             │         │ • Process access to LSASS          │ │
+│  │ • ProcDump (Sysinternals)        │   (Sysmon Event 10)                │ │
+│  │ • Task Manager         │         │ • File creation: *.dmp             │ │
+│  │ • comsvcs.dll + minidump         │ • Suspicious parent of LSASS       │ │
+│  │ • Direct memory read   │         │ • Handle to LSASS with             │ │
+│  │ • WerFault abuse       │         │   PROCESS_VM_READ                  │ │
+│  └────────────────────────┘         └────────────────────────────────────┘ │
+│                                                                             │
+│  ATTACK COMMAND EXAMPLES:                                                   │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  mimikatz # sekurlsa::logonpasswords                                       │
+│  procdump -ma lsass.exe lsass.dmp                                          │
+│  rundll32 comsvcs.dll,MiniDump <lsass_pid> dump.bin full                   │
+│  taskmgr.exe → Right-click lsass → Create dump file                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: LSASS Access Detection (Sysmon)</div>
+                        <pre><code>// Sysmon Event 10 - Process Access
+Event
+| where Source == "Microsoft-Windows-Sysmon"
+| where EventID == 10
+| extend TargetImage = tostring(parse_xml(EventData).DataItem.TargetImage)
+| extend SourceImage = tostring(parse_xml(EventData).DataItem.SourceImage)
+| extend GrantedAccess = tostring(parse_xml(EventData).DataItem.GrantedAccess)
+| where TargetImage endswith "\\lsass.exe"
+| where GrantedAccess in ("0x1010", "0x1038", "0x1fffff", "0x1f3fff")
+| where SourceImage !endswith "\\MsMpEng.exe"  // Exclude Defender
+| where SourceImage !endswith "\\csrss.exe"
+| project TimeGenerated, Computer, SourceImage, GrantedAccess</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Credential Dumping via comsvcs.dll</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where NewProcessName endswith "\\rundll32.exe"
+| where CommandLine has "comsvcs" and CommandLine has "MiniDump"
+| project TimeGenerated, Computer, SubjectUserName, CommandLine</code></pre>
+                    </div>
+
+                    <h3>SAM Database Access (T1003.002)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: SAM/SYSTEM Registry Hive Access</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where (CommandLine has "reg" and CommandLine has "save" 
+         and (CommandLine has "sam" or CommandLine has "system" or CommandLine has "security"))
+     or (CommandLine has "esentutl" and CommandLine has "/y")
+     or (CommandLine has "vssadmin" and CommandLine has "create shadow")
+| project TimeGenerated, Computer, SubjectUserName, CommandLine</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Lateral Movement Techniques</h2>
+                    
+                    <h3>PsExec and Remote Services (T1021.002)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: PsExec Detection</div>
+                        <pre><code>// Detect PsExec service installation
+SecurityEvent
+| where EventID == 7045  // Service installed
+| where ServiceFileName has_any ("psexec", "paexec", "csexec")
+     or ServiceName has_any ("psexec", "paexec", "csexec")
+| project TimeGenerated, Computer, ServiceName, ServiceFileName, SubjectUserName
+
+// Alternative: Detect PsExec execution pattern
+SecurityEvent
+| where EventID == 4688
+| where NewProcessName endswith "\\psexec.exe" 
+     or NewProcessName endswith "\\psexec64.exe"
+| project TimeGenerated, Computer, SubjectUserName, CommandLine</code></pre>
+                    </div>
+
+                    <h3>Remote Desktop (T1021.001)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious RDP Activity</div>
+                        <pre><code>// Internal-to-internal RDP from unusual sources
+SecurityEvent
+| where EventID == 4624
+| where LogonType == 10  // RDP
+| where IpAddress != "-" and IpAddress != "127.0.0.1"
+| where ipv4_is_private(IpAddress)  // Internal source
+| summarize 
+    RDPCount = count(),
+    TargetHosts = dcount(Computer),
+    Targets = make_set(Computer, 10)
+  by IpAddress, Account, bin(TimeGenerated, 1h)
+| where TargetHosts > 3  // Accessing multiple hosts
+| extend Alert = "Possible lateral movement via RDP"</code></pre>
+                    </div>
+
+                    <h3>WinRM / PowerShell Remoting (T1021.006)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: WinRM Remote Execution</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where ParentProcessName endswith "\\wsmprovhost.exe"  // WinRM host
+| where NewProcessName has_any ("cmd.exe", "powershell.exe", "pwsh.exe")
+| project TimeGenerated, Computer, SubjectUserName, NewProcessName, CommandLine</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Defense Evasion Techniques</h2>
+                    
+                    <h3>Disable Security Tools (T1562.001)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Security Tool Tampering</div>
+                        <pre><code>// Detect attempts to stop/disable Defender
+SecurityEvent
+| where EventID == 4688
+| where (CommandLine has "Stop-Service" and CommandLine has_any ("windefend", "sense", "mpssvc"))
+     or (CommandLine has "sc" and CommandLine has "stop" and CommandLine has_any ("windefend", "sense"))
+     or (CommandLine has "Set-MpPreference" and CommandLine has "DisableRealtimeMonitoring")
+     or (CommandLine has "reg" and CommandLine has "DisableAntiSpyware")
+| project TimeGenerated, Computer, SubjectUserName, CommandLine</code></pre>
+                    </div>
+
+                    <h3>Log Clearing (T1070.001)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Log Clearing Detection</div>
+                        <pre><code>// Event 1102 - Security log cleared
+SecurityEvent
+| where EventID == 1102
+| project TimeGenerated, Computer, SubjectUserName, Activity
+
+// Or detect wevtutil clear commands
+SecurityEvent
+| where EventID == 4688
+| where CommandLine has "wevtutil" and CommandLine has "cl"
+| project TimeGenerated, Computer, SubjectUserName, CommandLine</code></pre>
+                    </div>
+
+                    <h3>Timestomping (T1070.006)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Timestomping Indicators (Sysmon)</div>
+                        <pre><code>// Sysmon Event 2 - File creation time changed
+Event
+| where Source == "Microsoft-Windows-Sysmon"
+| where EventID == 2
+| extend TargetFilename = tostring(parse_xml(EventData).DataItem.TargetFilename)
+| extend CreationUtcTime = tostring(parse_xml(EventData).DataItem.CreationUtcTime)
+| extend PreviousCreationUtcTime = tostring(parse_xml(EventData).DataItem.PreviousCreationUtcTime)
+| where TargetFilename !endswith ".tmp"
+| project TimeGenerated, Computer, TargetFilename, CreationUtcTime, PreviousCreationUtcTime</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Persistence Techniques</h2>
+                    
+                    <h3>Scheduled Tasks (T1053.005)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Scheduled Task Creation</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4698  // Scheduled task created
+| extend TaskContent = tostring(parse_xml(EventData).DataItem.TaskContent)
+| where TaskContent has_any ("powershell", "cmd.exe", "wscript", "cscript", "mshta")
+| project TimeGenerated, Computer, SubjectUserName, TaskName, TaskContent</code></pre>
+                    </div>
+
+                    <h3>Registry Run Keys (T1547.001)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Registry Persistence (Sysmon)</div>
+                        <pre><code>// Sysmon Event 13 - Registry value set
+Event
+| where Source == "Microsoft-Windows-Sysmon"
+| where EventID == 13
+| extend TargetObject = tostring(parse_xml(EventData).DataItem.TargetObject)
+| extend Details = tostring(parse_xml(EventData).DataItem.Details)
+| where TargetObject has_any (
+    "\\Run\\", "\\RunOnce\\", "\\RunServices\\",
+    "\\Winlogon\\Shell", "\\Winlogon\\Userinit",
+    "\\Image File Execution Options\\"
+)
+| project TimeGenerated, Computer, TargetObject, Details</code></pre>
+                    </div>
+
+                    <h3>Services (T1543.003)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Service Creation</div>
+                        <pre><code>SecurityEvent
+| where EventID == 7045  // New service installed
+| where ServiceFileName has_any (
+    "powershell", "cmd.exe", "wscript", "cscript",
+    "mshta", "rundll32", "regsvr32"
+)
+     or ServiceFileName matches regex @"[A-Za-z]:\\(Users|Temp|ProgramData)\\"
+| project TimeGenerated, Computer, ServiceName, ServiceFileName, ServiceStartType</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Living Off the Land Binaries (LOLBins)</h2>
+                    <p>Attackers use legitimate Windows tools to evade detection:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Binary</th>
+                                    <th>Legitimate Use</th>
+                                    <th>Abuse Technique</th>
+                                    <th>Detection</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>mshta.exe</strong></td>
+                                    <td>HTML Applications</td>
+                                    <td>Execute scripts from URL</td>
+                                    <td>mshta + http/https</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>certutil.exe</strong></td>
+                                    <td>Certificate management</td>
+                                    <td>Download files, decode</td>
+                                    <td>certutil -urlcache</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>regsvr32.exe</strong></td>
+                                    <td>Register COM objects</td>
+                                    <td>Execute scripts via /s /u</td>
+                                    <td>regsvr32 + http/scrobj</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>rundll32.exe</strong></td>
+                                    <td>Execute DLL functions</td>
+                                    <td>Load malicious DLLs</td>
+                                    <td>Unusual DLL paths</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>msiexec.exe</strong></td>
+                                    <td>Install MSI packages</td>
+                                    <td>Execute from URL</td>
+                                    <td>msiexec + http</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>bitsadmin.exe</strong></td>
+                                    <td>Background transfers</td>
+                                    <td>Download and execute</td>
+                                    <td>bitsadmin /transfer</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: LOLBin Abuse Detection</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where (NewProcessName endswith "\\mshta.exe" and CommandLine has_any ("http", "https", "javascript", "vbscript"))
+     or (NewProcessName endswith "\\certutil.exe" and CommandLine has_any ("-urlcache", "-decode", "-encode"))
+     or (NewProcessName endswith "\\regsvr32.exe" and CommandLine has_any ("/s", "/i:http", "scrobj"))
+     or (NewProcessName endswith "\\msiexec.exe" and CommandLine has_any ("http://", "https://"))
+     or (NewProcessName endswith "\\bitsadmin.exe" and CommandLine has "/transfer")
+| extend LOLBin = extract(@"\\([^\\]+\.exe)$", 1, NewProcessName)
+| project TimeGenerated, Computer, SubjectUserName, LOLBin, CommandLine</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you detect credential dumping on Windows?"</strong></p>
+                        <p><strong>A:</strong> "I use a layered approach since attackers have many methods:</p>
+                        <ol>
+                            <li><strong>LSASS access monitoring:</strong> With Sysmon Event 10, I look for processes accessing LSASS with suspicious access masks like 0x1010 or 0x1fffff, excluding legitimate processes like AV.</li>
+                            <li><strong>Known tool patterns:</strong> Detect comsvcs.dll MiniDump via rundll32, ProcDump with -ma flag targeting lsass, or reg.exe saving SAM/SYSTEM hives.</li>
+                            <li><strong>Credential Guard bypass attempts:</strong> Look for unusual processes loading specific DLLs or accessing credential-related registry keys.</li>
+                            <li><strong>Behavioral patterns:</strong> Processes creating .dmp files, especially in temp directories. Shadow copy creation followed by ntds.dit access.</li>
+                        </ol>
+                        <p>The key is defense in depth—Credential Guard prevents many attacks, but detection still matters for attempts and bypasses. I also correlate with other indicators like lateral movement following suspected credential theft."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Windows Attack Detection Quick Reference</div>
+                        <h4>High-Priority Detections</h4>
+                        <table>
+                            <tr><th>Technique</th><th>Key Indicator</th></tr>
+                            <tr><td>PowerShell abuse</td><td>-enc, bypass, downloadstring, IEX</td></tr>
+                            <tr><td>LSASS dump</td><td>Access to lsass.exe, comsvcs MiniDump</td></tr>
+                            <tr><td>PsExec</td><td>PSEXESVC service, -s -d flags</td></tr>
+                            <tr><td>Scheduled task</td><td>Event 4698 with suspicious commands</td></tr>
+                            <tr><td>Service persistence</td><td>Event 7045 with script interpreters</td></tr>
+                        </table>
+                        <h4>LOLBins to Monitor</h4>
+                        <p>mshta, certutil, regsvr32, rundll32, msiexec, bitsadmin, wmic, cscript, wscript</p>
+                        <h4>Sysmon Events</h4>
+                        <table>
+                            <tr><th>ID</th><th>Use</th></tr>
+                            <tr><td>1</td><td>Process creation with hashes</td></tr>
+                            <tr><td>3</td><td>Network connections</td></tr>
+                            <tr><td>7</td><td>Image loaded (DLLs)</td></tr>
+                            <tr><td>10</td><td>Process access (LSASS)</td></tr>
+                            <tr><td>13</td><td>Registry modifications</td></tr>
+                        </table>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="active-directory.html" class="card-link">← Active Directory</a>
+                    <a href="windows-hardening.html" class="card-link">Windows Hardening →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

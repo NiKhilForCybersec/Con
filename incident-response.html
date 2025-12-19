@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Context</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="incident-response.html" class="nav-item active">Incident Response</a>
+                    <a href="threat-hunting.html" class="nav-item">Threat Hunting</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="soc-operations.html">SOC Context</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Incident Response</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Incident Response</h1>
+                    <p class="page-subtitle">When detection becomes incident, structured response is critical. The SIEM is the primary tool for investigation—understanding IR methodology helps build better detection and response capabilities.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Incident Response Lifecycle</h2>
+                    <p>Based on NIST SP 800-61, the IR lifecycle provides a structured approach:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">NIST Incident Response Lifecycle</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│      ┌─────────────────┐                      ┌─────────────────┐          │
+│      │  PREPARATION    │                      │ POST-INCIDENT   │          │
+│      │                 │                      │ ACTIVITY        │          │
+│      │ • IR plan       │                      │ • Lessons       │          │
+│      │ • Team training │                      │   learned       │          │
+│      │ • Tools ready   │                      │ • Plan updates  │          │
+│      │ • Runbooks      │                      │ • Detection     │          │
+│      └────────┬────────┘                      │   improvements  │          │
+│               │                               └────────▲────────┘          │
+│               ▼                                        │                   │
+│      ┌─────────────────┐      ┌─────────────────┐     │                   │
+│      │ DETECTION &     │      │ CONTAINMENT,    │     │                   │
+│      │ ANALYSIS        │ ───► │ ERADICATION &   │ ────┘                   │
+│      │                 │      │ RECOVERY        │                          │
+│      │ • Alert triage  │      │                 │                          │
+│      │ • Investigation │      │ • Stop spread   │                          │
+│      │ • Scoping       │      │ • Remove threat │                          │
+│      │ • Evidence      │      │ • Restore ops   │                          │
+│      └─────────────────┘      └─────────────────┘                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection & Analysis Phase</h2>
+                    <p>This is where SIEM expertise matters most. Key activities:</p>
+                    
+                    <h3>Initial Scoping</h3>
+                    <p>Answer critical questions quickly:</p>
+                    <ul>
+                        <li><strong>What happened?</strong> Type of attack, techniques used</li>
+                        <li><strong>When did it start?</strong> Timeline of initial compromise</li>
+                        <li><strong>What's affected?</strong> Hosts, accounts, data</li>
+                        <li><strong>Is it ongoing?</strong> Active threat actor presence</li>
+                        <li><strong>How did they get in?</strong> Initial access vector</li>
+                    </ul>
+
+                    <h3>SIEM Investigation Queries</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: User Activity Timeline</div>
+                        <pre><code>// Build complete timeline for compromised user
+let TargetUser = "compromised.user@domain.com";
+let TimeWindow = 7d;
+
+union
+    (SigninLogs 
+     | where UserPrincipalName =~ TargetUser
+     | project TimeGenerated, Source = "SignIn", Activity = strcat(ResultType, " - ", Location)
+    ),
+    (AuditLogs
+     | where InitiatedBy.user.userPrincipalName =~ TargetUser
+     | project TimeGenerated, Source = "AuditLog", Activity = OperationName
+    ),
+    (SecurityEvent
+     | where Account contains TargetUser
+     | project TimeGenerated, Source = "WinSecurity", Activity = Activity
+    ),
+    (OfficeActivity
+     | where UserId =~ TargetUser
+     | project TimeGenerated, Source = "Office365", Activity = Operation
+    )
+| where TimeGenerated > ago(TimeWindow)
+| order by TimeGenerated asc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Host Activity Timeline</div>
+                        <pre><code>// Build timeline for compromised host
+let TargetHost = "WORKSTATION01";
+let TimeWindow = 7d;
+
+union
+    (SecurityEvent
+     | where Computer has TargetHost
+     | where EventID in (4624, 4625, 4688, 4698, 4720, 7045)
+     | project TimeGenerated, Source = "Security", Activity = Activity, Details = CommandLine
+    ),
+    (Event
+     | where Computer has TargetHost
+     | where Source == "Microsoft-Windows-Sysmon"
+     | project TimeGenerated, Source = "Sysmon", Activity = tostring(EventID), Details = RenderedDescription
+    ),
+    (DeviceProcessEvents
+     | where DeviceName has TargetHost
+     | project TimeGenerated, Source = "MDE", Activity = ActionType, Details = ProcessCommandLine
+    )
+| where TimeGenerated > ago(TimeWindow)
+| order by TimeGenerated asc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Lateral Movement Search</div>
+                        <pre><code>// Find where compromised account authenticated
+let CompromisedAccount = "admin.user";
+let CompromiseTime = datetime(2024-03-15T10:00:00Z);
+
+SecurityEvent
+| where TimeGenerated > CompromiseTime
+| where EventID == 4624
+| where Account contains CompromisedAccount
+| summarize 
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    LogonCount = count()
+  by Computer, LogonType, IpAddress
+| order by FirstSeen asc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Containment Strategies</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Containment Decision Matrix</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      CONTAINMENT OPTIONS                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  SHORT-TERM CONTAINMENT (Stop the bleeding)                                │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌───────────────────┐  │
+│  │ NETWORK ISOLATION   │  │ ACCOUNT DISABLE     │  │ BLOCK INDICATORS │  │
+│  ├─────────────────────┤  ├─────────────────────┤  ├───────────────────┤  │
+│  │ • Isolate host from │  │ • Disable compro-   │  │ • Block C2 IPs   │  │
+│  │   network           │  │   mised accounts    │  │ • Block domains  │  │
+│  │ • Block lateral     │  │ • Force password    │  │ • Block hashes   │  │
+│  │   movement ports    │  │   reset             │  │                  │  │
+│  │ • Segment affected  │  │ • Revoke sessions   │  │                  │  │
+│  │   VLAN              │  │ • Revoke tokens     │  │                  │  │
+│  └─────────────────────┘  └─────────────────────┘  └───────────────────┘  │
+│                                                                             │
+│  CONSIDERATIONS:                                                            │
+│  • Preserve evidence (don't power off unless necessary)                    │
+│  • Document all actions taken                                              │
+│  • Coordinate with business stakeholders                                   │
+│  • Balance containment with business continuity                            │
+│                                                                             │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  LONG-TERM CONTAINMENT (Stabilize for eradication)                         │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  • Build clean systems in parallel                                         │
+│  • Implement additional monitoring on affected systems                     │
+│  • Prepare for coordinated eradication                                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Evidence Collection</h2>
+                    <p>Preserve evidence for investigation and potential legal action:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Evidence Type</th>
+                                    <th>Collection Method</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Volatile Memory</strong></td>
+                                    <td>Memory dump before shutdown</td>
+                                    <td>Critical - collect first</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SIEM Logs</strong></td>
+                                    <td>Export relevant timeframe</td>
+                                    <td>High - already preserved</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Disk Image</strong></td>
+                                    <td>Forensic imaging</td>
+                                    <td>High - after memory</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Network Captures</strong></td>
+                                    <td>PCAP from affected segments</td>
+                                    <td>Medium - if available</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cloud Logs</strong></td>
+                                    <td>Export from cloud providers</td>
+                                    <td>High - retention limits</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>EDR Data</strong></td>
+                                    <td>Export from EDR console</td>
+                                    <td>High - detailed telemetry</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Chain of Custody</div>
+                        <p>Document who collected what, when, and how. Hash all evidence files. Store securely with access logging. This is essential if the incident leads to legal action.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Incident Types</h2>
+                    
+                    <h3>Ransomware Incident</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phase</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Detection</strong></td>
+                                    <td>File encryption alerts, ransom notes, EDR detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Immediate</strong></td>
+                                    <td>Isolate affected systems, disable network shares, preserve evidence</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scope</strong></td>
+                                    <td>Identify all encrypted systems, determine initial access, find backup status</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contain</strong></td>
+                                    <td>Block C2, disable compromised accounts, segment network</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Eradicate</strong></td>
+                                    <td>Remove persistence, rebuild from clean images</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Recover</strong></td>
+                                    <td>Restore from backups, validate integrity, monitor closely</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Business Email Compromise</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phase</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Detection</strong></td>
+                                    <td>Impossible travel, inbox rule creation, unusual email patterns</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Immediate</strong></td>
+                                    <td>Reset password, revoke sessions, check mail forwarding rules</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scope</strong></td>
+                                    <td>Review sent items, check for data exfiltration, identify contacted parties</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contain</strong></td>
+                                    <td>Remove malicious inbox rules, block attacker IPs, enable MFA</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Notify</strong></td>
+                                    <td>Alert recipients of fraudulent emails, contact vendors if financial</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Recover</strong></td>
+                                    <td>Conduct awareness training, implement additional controls</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Incident Severity Classification</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Severity</th>
+                                    <th>Criteria</th>
+                                    <th>Response</th>
+                                    <th>Notification</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Critical (P1)</strong></td>
+                                    <td>Active attack, data breach, ransomware, critical system down</td>
+                                    <td>All hands, war room, 24/7</td>
+                                    <td>Executive, legal, potentially regulatory</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>High (P2)</strong></td>
+                                    <td>Confirmed compromise, malware infection, credential theft</td>
+                                    <td>Dedicated team, business hours+</td>
+                                    <td>Management, affected business units</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Medium (P3)</strong></td>
+                                    <td>Potential compromise, policy violation, contained threat</td>
+                                    <td>Normal SOC workflow, escalated</td>
+                                    <td>Team leads</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Low (P4)</strong></td>
+                                    <td>Reconnaissance, blocked attack, security event</td>
+                                    <td>Normal SOC workflow</td>
+                                    <td>Logged for trending</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Post-Incident Activities</h2>
+                    
+                    <h3>Lessons Learned Template</h3>
+                    <ul>
+                        <li><strong>Incident summary:</strong> What happened, timeline, impact</li>
+                        <li><strong>Detection:</strong> How was it discovered? Could we detect earlier?</li>
+                        <li><strong>Response:</strong> What worked? What was difficult?</li>
+                        <li><strong>Root cause:</strong> Why did this happen?</li>
+                        <li><strong>Recommendations:</strong> What should we change?</li>
+                        <li><strong>Action items:</strong> Specific tasks with owners and deadlines</li>
+                    </ul>
+
+                    <h3>Detection Improvements</h3>
+                    <p>Every incident should improve detection:</p>
+                    <ul>
+                        <li>Could we have detected this earlier with a new rule?</li>
+                        <li>Were there alerts that should have been investigated?</li>
+                        <li>What IOCs can we add to threat intel?</li>
+                        <li>What log sources were missing that would have helped?</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "Walk me through how you would respond to a ransomware incident."</strong></p>
+                        <p><strong>A:</strong> "I follow the NIST framework:</p>
+                        <ol>
+                            <li><strong>Immediate containment:</strong> Isolate affected systems from the network to stop spread. Don't power them off—preserve volatile memory for investigation.</li>
+                            <li><strong>Scope the impact:</strong> Use the SIEM to identify all systems with encryption indicators. Check for lateral movement—where did the attacker go before deploying ransomware?</li>
+                            <li><strong>Determine initial access:</strong> Work backward from first encrypted system. Check email logs for phishing, VPN logs for compromised credentials, perimeter logs for exploitation.</li>
+                            <li><strong>Eradicate persistence:</strong> The ransomware is just the final stage. Find and remove any backdoors, scheduled tasks, or other persistence before recovering.</li>
+                            <li><strong>Recover:</strong> Rebuild from clean images and restore from backups. Validate backup integrity before trusting them.</li>
+                            <li><strong>Post-incident:</strong> Document lessons learned. Implement detection for the initial access vector. Add new IOCs to threat intel.</li>
+                        </ol>
+                        <p>Key point: Don't pay the ransom unless absolutely necessary—it doesn't guarantee recovery and funds criminal operations."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Incident Response Quick Reference</div>
+                        <h4>IR Phases (NIST)</h4>
+                        <ol>
+                            <li>Preparation</li>
+                            <li>Detection & Analysis</li>
+                            <li>Containment, Eradication & Recovery</li>
+                            <li>Post-Incident Activity</li>
+                        </ol>
+                        <h4>First Response Actions</h4>
+                        <ul>
+                            <li>Preserve evidence (memory before disk)</li>
+                            <li>Isolate affected systems</li>
+                            <li>Document all actions</li>
+                            <li>Notify appropriate stakeholders</li>
+                        </ul>
+                        <h4>Key Questions</h4>
+                        <ul>
+                            <li>What happened? When did it start?</li>
+                            <li>What's affected? Is it ongoing?</li>
+                            <li>How did they get in?</li>
+                            <li>Where did they go?</li>
+                        </ul>
+                        <h4>Severity Triggers</h4>
+                        <ul>
+                            <li>P1: Active breach, data exfil, ransomware</li>
+                            <li>P2: Confirmed compromise, credential theft</li>
+                            <li>P3: Potential compromise, contained</li>
+                            <li>P4: Recon, blocked attack</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soc-operations.html" class="card-link">← SOC Operations</a>
+                    <a href="threat-hunting.html" class="card-link">Threat Hunting →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

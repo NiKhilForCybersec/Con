@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Fundamentals | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Detection Fundamentals</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Detection Fundamentals</h1>
+                    <p class="page-subtitle">Core concepts of security detection engineering</p>
+                </header>
+                
+                
+                <h2>What is Detection Engineering?</h2>
+                
+                <p>Detection engineering is the practice of designing, building, testing, and maintaining detection rules that identify security threats in your environment.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 The Detection Pyramid</div>
+                    <p>Effective detection requires:</p>
+                    <ul>
+                        <li><strong>Visibility:</strong> The right logs collected</li>
+                        <li><strong>Context:</strong> Understanding what's normal</li>
+                        <li><strong>Logic:</strong> Rules that identify threats</li>
+                        <li><strong>Tuning:</strong> Reducing false positives</li>
+                        <li><strong>Response:</strong> Actionable alerts</li>
+                    </ul>
+                </div>
+                
+                <h2>Detection Types</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>How It Works</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Signature-based</strong></td>
+                                <td>Match known-bad patterns</td>
+                                <td>Specific malware hash, known C2 IP</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Behavioral</strong></td>
+                                <td>Detect actions regardless of tool</td>
+                                <td>Process creating scheduled task + network connection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Threshold</strong></td>
+                                <td>Count exceeds limit</td>
+                                <td>5+ failed logins in 5 minutes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Anomaly/ML</strong></td>
+                                <td>Deviation from baseline</td>
+                                <td>User accessing unusual systems</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Correlation</strong></td>
+                                <td>Multiple events together</td>
+                                <td>Failed login → success → privilege escalation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Detection Quality Metrics</h2>
+                
+                <ul>
+                    <li><strong>True Positive Rate:</strong> How often it catches real threats</li>
+                    <li><strong>False Positive Rate:</strong> How often it fires on benign activity</li>
+                    <li><strong>Coverage:</strong> What percentage of attack techniques it detects</li>
+                    <li><strong>Timeliness:</strong> How quickly it alerts after the event</li>
+                </ul>
+                
+                <h2>The Detection Lifecycle</h2>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Detection Engineering Lifecycle</div>
+                    <pre><code>
+┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐
+│  IDEATION  │ →  │   BUILD    │ →  │   TEST     │ →  │  DEPLOY    │ →  │  MAINTAIN  │
+├────────────┤    ├────────────┤    ├────────────┤    ├────────────┤    ├────────────┤
+│ • Threat   │    │ • Write    │    │ • Atomic   │    │ • Enable   │    │ • Monitor  │
+│   intel    │    │   logic    │    │   tests    │    │   rule     │    │   FP rate  │
+│ • ATT&CK   │    │ • Add      │    │ • Purple   │    │ • Document │    │ • Tune     │
+│   coverage │    │   context  │    │   team     │    │ • Alert    │    │ • Review   │
+│ • Gaps     │    │ • Assign   │    │ • Validate │    │   routing  │    │ • Retire   │
+│            │    │   severity │    │            │    │            │    │            │
+└────────────┘    └────────────┘    └────────────┘    └────────────┘    └────────────┘
+                    </code></pre>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How do you approach building a new detection rule?"</p>
+                    <p><strong>Answer:</strong> "I start with the threat - what attack technique am I trying to detect? I map it to MITRE ATT&CK for context. Then I identify the data source needed - do we have the right logs? I write the detection logic, starting broad then narrowing to reduce false positives. I test with atomic tests or purple team exercises to validate it catches the attack. After deployment, I monitor false positive rates for the first week and tune as needed. Every rule gets documented with its purpose, limitations, and response procedure."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="migration-methodology.html" class="card-link">← Migration Methodology</a>
+                    <a href="use-case-development.html" class="card-link">Use Case Development →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

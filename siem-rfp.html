@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM RFP Guide | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Selection</div>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-rfp.html" class="nav-item active">RFP Guide</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SIEM RFP Guide</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Selection & RFP Guide</h1>
+                    <p class="page-subtitle">Selecting a SIEM is a multi-year commitment with significant cost and operational implications. A structured evaluation ensures the chosen platform meets security, operational, and business requirements.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Selection Process</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SIEM Selection Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SIEM SELECTION PROCESS                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  PHASE 1: REQUIREMENTS (2-4 weeks)                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Define use cases and detection requirements                        │   │
+│  │ • Inventory log sources and volumes                                  │   │
+│  │ • Identify compliance requirements                                   │   │
+│  │ • Document integration needs (EDR, SOAR, TI)                        │   │
+│  │ • Establish budget constraints                                       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  PHASE 2: MARKET ANALYSIS (2-3 weeks)                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Research vendor landscape                                          │   │
+│  │ • Create long list (5-8 vendors)                                     │   │
+│  │ • Preliminary capability assessment                                  │   │
+│  │ • Shortlist to 3-4 vendors                                          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  PHASE 3: EVALUATION (4-8 weeks)                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Issue RFP to shortlisted vendors                                   │   │
+│  │ • Conduct demos with standardized scenarios                          │   │
+│  │ • Proof of Concept with real data (optional)                        │   │
+│  │ • Reference checks                                                   │   │
+│  │ • TCO analysis                                                       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  PHASE 4: DECISION (2-3 weeks)                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Scoring and ranking                                                │   │
+│  │ • Contract negotiation                                               │   │
+│  │ • Executive approval                                                 │   │
+│  │ • Implementation planning                                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>RFP Evaluation Criteria</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Weight</th>
+                                    <th>Key Questions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Detection Capabilities</strong></td>
+                                    <td>25%</td>
+                                    <td>Out-of-box rules, custom detection, MITRE coverage</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Collection</strong></td>
+                                    <td>20%</td>
+                                    <td>Native connectors, custom parsing, cloud support</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Cost</strong></td>
+                                    <td>20%</td>
+                                    <td>License, infrastructure, professional services</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Usability</strong></td>
+                                    <td>15%</td>
+                                    <td>Analyst workflow, investigation UI, query language</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Integration</strong></td>
+                                    <td>10%</td>
+                                    <td>EDR, SOAR, TI, ticketing integration</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scalability</strong></td>
+                                    <td>5%</td>
+                                    <td>Performance at scale, multi-tenant, global</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vendor</strong></td>
+                                    <td>5%</td>
+                                    <td>Viability, support quality, roadmap</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Key RFP Questions</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Detection & Analytics</div>
+                        <ul>
+                            <li>How many out-of-box detection rules are included?</li>
+                            <li>What is the MITRE ATT&CK coverage?</li>
+                            <li>How are custom detection rules created and managed?</li>
+                            <li>What UEBA/ML capabilities are included vs add-on?</li>
+                            <li>How does correlation work across data sources?</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Data Collection</div>
+                        <ul>
+                            <li>What log sources have native integrations?</li>
+                            <li>How is custom parsing handled?</li>
+                            <li>What is the maximum ingestion rate supported?</li>
+                            <li>How is data normalized across sources?</li>
+                            <li>What cloud platforms are natively supported?</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Pricing & Licensing</div>
+                        <ul>
+                            <li>What is the pricing model (GB, EPS, users)?</li>
+                            <li>What features require additional licensing?</li>
+                            <li>Are there overage charges? How are they calculated?</li>
+                            <li>What commitment terms are available?</li>
+                            <li>What is included in support tiers?</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>TCO Calculation</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Total Cost of Ownership Framework</div>
+                        <pre><code>
+SIEM TCO CALCULATION (3-Year)
+═══════════════════════════════════════════════════════════════
+
+DIRECT COSTS
+├── License/Subscription
+│   ├── Base platform                    $________
+│   ├── Additional modules (SOAR, UEBA)  $________
+│   └── Overage reserve (10-20%)         $________
+│
+├── Infrastructure (if applicable)
+│   ├── Compute (servers/VMs)            $________
+│   ├── Storage                          $________
+│   └── Network/bandwidth                $________
+│
+└── Professional Services
+    ├── Implementation                   $________
+    ├── Training                         $________
+    └── Annual support/maintenance       $________
+
+INDIRECT COSTS
+├── Internal Resources
+│   ├── FTE for administration           $________
+│   ├── FTE for content development      $________
+│   └── Project management               $________
+│
+└── Opportunity Costs
+    ├── Migration effort                 $________
+    └── Learning curve productivity      $________
+
+═══════════════════════════════════════════════════════════════
+TOTAL 3-YEAR TCO                         $________
+ANNUAL TCO                               $________
+COST PER GB/DAY                          $________
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Demo Scenarios</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Standardized Demo Script</div>
+                        <ol>
+                            <li><strong>Data onboarding:</strong> Show ingesting a new log source (Windows Security, cloud logs)</li>
+                            <li><strong>Rule creation:</strong> Build a custom detection rule from scratch</li>
+                            <li><strong>Investigation:</strong> Walk through investigating a sample alert</li>
+                            <li><strong>Threat hunting:</strong> Demonstrate ad-hoc query capabilities</li>
+                            <li><strong>Dashboard:</strong> Create an executive dashboard</li>
+                            <li><strong>Integration:</strong> Show EDR/SOAR/TI integration</li>
+                            <li><strong>Scale:</strong> Demonstrate performance with volume</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Pitfalls</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Selection Mistakes to Avoid</div>
+                        <ul>
+                            <li><strong>Underestimating data volume:</strong> Actual ingestion often 2-3x estimates</li>
+                            <li><strong>Ignoring hidden costs:</strong> Professional services, training, infrastructure</li>
+                            <li><strong>Feature checklist focus:</strong> Demo workflow matters more than feature lists</li>
+                            <li><strong>Skipping POC:</strong> Production testing reveals real limitations</li>
+                            <li><strong>Not checking references:</strong> Talk to similar-sized customers</li>
+                            <li><strong>Short-term thinking:</strong> Consider 3-5 year trajectory</li>
+                            <li><strong>Ignoring ecosystem:</strong> Integration with existing tools matters</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you approach SIEM selection?"</strong></p>
+                        <p><strong>A:</strong> "I follow a structured process:</p>
+                        <ol>
+                            <li><strong>Requirements first:</strong> Before looking at vendors, I document use cases, data sources, volumes, and compliance needs. This prevents being swayed by shiny features.</li>
+                            <li><strong>Shortlist carefully:</strong> I narrow to 3-4 vendors based on deployment model fit (cloud/on-prem), existing ecosystem, and rough budget alignment.</li>
+                            <li><strong>Standardized evaluation:</strong> Every vendor gets the same demo script and RFP questions. This enables apples-to-apples comparison.</li>
+                            <li><strong>POC with real data:</strong> For major investments, I run a proof of concept with actual production logs. Brochure performance rarely matches reality.</li>
+                            <li><strong>TCO, not license cost:</strong> I calculate full 3-year TCO including infrastructure, services, and internal effort. The cheapest license often isn't cheapest overall.</li>
+                            <li><strong>Reference checks:</strong> I talk to similar organizations about real-world experience, especially support quality and hidden gotchas.</li>
+                        </ol>
+                        <p>The goal is matching the platform to actual needs, not buying the most features."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 SIEM Selection Quick Reference</div>
+                        <h4>Must-Have Requirements</h4>
+                        <ul>
+                            <li>Cloud log source support</li>
+                            <li>Custom detection capability</li>
+                            <li>EDR/endpoint integration</li>
+                            <li>Reasonable query performance</li>
+                            <li>Scalable pricing model</li>
+                        </ul>
+                        <h4>Evaluation Timeline</h4>
+                        <ul>
+                            <li>Requirements: 2-4 weeks</li>
+                            <li>Market analysis: 2-3 weeks</li>
+                            <li>RFP/Demo: 4-6 weeks</li>
+                            <li>POC (optional): 4-6 weeks</li>
+                            <li>Decision: 2-3 weeks</li>
+                        </ul>
+                        <h4>Key Decision Factors</h4>
+                        <ul>
+                            <li>Detection effectiveness</li>
+                            <li>Analyst workflow/UX</li>
+                            <li>Integration ecosystem</li>
+                            <li>True TCO</li>
+                            <li>Vendor stability</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="platform-comparison.html" class="card-link">← Platform Comparison</a>
+                    <a href="migration-methodology.html" class="card-link">Migration →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

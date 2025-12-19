@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SIEM Consultant Experience - Projects and documentation portfolio">
+  <title>Experience & Portfolio | SIEM Consultant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle navigation">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+  </button>
+  <div class="sidebar-overlay"></div>
+  
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">🛡️</div>
+          <div class="sidebar-logo-text">
+            SIEM Consultant
+            <span>Portfolio & Reference</span>
+          </div>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <!-- Section 1: Foundation -->
+        <div class="nav-section" data-section="1">
+          <div class="nav-section-header">
+            <span>1. Consultant Foundation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="approach.html" class="nav-item">My Approach</a>
+            <a href="deliverables.html" class="nav-item">Deliverables</a>
+            <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+          </div>
+        </div>
+        
+        <!-- Section 2: SIEM Fundamentals -->
+        <div class="nav-section" data-section="2">
+          <div class="nav-section-header">
+            <span>2. SIEM Fundamentals</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+            <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+            <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+            <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+            <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+            <a href="sentinel-overview.html" class="nav-item">Sentinel Overview</a>
+            <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+            <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+          </div>
+        </div>
+        
+        <!-- Section 3: Log Source Engineering -->
+        <div class="nav-section" data-section="3">
+          <div class="nav-section-header">
+            <span>3. Log Source Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+            <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+            <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+            <a href="network-logs.html" class="nav-item">Network Logs</a>
+            <a href="identity-logs.html" class="nav-item">Identity Logs</a>
+            <a href="cloud-logs.html" class="nav-item">Cloud Logs</a>
+            <a href="endpoint-logs.html" class="nav-item">Endpoint/EDR Logs</a>
+            <a href="application-logs.html" class="nav-item">Application Logs</a>
+          </div>
+        </div>
+        
+        <!-- Section 4: SIEM Migrations -->
+        <div class="nav-section" data-section="4">
+          <div class="nav-section-header">
+            <span>4. SIEM Migrations</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+            <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+            <a href="log-migration.html" class="nav-item">Log Source Migration</a>
+            <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+            <a href="query-translation.html" class="nav-item">Query Translation</a>
+            <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+            <a href="parallel-cutover.html" class="nav-item">Parallel Run & Cutover</a>
+            <a href="migration-challenges.html" class="nav-item">Challenges & Solutions</a>
+          </div>
+        </div>
+        
+        <!-- Section 5: SIEM Deployments -->
+        <div class="nav-section" data-section="5">
+          <div class="nav-section-header">
+            <span>5. SIEM Deployments</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="deployment-approach.html" class="nav-item">Deployment Approach</a>
+            <a href="splunk-cloud-deployment.html" class="nav-item">Splunk Cloud Deployment</a>
+            <a href="splunk-enterprise-deployment.html" class="nav-item">Splunk Enterprise Deployment</a>
+            <a href="sentinel-deployment.html" class="nav-item">Sentinel Deployment</a>
+            <a href="architecture-design.html" class="nav-item">Architecture Design</a>
+            <a href="workspace-design.html" class="nav-item">Workspace Design</a>
+            <a href="initial-onboarding.html" class="nav-item">Initial Onboarding</a>
+            <a href="operationalization.html" class="nav-item">Operationalization</a>
+          </div>
+        </div>
+        
+        <!-- Section 6: Detection Engineering -->
+        <div class="nav-section" data-section="6">
+          <div class="nav-section-header">
+            <span>6. Detection Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+            <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+            <a href="splunk-detections.html" class="nav-item">Splunk Detections</a>
+            <a href="sentinel-detections.html" class="nav-item">Sentinel Detections</a>
+            <a href="tuning-methodology.html" class="nav-item">Tuning Methodology</a>
+            <a href="detection-testing.html" class="nav-item">Detection Testing</a>
+          </div>
+        </div>
+        
+        <!-- Section 7: Threat Frameworks -->
+        <div class="nav-section" data-section="7">
+          <div class="nav-section-header">
+            <span>7. Threat Frameworks</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK Intro</a>
+            <a href="mitre-for-detection.html" class="nav-item">ATT&CK for Detection</a>
+            <a href="cyber-kill-chain.html" class="nav-item">Cyber Kill Chain</a>
+            <a href="detection-coverage.html" class="nav-item">Detection Coverage</a>
+            <a href="threat-modeling-basics.html" class="nav-item">Threat Modeling</a>
+          </div>
+        </div>
+        
+        <!-- Section 8: Windows Security -->
+        <div class="nav-section" data-section="8">
+          <div class="nav-section-header">
+            <span>8. Windows Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="windows-security-basics.html" class="nav-item">Windows Security Basics</a>
+            <a href="windows-authentication.html" class="nav-item">Windows Authentication</a>
+            <a href="critical-event-ids.html" class="nav-item">Critical Event IDs</a>
+            <a href="windows-attacks.html" class="nav-item">Windows Attacks</a>
+            <a href="sysmon-basics.html" class="nav-item">Sysmon Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 9: Network Security -->
+        <div class="nav-section" data-section="9">
+          <div class="nav-section-header">
+            <span>9. Network Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="network-fundamentals.html" class="nav-item">Network Fundamentals</a>
+            <a href="network-protocols.html" class="nav-item">Network Protocols</a>
+            <a href="network-attacks.html" class="nav-item">Network Attacks</a>
+            <a href="network-architecture.html" class="nav-item">Network Architecture</a>
+            <a href="visibility-points.html" class="nav-item">Visibility Points</a>
+          </div>
+        </div>
+        
+        <!-- Section 10: Cloud Security -->
+        <div class="nav-section" data-section="10">
+          <div class="nav-section-header">
+            <span>10. Cloud Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="cloud-security-basics.html" class="nav-item">Cloud Security Basics</a>
+            <a href="aws-security.html" class="nav-item">AWS Security</a>
+            <a href="azure-security.html" class="nav-item">Azure Security</a>
+            <a href="cloud-siem-integration.html" class="nav-item">Cloud SIEM Integration</a>
+          </div>
+        </div>
+        
+        <!-- Section 11: Identity Security -->
+        <div class="nav-section" data-section="11">
+          <div class="nav-section-header">
+            <span>11. Identity Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="identity-fundamentals.html" class="nav-item">Identity Fundamentals</a>
+            <a href="active-directory.html" class="nav-item">Active Directory</a>
+            <a href="entra-id.html" class="nav-item">Entra ID</a>
+            <a href="identity-attacks.html" class="nav-item">Identity Attacks</a>
+          </div>
+        </div>
+        
+        <!-- Section 12: Scripting & Automation -->
+        <div class="nav-section" data-section="12">
+          <div class="nav-section-header">
+            <span>12. Scripting & Automation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="scripting-overview.html" class="nav-item">Scripting Overview</a>
+            <a href="powershell-for-siem.html" class="nav-item">PowerShell for SIEM</a>
+            <a href="python-for-siem.html" class="nav-item">Python for SIEM</a>
+            <a href="soar-basics.html" class="nav-item">SOAR Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 13: Query Languages -->
+        <div class="nav-section" data-section="13">
+          <div class="nav-section-header">
+            <span>13. Query Languages</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+            <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+            <a href="query-patterns.html" class="nav-item">Query Patterns</a>
+            <a href="query-cheatsheet.html" class="nav-item">Query Cheat Sheet</a>
+          </div>
+        </div>
+        
+        <!-- Section 14: SOC Context -->
+        <div class="nav-section" data-section="14">
+          <div class="nav-section-header">
+            <span>14. SOC Context</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="soc-fundamentals.html" class="nav-item">SOC Fundamentals</a>
+            <a href="alert-lifecycle.html" class="nav-item">Alert Lifecycle</a>
+            <a href="metrics-reporting.html" class="nav-item">Metrics & Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 15: Compliance -->
+        <div class="nav-section" data-section="15">
+          <div class="nav-section-header">
+            <span>15. Compliance & Governance</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="compliance-overview.html" class="nav-item">Compliance Overview</a>
+            <a href="log-retention.html" class="nav-item">Log Retention</a>
+            <a href="audit-reporting.html" class="nav-item">Audit Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 16: Interview Prep -->
+        <div class="nav-section" data-section="16">
+          <div class="nav-section-header">
+            <span>16. Interview Preparation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="common-questions.html" class="nav-item">Common Questions</a>
+            <a href="scenario-questions.html" class="nav-item">Scenario Questions</a>
+            <a href="technical-exercises.html" class="nav-item">Technical Exercises</a>
+            <a href="architecture-diagrams.html" class="nav-item">Architecture Diagrams</a>
+            <a href="your-experience.html" class="nav-item">Your Experience</a>
+          </div>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>SIEM Consultant Portfolio</p>
+        <p>Built for Interview Success</p>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span>Experience & Portfolio</span>
+        </nav>
+        
+        <header class="page-header">
+          <h1 class="page-title">Experience & Portfolio</h1>
+          <p class="page-subtitle">5+ years in security operations, SIEM engineering, and detection development</p>
+        </header>
+        
+        <h2>Professional Background</h2>
+        
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">2022 - Present</div>
+            <div class="timeline-title">Security Engineer - Siemens Subsidiary</div>
+            <div class="timeline-subtitle">EDR/XDR, DLP, Microsoft Security Stack, SIEM Operations</div>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary);">
+              Leading Purview Endpoint DLP migration from Symantec. Working with Cortex XDR, Microsoft Sentinel, and Splunk. 
+              Developed 200+ detection rules, managed RSA NetWitness to Sentinel migration.
+            </p>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">2020 - 2022</div>
+            <div class="timeline-title">Security Engineer - Infosys</div>
+            <div class="timeline-subtitle">Trellix, Symantec DLP, SIEM Engineering</div>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary);">
+              Enterprise DLP implementation and management. Security monitoring and incident response. 
+              SIEM content development and log source onboarding.
+            </p>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">2018 - 2020</div>
+            <div class="timeline-title">L1 SOC Analyst - Cognizant</div>
+            <div class="timeline-subtitle">Splunk, Security Monitoring, Incident Response</div>
+            <p style="margin-top: 0.5rem; color: var(--text-secondary);">
+              24x7 SOC operations with Splunk Enterprise Security. Alert triage, investigation, escalation. 
+              Foundation in security operations and SIEM usage.
+            </p>
+          </div>
+        </div>
+        
+        <h2>Technical Skills</h2>
+        
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon">📊</div>
+            <h3>SIEM Platforms</h3>
+            <p>Splunk Enterprise & Cloud, Microsoft Sentinel, RSA NetWitness, ArcSight (exposure)</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🛡️</div>
+            <h3>Security Tools</h3>
+            <p>Cortex XDR, Microsoft Defender for Endpoint, Trellix, Symantec DLP, Microsoft Purview</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">💻</div>
+            <h3>Query Languages</h3>
+            <p>SPL (Splunk), KQL (Sentinel), PowerShell, Python, Bash</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">☁️</div>
+            <h3>Cloud Platforms</h3>
+            <p>Microsoft Azure, Azure Security Services, Logic Apps, Azure Functions</p>
+          </div>
+        </div>
+        
+        <h2>Documentation Portfolio</h2>
+        <p>Comprehensive technical documentation demonstrating deep expertise:</p>
+        
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Scope</th>
+                <th>Key Content</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>RSA NetWitness → Sentinel Migration</strong></td>
+                <td>22 pages, 302 rules</td>
+                <td>Complete migration playbook, rule translation catalog, custom KQL parsers, Logic Apps playbooks</td>
+              </tr>
+              <tr>
+                <td><strong>SIEM Engineering Guide</strong></td>
+                <td>70+ pages</td>
+                <td>Splunk & Sentinel deep dive, SPL/KQL reference, ES correlation searches, detection engineering</td>
+              </tr>
+              <tr>
+                <td><strong>Microsoft Defender for Endpoint</strong></td>
+                <td>92 pages</td>
+                <td>MDE architecture, telemetry, hunting queries, response automation, integration patterns</td>
+              </tr>
+              <tr>
+                <td><strong>IAM Ultimate Guide</strong></td>
+                <td>84 files</td>
+                <td>Enterprise security architecture, Zero Trust, PAM, Conditional Access, identity attacks</td>
+              </tr>
+              <tr>
+                <td><strong>Azure SOC Documentation</strong></td>
+                <td>50+ pages</td>
+                <td>Cloud-native SOC deployment, Sentinel + Defender + Logic Apps integration</td>
+              </tr>
+              <tr>
+                <td><strong>Trellix Platform Guide</strong></td>
+                <td>31 pages</td>
+                <td>McAfee/FireEye merger products, ePO, XDR architecture, deployment models</td>
+              </tr>
+              <tr>
+                <td><strong>DLP Migration Documentation</strong></td>
+                <td>180 policies</td>
+                <td>Symantec → Purview migration, custom SITs, endpoint/cloud/email DLP</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Key Projects & Achievements</h2>
+        
+        <h3>SIEM Migration: RSA NetWitness → Microsoft Sentinel</h3>
+        <ul>
+          <li>Led migration of 302 detection rules from legacy RSA NetWitness to Sentinel</li>
+          <li>Developed detection translation catalog categorizing rules: built-in, minor mods, full rebuild</li>
+          <li>Created 4 custom KQL parser functions for log normalization</li>
+          <li>Built Logic Apps playbooks for automated response</li>
+          <li>Achieved 100% detection parity with improved false positive rates</li>
+        </ul>
+        
+        <h3>DLP Platform Migration: Symantec → Microsoft Purview</h3>
+        <ul>
+          <li>Migrated 180 DLP policies from Symantec to Microsoft Purview</li>
+          <li>Created custom Sensitive Information Types (SITs) for organization-specific data</li>
+          <li>Implemented endpoint, cloud, and email DLP policies</li>
+          <li>Currently managing enforcement phase with block and warn actions</li>
+        </ul>
+        
+        <h3>Detection Engineering</h3>
+        <ul>
+          <li>Developed 200+ detection rules mapped to MITRE ATT&CK</li>
+          <li>Built risk-based alerting framework integrating Qualys VMDR, Defender TVM, EPSS, CISA KEV</li>
+          <li>Created query-time parsing with KQL parser functions for consistent field extraction</li>
+          <li>Reduced false positive rate by 40% through systematic tuning methodology</li>
+        </ul>
+        
+        <h2>Certifications & Training</h2>
+        
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon">🎓</div>
+            <h3>SIEM Platforms</h3>
+            <p>Splunk Core Certified User, Microsoft SC-200 (in progress)</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">☁️</div>
+            <h3>Cloud Security</h3>
+            <p>Azure Security fundamentals, cloud architecture training</p>
+          </div>
+        </div>
+        
+        <h2>Why This Background Matters</h2>
+        
+        <div class="info-box note">
+          <div class="info-box-title">🎯 Connecting Experience to Consulting</div>
+          <p>My experience spans the full SIEM lifecycle - from SOC analyst using Splunk daily, to security engineer building detections, to leading platform migrations. This means I understand SIEM from the analyst's perspective (what makes alerts useful), the engineer's perspective (how to build and maintain content), and the architect's perspective (how to design solutions that scale).</p>
+        </div>
+        
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Job Requirement</th>
+                <th>My Experience</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3+ yrs SIEM (Splunk & Sentinel)</td>
+                <td>5 years - Splunk at Cognizant, Sentinel at current role, RSA NetWitness migration</td>
+              </tr>
+              <tr>
+                <td>Log source onboarding</td>
+                <td>RSA → Sentinel migration, MDE rollout, custom app onboarding, 15+ source types</td>
+              </tr>
+              <tr>
+                <td>Use cases → detection rules</td>
+                <td>200+ detections developed, audit→enforcement workflow, detection translation catalog</td>
+              </tr>
+              <tr>
+                <td>MITRE ATT&CK</td>
+                <td>Mapped all detections to 14 tactics, coverage analysis, gap identification</td>
+              </tr>
+              <tr>
+                <td>Windows/Network fundamentals</td>
+                <td>Endpoint log analysis, MDE telemetry, firewall/proxy logs, network visibility</td>
+              </tr>
+              <tr>
+                <td>Scripting</td>
+                <td>Python, PowerShell, KQL, Azure Functions, Logic Apps automation</td>
+              </tr>
+              <tr>
+                <td>Security operations</td>
+                <td>SOC background (L1), incident-driven hunting, security monitoring</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="info-box tip">
+          <div class="info-box-title">💡 Interview Tip</div>
+          <p>"When asked 'Tell me about your experience', connect your background to what the role needs. Don't just list jobs - explain how each experience prepared you for SIEM consulting. For example: 'My SOC analyst background means I understand what makes a detection actionable, which is critical when designing migration strategies.'"</p>
+        </div>
+        
+        <!-- Page Navigation -->
+        <div class="page-nav">
+          <a href="deliverables.html" class="page-nav-btn prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">← Deliverables</span>
+          </a>
+          <a href="what-is-siem.html" class="page-nav-btn next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">What is SIEM? →</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

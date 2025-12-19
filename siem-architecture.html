@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Architecture | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Understand SIEM architecture - collectors, parsers, correlation engines, storage, and how data flows through a SIEM system.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item active">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Source Engineering</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+                    <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+                    <a href="log-migration.html" class="nav-item">Log Source Migration</a>
+                    <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Interview Preparation</div>
+                    <a href="common-questions.html" class="nav-item">Common Questions</a>
+                    <a href="scenario-questions.html" class="nav-item">Scenario Questions</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SIEM Architecture</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Architecture</h1>
+                    <p class="page-subtitle">Understanding how SIEM components work together</p>
+                </header>
+                
+                <!-- The Big Picture -->
+                <h2>The Big Picture</h2>
+                
+                <p>Every SIEM, regardless of vendor, has the same fundamental architecture. Understanding this makes it easy to learn any SIEM platform.</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Universal SIEM Architecture</div>
+                    <pre><code>
+┌──────────────────────────────────────────────────────────────────────────┐
+│                              DATA SOURCES                                 │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐            │
+│  │ Windows │ │ Linux   │ │Firewall │ │ Cloud   │ │   EDR   │  ...more   │
+│  │ Servers │ │ Servers │ │ /Proxy  │ │ (AWS/   │ │(CrowdSt │            │
+│  │         │ │         │ │         │ │ Azure)  │ │rike/MDE)│            │
+│  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘            │
+│       │          │          │          │          │                      │
+└───────┼──────────┼──────────┼──────────┼──────────┼──────────────────────┘
+        │          │          │          │          │
+        ▼          ▼          ▼          ▼          ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           COLLECTION LAYER                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │   Agents / Forwarders / Connectors / APIs / Syslog Receivers        │ │
+│  │   (Get logs from sources → Send to SIEM)                            │ │
+│  └─────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           PROCESSING LAYER                                │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐          │
+│  │     PARSING     │  │  NORMALIZATION  │  │   ENRICHMENT    │          │
+│  │                 │  │                 │  │                 │          │
+│  │ Break raw logs  │→ │ Map to common   │→ │ Add context:    │          │
+│  │ into fields     │  │ schema (who,    │  │ - GeoIP         │          │
+│  │                 │  │ what, where)    │  │ - Asset info    │          │
+│  │                 │  │                 │  │ - User info     │          │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘          │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                            STORAGE LAYER                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │   Indexed, Searchable Database (Hot / Warm / Cold Tiers)            │ │
+│  │   - Hot: Recent data, fast search (expensive)                       │ │
+│  │   - Warm: Older data, slower search (cheaper)                       │ │
+│  │   - Cold/Archive: Long-term retention, very slow (cheapest)         │ │
+│  └─────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           ANALYSIS LAYER                                  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐          │
+│  │   CORRELATION   │  │     SEARCH      │  │   DASHBOARDS    │          │
+│  │                 │  │                 │  │                 │          │
+│  │ Detection rules │  │ Ad-hoc queries  │  │ Visual display  │          │
+│  │ run against     │  │ (SPL, KQL, AQL) │  │ of metrics and  │          │
+│  │ incoming data   │  │ for hunting &   │  │ key indicators  │          │
+│  │                 │  │ investigation   │  │                 │          │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘          │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                            OUTPUT LAYER                                   │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐          │
+│  │     ALERTS      │  │    REPORTS      │  │      SOAR       │          │
+│  │                 │  │                 │  │                 │          │
+│  │ Email, Slack,   │  │ Scheduled       │  │ Automated       │          │
+│  │ PagerDuty,      │  │ compliance and  │  │ response        │          │
+│  │ ServiceNow      │  │ executive       │  │ playbooks       │          │
+│  │                 │  │ reports         │  │                 │          │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘          │
+└──────────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <!-- Each Layer Explained -->
+                <h2>Each Layer Explained</h2>
+                
+                <h3>1. Collection Layer</h3>
+                
+                <p>This is where data enters the SIEM. Different sources require different collection methods:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Collection Method</th>
+                                <th>How It Works</th>
+                                <th>Common Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Agent/Forwarder</strong></td>
+                                <td>Software installed on the source that sends logs to SIEM</td>
+                                <td>Windows/Linux servers, endpoints</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Syslog</strong></td>
+                                <td>Standard protocol (UDP/TCP 514) - source pushes logs</td>
+                                <td>Network devices, firewalls, Linux</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Pull</strong></td>
+                                <td>SIEM queries source's API on a schedule</td>
+                                <td>Cloud services (AWS, Azure, SaaS apps)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Push (Webhook)</strong></td>
+                                <td>Source sends to SIEM's HTTP endpoint</td>
+                                <td>Cloud-native apps, custom integrations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Query</strong></td>
+                                <td>SIEM queries database tables directly</td>
+                                <td>Legacy applications, CMDB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>File Monitoring</strong></td>
+                                <td>SIEM watches log files for changes</td>
+                                <td>Applications that write to local files</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Concept: Push vs Pull</div>
+                    <p><strong>Push:</strong> The source sends data to the SIEM (syslog, agents, webhooks). More real-time, but SIEM must be reachable.</p>
+                    <p><strong>Pull:</strong> The SIEM fetches data from the source (API polling). Works through firewalls, but adds latency.</p>
+                </div>
+                
+                <h3>2. Processing Layer</h3>
+                
+                <p>Raw logs are useless until they're processed. This layer transforms them into structured, searchable data.</p>
+                
+                <h4>Parsing</h4>
+                
+                <p>Raw logs come in many formats. Parsing breaks them into individual fields:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Before and After Parsing</div>
+                    <pre><code>
+BEFORE (Raw Log):
+"Mar 15 14:23:45 webserver01 sshd[12345]: Failed password for admin from 192.168.1.100 port 52341 ssh2"
+
+AFTER (Parsed Fields):
+┌────────────────┬─────────────────────┐
+│ Field          │ Value               │
+├────────────────┼─────────────────────┤
+│ timestamp      │ Mar 15 14:23:45     │
+│ hostname       │ webserver01         │
+│ process        │ sshd                │
+│ pid            │ 12345               │
+│ action         │ Failed password     │
+│ user           │ admin               │
+│ src_ip         │ 192.168.1.100       │
+│ src_port       │ 52341               │
+│ protocol       │ ssh2                │
+└────────────────┴─────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <h4>Normalization</h4>
+                
+                <p>Different sources use different field names for the same concept. Normalization maps them to a common schema:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Original Field</th>
+                                <th>Normalized Field</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Windows</td>
+                                <td>IpAddress</td>
+                                <td rowspan="3"><strong>src_ip</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Linux</td>
+                                <td>SRC</td>
+                            </tr>
+                            <tr>
+                                <td>Firewall</td>
+                                <td>source_address</td>
+                            </tr>
+                            <tr>
+                                <td>Windows</td>
+                                <td>TargetUserName</td>
+                                <td rowspan="3"><strong>user</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Linux</td>
+                                <td>USER</td>
+                            </tr>
+                            <tr>
+                                <td>Cloud</td>
+                                <td>userPrincipalName</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Why Normalization Matters</div>
+                    <p>Without normalization, you'd need different queries for every log source. With normalization, one query like <code>src_ip = "192.168.1.100"</code> searches across all sources.</p>
+                    <p><strong>Splunk uses:</strong> Common Information Model (CIM)</p>
+                    <p><strong>Sentinel uses:</strong> Advanced Security Information Model (ASIM)</p>
+                </div>
+                
+                <h4>Enrichment</h4>
+                
+                <p>Adding context that isn't in the original log:</p>
+                
+                <ul>
+                    <li><strong>GeoIP:</strong> Convert IP address to country/city</li>
+                    <li><strong>Asset data:</strong> Is this IP a server, workstation, or unknown?</li>
+                    <li><strong>User data:</strong> What department is this user in? Are they an admin?</li>
+                    <li><strong>Threat intelligence:</strong> Is this IP on a known-bad list?</li>
+                </ul>
+                
+                <h3>3. Storage Layer</h3>
+                
+                <p>SIEM storage is typically tiered by age and access speed:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Data Age</th>
+                                <th>Search Speed</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hot</strong></td>
+                                <td>0-30 days</td>
+                                <td>Fast (SSD/NVMe)</td>
+                                <td>$$$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Warm</strong></td>
+                                <td>30-90 days</td>
+                                <td>Medium (HDD)</td>
+                                <td>$$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cold</strong></td>
+                                <td>90+ days</td>
+                                <td>Slow (object storage)</td>
+                                <td>$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Frozen/Archive</strong></td>
+                                <td>1+ years</td>
+                                <td>Very slow (must restore)</td>
+                                <td>¢</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>4. Analysis Layer</h3>
+                
+                <p>This is where security value is created:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🔗</div>
+                        <h3 class="card-title">Correlation Engine</h3>
+                        <p class="card-description">Runs detection rules against incoming data. When a rule matches, it creates an alert. Rules can be simple (single event) or complex (multiple events over time).</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🔍</div>
+                        <h3 class="card-title">Search Interface</h3>
+                        <p class="card-description">Ad-hoc query capability for threat hunting and incident investigation. SPL (Splunk), KQL (Sentinel), or AQL (QRadar).</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Dashboards</h3>
+                        <p class="card-description">Visual displays of security metrics - alert trends, top threats, compliance status, system health.</p>
+                    </div>
+                </div>
+                
+                <!-- On-Premises vs Cloud Architecture -->
+                <h2>On-Premises vs Cloud Architecture</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>On-Premises</th>
+                                <th>Cloud-Native</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Infrastructure</strong></td>
+                                <td>You manage servers, storage, networking</td>
+                                <td>Vendor manages everything</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scaling</strong></td>
+                                <td>Buy more hardware (weeks/months)</td>
+                                <td>Automatic or on-demand (minutes)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Updates</strong></td>
+                                <td>You plan and execute upgrades</td>
+                                <td>Vendor pushes updates continuously</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Location</strong></td>
+                                <td>Full control - stays in your datacenter</td>
+                                <td>In vendor's cloud (region choice)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost Model</strong></td>
+                                <td>CapEx (hardware) + OpEx (licenses, staff)</td>
+                                <td>Pure OpEx (pay per GB ingested)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Example</strong></td>
+                                <td>Splunk Enterprise on-prem</td>
+                                <td>Microsoft Sentinel, Splunk Cloud</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- How Vendors Implement This -->
+                <h2>How Vendors Implement This</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Splunk</th>
+                                <th>Microsoft Sentinel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Collection</strong></td>
+                                <td>Universal Forwarder, Heavy Forwarder, HEC</td>
+                                <td>Data Connectors, AMA Agent, Syslog</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Processing</strong></td>
+                                <td>props.conf, transforms.conf, CIM</td>
+                                <td>Data Collection Rules (DCR), ASIM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Storage</strong></td>
+                                <td>Indexers (hot/warm/cold buckets)</td>
+                                <td>Log Analytics Workspace</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Correlation</strong></td>
+                                <td>Correlation Searches (Enterprise Security)</td>
+                                <td>Analytics Rules</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Search</strong></td>
+                                <td>Search Processing Language (SPL)</td>
+                                <td>Kusto Query Language (KQL)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Automation</strong></td>
+                                <td>Splunk SOAR</td>
+                                <td>Logic Apps (Playbooks)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "Walk me through SIEM architecture."</p>
+                    <p><strong>Good Answer:</strong> "SIEM has five main layers. First, Collection - getting logs from sources using agents, syslog, or APIs. Second, Processing - parsing raw logs into fields, normalizing to a common schema, and enriching with context like GeoIP. Third, Storage - indexed database with hot/warm/cold tiers balancing speed and cost. Fourth, Analysis - correlation engine for detection rules, search interface for hunting, and dashboards for visibility. Fifth, Output - alerts, reports, and automated response through SOAR."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "What's the difference between on-prem and cloud SIEM?"</p>
+                    <p><strong>Good Answer:</strong> "On-prem gives you full control over infrastructure and data location, but you manage hardware, scaling, and upgrades. Cloud SIEM removes that burden - the vendor handles infrastructure and you pay per GB. The trade-off is less control over where data lives and dependency on the vendor. Many organizations now use hybrid - cloud SIEM with on-prem collectors for data that can't leave the network."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Architecture Quick Reference</div>
+                    
+                    <h4>The Five Layers</h4>
+                    <ol>
+                        <li><strong>Collection</strong> - Get logs into SIEM</li>
+                        <li><strong>Processing</strong> - Parse, normalize, enrich</li>
+                        <li><strong>Storage</strong> - Index and retain data</li>
+                        <li><strong>Analysis</strong> - Correlate, search, visualize</li>
+                        <li><strong>Output</strong> - Alert, report, respond</li>
+                    </ol>
+                    
+                    <h4>Collection Methods</h4>
+                    <ul>
+                        <li>Agents/Forwarders (installed on source)</li>
+                        <li>Syslog (push over network)</li>
+                        <li>API (pull from cloud services)</li>
+                        <li>Webhook (push from cloud services)</li>
+                    </ul>
+                    
+                    <h4>Storage Tiers</h4>
+                    <ul>
+                        <li>Hot (0-30 days) - Fast, expensive</li>
+                        <li>Warm (30-90 days) - Medium speed/cost</li>
+                        <li>Cold (90+ days) - Slow, cheap</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="what-is-siem.html" class="card-link">← What is SIEM?</a>
+                    <a href="splunk-overview.html" class="card-link">Splunk Overview →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

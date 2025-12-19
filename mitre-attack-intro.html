@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITRE ATT&CK Introduction | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">MITRE ATT&CK Introduction</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">MITRE ATT&CK Introduction</h1>
+                    <p class="page-subtitle">Understanding the MITRE ATT&CK framework for detection</p>
+                </header>
+                
+                
+                <h2>What is MITRE ATT&CK?</h2>
+                
+                <p>MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) is a knowledge base of adversary behavior based on real-world observations. It's become the standard framework for discussing and mapping threats.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 ATT&CK in Simple Terms</div>
+                    <p>ATT&CK answers: "What do attackers actually do after they get in?" It categorizes attack behaviors into:</p>
+                    <ul>
+                        <li><strong>Tactics:</strong> The "why" - the attacker's goal (14 tactics)</li>
+                        <li><strong>Techniques:</strong> The "how" - specific methods to achieve the goal</li>
+                        <li><strong>Sub-techniques:</strong> More specific variations</li>
+                        <li><strong>Procedures:</strong> Real-world examples from threat groups</li>
+                    </ul>
+                </div>
+                
+                <h2>The 14 Tactics</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tactic</th>
+                                <th>Goal</th>
+                                <th>Example Technique</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Reconnaissance</strong></td>
+                                <td>Gather information</td>
+                                <td>Active Scanning</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Resource Development</strong></td>
+                                <td>Prepare infrastructure</td>
+                                <td>Acquire Infrastructure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Initial Access</strong></td>
+                                <td>Get into the network</td>
+                                <td>Phishing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Execution</strong></td>
+                                <td>Run malicious code</td>
+                                <td>PowerShell</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Persistence</strong></td>
+                                <td>Maintain access</td>
+                                <td>Scheduled Task</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Privilege Escalation</strong></td>
+                                <td>Get higher permissions</td>
+                                <td>Valid Accounts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Defense Evasion</strong></td>
+                                <td>Avoid detection</td>
+                                <td>Obfuscated Files</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Credential Access</strong></td>
+                                <td>Steal credentials</td>
+                                <td>OS Credential Dumping</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Discovery</strong></td>
+                                <td>Learn the environment</td>
+                                <td>System Network Config</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lateral Movement</strong></td>
+                                <td>Move through network</td>
+                                <td>Remote Services</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Collection</strong></td>
+                                <td>Gather data to steal</td>
+                                <td>Data from Local System</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Command & Control</strong></td>
+                                <td>Communicate with implants</td>
+                                <td>Web Protocols</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Exfiltration</strong></td>
+                                <td>Steal data</td>
+                                <td>Exfil Over C2 Channel</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Impact</strong></td>
+                                <td>Damage or disrupt</td>
+                                <td>Data Encrypted for Impact</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Using ATT&CK for SIEM</h2>
+                
+                <p>ATT&CK helps you:</p>
+                
+                <ul>
+                    <li><strong>Map detections:</strong> Tag rules with techniques they detect</li>
+                    <li><strong>Identify gaps:</strong> What techniques have no coverage?</li>
+                    <li><strong>Prioritize:</strong> Focus on techniques used by relevant threat groups</li>
+                    <li><strong>Communicate:</strong> Common language with red team and leadership</li>
+                </ul>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How do you use MITRE ATT&CK in your detection strategy?"</p>
+                    <p><strong>Answer:</strong> "I use ATT&CK for coverage mapping - tagging each detection rule with the techniques it catches. This lets me visualize gaps on the ATT&CK Navigator. I prioritize based on threat intelligence - which techniques are used by groups targeting our industry? I also use ATT&CK to structure purple team exercises - we systematically test detection across the framework. Finally, it's great for communication - I can show leadership our coverage against specific threat groups using ATT&CK heatmaps."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-fundamentals.html" class="card-link">← Detection Fundamentals</a>
+                    <a href="mitre-for-detection.html" class="card-link">ATT&CK for Detection →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

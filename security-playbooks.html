@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Playbooks | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Automation</div>
+                    <a href="soar-automation.html" class="nav-item">SOAR Automation</a>
+                    <a href="security-playbooks.html" class="nav-item active">Playbooks</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Security Playbooks</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Security Automation Playbooks</h1>
+                    <p class="page-subtitle">Playbooks codify incident response procedures for consistent, rapid execution. Well-designed playbooks reduce response time, ensure completeness, and enable automation.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Playbook Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Playbook Design Pattern</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PLAYBOOK STRUCTURE                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  TRIGGER                                                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Alert Type: Phishing Email Reported                                  │   │
+│  │ Source: Email gateway, User report                                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ENRICHMENT (Automated)                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ □ Extract IOCs (URLs, attachments, sender)                          │   │
+│  │ □ Check URL reputation (VirusTotal, URLScan)                        │   │
+│  │ □ Sandbox attachment                                                 │   │
+│  │ □ Query email logs for other recipients                              │   │
+│  │ □ Check if any users clicked                                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  DECISION POINT                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ IF malicious indicators found:                                       │   │
+│  │   → Continue to CONTAINMENT                                          │   │
+│  │ IF benign:                                                           │   │
+│  │   → Close as False Positive                                          │   │
+│  │ IF uncertain:                                                        │   │
+│  │   → Escalate to analyst                                              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  CONTAINMENT (Automated or Approved)                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ □ Block sender domain                                                │   │
+│  │ □ Remove emails from all mailboxes (ZAP)                            │   │
+│  │ □ Block URLs in proxy                                                │   │
+│  │ □ Reset passwords for users who clicked                              │   │
+│  │ □ Revoke active sessions                                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  DOCUMENTATION                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ □ Update ticket with findings                                        │   │
+│  │ □ Log actions taken                                                  │   │
+│  │ □ Notify stakeholders                                                │   │
+│  │ □ Add IOCs to threat intel                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phishing Response Playbook</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">YAML: Phishing Playbook</div>
+                        <pre><code>name: Phishing Email Response
+description: Automated response to reported phishing emails
+trigger:
+  type: alert
+  source: email_gateway
+  conditions:
+    - alert_type: "Phishing"
+    - severity: ["Medium", "High"]
+
+steps:
+  - name: Extract IOCs
+    action: extract_iocs
+    inputs:
+      email_id: "{{ trigger.email_id }}"
+    outputs:
+      - sender_domain
+      - urls
+      - attachment_hashes
+
+  - name: Check URL Reputation
+    action: virustotal_lookup
+    inputs:
+      urls: "{{ steps.extract_iocs.urls }}"
+    outputs:
+      - url_verdicts
+
+  - name: Find Other Recipients
+    action: query_email_logs
+    inputs:
+      sender: "{{ steps.extract_iocs.sender }}"
+      subject: "{{ trigger.subject }}"
+      timeframe: "7d"
+    outputs:
+      - recipient_list
+      - delivered_count
+
+  - name: Check for Clicks
+    action: query_url_clicks
+    inputs:
+      urls: "{{ steps.extract_iocs.urls }}"
+    outputs:
+      - clicked_users
+
+  - name: Decision
+    action: evaluate
+    conditions:
+      - if: "{{ steps.check_url_reputation.url_verdicts contains 'malicious' }}"
+        then: containment
+      - if: "{{ steps.clicked_users | length > 0 }}"
+        then: containment
+      - else: close_benign
+
+  - name: Containment
+    action: parallel
+    when: "{{ steps.decision.result == 'containment' }}"
+    tasks:
+      - action: block_sender
+        inputs:
+          domain: "{{ steps.extract_iocs.sender_domain }}"
+      - action: zap_emails
+        inputs:
+          message_ids: "{{ steps.find_other_recipients.message_ids }}"
+      - action: reset_passwords
+        when: "{{ steps.clicked_users | length > 0 }}"
+        inputs:
+          users: "{{ steps.clicked_users }}"
+
+  - name: Document
+    action: update_ticket
+    inputs:
+      findings: "{{ steps | summarize }}"
+      actions_taken: "{{ steps.containment.results }}"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Malware Response Playbook</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Malware Detection Response</div>
+                        <pre><code>name: Malware Detection Response
+trigger:
+  - source: EDR
+    alert_type: ["Malware", "Ransomware", "Trojan"]
+
+steps:
+  - name: Get Alert Details
+    action: edr_get_alert
+    outputs: [hostname, file_hash, file_path, user, process_tree]
+
+  - name: Enrich Host
+    action: parallel
+    tasks:
+      - action: cmdb_lookup
+        inputs: { hostname: "{{ hostname }}" }
+        outputs: [criticality, owner, department]
+      - action: get_logged_in_users
+        inputs: { hostname: "{{ hostname }}" }
+      - action: get_recent_activity
+        inputs: { hostname: "{{ hostname }}", hours: 24 }
+
+  - name: Check Hash Reputation
+    action: virustotal_hash
+    inputs: { hash: "{{ file_hash }}" }
+    outputs: [detection_ratio, malware_family]
+
+  - name: Auto-Isolate Decision
+    action: evaluate
+    conditions:
+      - if: "criticality == 'Low' AND detection_ratio > 10"
+        then: auto_isolate
+      - if: "malware_family in ['Ransomware', 'Wiper']"
+        then: auto_isolate
+      - else: analyst_approval
+
+  - name: Isolate Host
+    action: edr_isolate
+    when: "decision in ['auto_isolate', 'approved']"
+    inputs: { hostname: "{{ hostname }}" }
+
+  - name: Collect Forensics
+    action: edr_collect
+    tasks:
+      - collect_memory_dump
+      - collect_process_list
+      - collect_network_connections
+      - collect_autoruns
+
+  - name: Block Hash Globally
+    action: edr_block_hash
+    inputs: { hash: "{{ file_hash }}" }
+
+  - name: Hunt for Spread
+    action: edr_hunt
+    inputs:
+      query: "file_hash:{{ file_hash }} OR parent_hash:{{ file_hash }}"
+    outputs: [affected_hosts]
+
+  - name: Create Incident
+    action: create_incident
+    inputs:
+      severity: "{{ calculated_severity }}"
+      affected_assets: "{{ affected_hosts }}"
+      iocs: "{{ collected_iocs }}"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Account Compromise Playbook</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Compromised Account Response</div>
+                        <pre><code>name: Account Compromise Response
+trigger:
+  - source: Identity Protection
+    alert_type: ["Impossible Travel", "Risky Sign-in", "Password Spray"]
+
+steps:
+  - name: Get User Context
+    action: parallel
+    tasks:
+      - action: get_user_info
+        inputs: { user: "{{ alert.user }}" }
+        outputs: [department, manager, is_privileged, mfa_status]
+      - action: get_recent_signins
+        inputs: { user: "{{ alert.user }}", days: 7 }
+      - action: get_recent_activity
+        inputs: { user: "{{ alert.user }}", days: 1 }
+
+  - name: Check for Known Travel
+    action: check_travel_approval
+    inputs: { user: "{{ alert.user }}", date: "{{ alert.timestamp }}" }
+
+  - name: Evaluate Risk
+    action: calculate_risk_score
+    inputs:
+      is_privileged: "{{ is_privileged }}"
+      mfa_status: "{{ mfa_status }}"
+      sign_in_anomalies: "{{ recent_signins.anomalies }}"
+      travel_approved: "{{ travel_check.approved }}"
+
+  - name: Containment Decision
+    conditions:
+      - if: "risk_score > 80"
+        then: immediate_containment
+      - if: "risk_score > 50 AND is_privileged"
+        then: immediate_containment
+      - if: "risk_score > 50"
+        then: analyst_review
+      - else: monitor
+
+  - name: Immediate Containment
+    when: "decision == 'immediate_containment'"
+    action: parallel
+    tasks:
+      - action: disable_account
+        approval: auto  # or require_approval for sensitive accounts
+      - action: revoke_sessions
+      - action: revoke_oauth_tokens
+      - action: notify_user_manager
+
+  - name: Investigation
+    action: parallel
+    tasks:
+      - action: check_inbox_rules
+        inputs: { user: "{{ alert.user }}" }
+      - action: check_oauth_grants
+        inputs: { user: "{{ alert.user }}" }
+      - action: check_mail_forwarding
+        inputs: { user: "{{ alert.user }}" }
+      - action: check_file_access
+        inputs: { user: "{{ alert.user }}", days: 7 }
+
+  - name: Remediation
+    when: "compromise_confirmed"
+    tasks:
+      - action: reset_password
+      - action: require_mfa_reregistration
+      - action: remove_suspicious_inbox_rules
+      - action: revoke_suspicious_oauth_apps</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Playbook Best Practices</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Practice</th>
+                                    <th>Description</th>
+                                    <th>Benefit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Idempotent actions</strong></td>
+                                    <td>Actions safe to run multiple times</td>
+                                    <td>Safe retries on failure</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Approval gates</strong></td>
+                                    <td>Human approval for high-impact actions</td>
+                                    <td>Prevent automation mishaps</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rollback capability</strong></td>
+                                    <td>Ability to undo containment actions</td>
+                                    <td>Recover from false positives</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Comprehensive logging</strong></td>
+                                    <td>Log every action and decision</td>
+                                    <td>Audit trail, debugging</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Timeout handling</strong></td>
+                                    <td>Graceful handling of slow/failed steps</td>
+                                    <td>Reliable execution</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Testing environment</strong></td>
+                                    <td>Test playbooks before production</td>
+                                    <td>Prevent production issues</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you design security automation playbooks?"</strong></p>
+                        <p><strong>A:</strong> "Effective playbooks balance automation with safety:</p>
+                        <ol>
+                            <li><strong>Start from runbooks:</strong> I convert proven manual runbooks to automation. The logic should already be validated before automating.</li>
+                            <li><strong>Enrichment first:</strong> Playbooks should gather context before taking action. More information means better decisions.</li>
+                            <li><strong>Decision points:</strong> Not everything should be fully automated. High-impact actions (disable account, isolate server) may need approval gates.</li>
+                            <li><strong>Parallel where possible:</strong> Enrichment steps can run in parallel. Containment steps often can't. I optimize for speed without breaking dependencies.</li>
+                            <li><strong>Comprehensive logging:</strong> Every decision, every action gets logged. This creates audit trail and enables debugging.</li>
+                            <li><strong>Test thoroughly:</strong> I test playbooks against realistic scenarios in a test environment before production deployment.</li>
+                            <li><strong>Iterate based on outcomes:</strong> I track playbook effectiveness—did it catch real threats? Did it cause false positive impact? Use data to improve.</li>
+                        </ol>
+                        <p>Good automation makes analysts faster, not unemployed."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Playbook Quick Reference</div>
+                        <h4>Essential Playbooks</h4>
+                        <ul>
+                            <li>Phishing response</li>
+                            <li>Malware detection</li>
+                            <li>Account compromise</li>
+                            <li>Data exfiltration</li>
+                            <li>Ransomware</li>
+                            <li>Insider threat</li>
+                        </ul>
+                        <h4>Common Actions</h4>
+                        <ul>
+                            <li>Enrich from TI</li>
+                            <li>Query SIEM/EDR</li>
+                            <li>Isolate endpoint</li>
+                            <li>Block IOC</li>
+                            <li>Disable account</li>
+                            <li>Create ticket</li>
+                        </ul>
+                        <h4>Approval Triggers</h4>
+                        <ul>
+                            <li>Executive accounts</li>
+                            <li>Production servers</li>
+                            <li>Customer-facing systems</li>
+                            <li>Uncertain verdicts</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soar-automation.html" class="card-link">← SOAR Automation</a>
+                    <a href="runbook-development.html" class="card-link">Runbooks →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

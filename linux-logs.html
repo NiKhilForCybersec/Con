@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Linux Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Linux Logs</h1>
+                    <p class="page-subtitle">Linux logging for security monitoring</p>
+                </header>
+                
+                
+                <h2>Linux Logging Landscape</h2>
+                
+                <p>Linux logging is more fragmented than Windows, with multiple systems depending on distribution and version:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>What It Does</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>syslog/rsyslog</strong></td>
+                                <td>Traditional system logging</td>
+                                <td>/var/log/syslog, /var/log/messages</td>
+                            </tr>
+                            <tr>
+                                <td><strong>journald</strong></td>
+                                <td>Systemd's logging (modern distros)</td>
+                                <td>journalctl command, binary format</td>
+                            </tr>
+                            <tr>
+                                <td><strong>auditd</strong></td>
+                                <td>Linux Audit Framework (security)</td>
+                                <td>/var/log/audit/audit.log</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Application logs</strong></td>
+                                <td>Individual application logging</td>
+                                <td>/var/log/apache2/, /var/log/nginx/, etc.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Critical Log Files</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Log File</th>
+                                <th>Contents</th>
+                                <th>Security Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/var/log/auth.log</code></td>
+                                <td>Authentication events (Debian/Ubuntu)</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>/var/log/secure</code></td>
+                                <td>Authentication events (RHEL/CentOS)</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>/var/log/audit/audit.log</code></td>
+                                <td>Audit framework events</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>/var/log/cron</code></td>
+                                <td>Scheduled task execution</td>
+                                <td><span class="tag tag-blue">Important</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>/var/log/sudo.log</code></td>
+                                <td>Sudo command usage</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Linux Audit Framework (auditd)</h2>
+                
+                <p>Auditd provides detailed security auditing similar to Windows Security events:</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Audit Rules</div>
+                    <p>Configure these for security monitoring:</p>
+                    <ul>
+                        <li><strong>-w /etc/passwd -p wa</strong> - Watch password file changes</li>
+                        <li><strong>-w /etc/shadow -p wa</strong> - Watch shadow file changes</li>
+                        <li><strong>-w /etc/sudoers -p wa</strong> - Watch sudo config changes</li>
+                        <li><strong>-a always,exit -F arch=b64 -S execve</strong> - Log all command execution</li>
+                    </ul>
+                </div>
+                
+                <h2>Collection Methods</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>How It Works</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Syslog forwarding</strong></td>
+                                <td>rsyslog sends to remote syslog receiver</td>
+                                <td>Simple setup, all distros</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk UF</strong></td>
+                                <td>Monitor log files directly</td>
+                                <td>Splunk deployments</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure Monitor Agent</strong></td>
+                                <td>Syslog + custom logs to Sentinel</td>
+                                <td>Azure/Sentinel deployments</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filebeat</strong></td>
+                                <td>Lightweight shipper</td>
+                                <td>Elastic deployments</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How would you detect privilege escalation on Linux?"</p>
+                    <p><strong>Answer:</strong> "I'd focus on several indicators: sudo usage from auth.log or sudo.log, looking for unusual users or commands. Auditd logs for setuid/setgid changes and execve calls, especially for known escalation tools like pkexec. Watch for /etc/passwd and /etc/shadow modifications. Monitor cron for persistence. And process execution logs for common exploit patterns - unexpected root processes, shells spawning from web servers, etc."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="windows-logs.html" class="card-link">← Windows Logs</a>
+                    <a href="network-logs.html" class="card-link">Network Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

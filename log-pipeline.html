@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Pipeline Architecture | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Architecture</div>
+                    <a href="siem-architecture.html" class="nav-item">Architecture Overview</a>
+                    <a href="log-pipeline.html" class="nav-item active">Log Pipeline</a>
+                    <a href="siem-data-flow.html" class="nav-item">Data Flow</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="siem-architecture.html">Architecture</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Log Pipeline</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Log Pipeline Architecture</h1>
+                    <p class="page-subtitle">Modern log pipelines do more than transport data. They collect, parse, enrich, filter, and route logs for optimal SIEM performance and cost efficiency.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Pipeline Components</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Enterprise Log Pipeline</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LOG PIPELINE ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  SOURCES                COLLECTION              PROCESSING                  │
+│  ┌──────────┐          ┌──────────┐           ┌──────────────┐             │
+│  │ Windows  │──────────│ Agents   │           │   PARSING    │             │
+│  │ Linux    │          │ (Beats,  │           │ • Extract    │             │
+│  │ Network  │──────────│ Fluentd, │──────────►│   fields     │             │
+│  │ Cloud    │          │ Splunk   │           │ • Normalize  │             │
+│  │ Apps     │──────────│ UF, AMA) │           │   timestamps │             │
+│  └──────────┘          └──────────┘           └──────┬───────┘             │
+│                                                      │                      │
+│                                                      ▼                      │
+│                        ┌──────────┐           ┌──────────────┐             │
+│                        │ Syslog   │           │  ENRICHMENT  │             │
+│                        │ Servers  │──────────►│ • GeoIP      │             │
+│                        └──────────┘           │ • Threat     │             │
+│                                               │   intel      │             │
+│                        ┌──────────┐           │ • Asset      │             │
+│                        │ API      │──────────►│   context    │             │
+│                        │ Polling  │           └──────┬───────┘             │
+│                        └──────────┘                  │                      │
+│                                                      ▼                      │
+│                                               ┌──────────────┐             │
+│  ROUTING                                      │   FILTERING  │             │
+│  ┌──────────────────────────────────────────┐│ • Drop noise │             │
+│  │                                          ││ • Sampling   │             │
+│  │  ┌────────┐  ┌────────┐  ┌────────┐    ││ • Route      │             │
+│  │  │  SIEM  │  │  Lake  │  │Archive │    │└──────┬───────┘             │
+│  │  │ (Hot)  │  │ (Warm) │  │ (Cold) │    │       │                      │
+│  │  └────────┘  └────────┘  └────────┘    │◄──────┘                      │
+│  │  Real-time   Ad-hoc      Compliance    │                              │
+│  │  detection   hunting     retention     │                              │
+│  └──────────────────────────────────────────┘                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Collection Methods</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Use Case</th>
+                                    <th>Pros</th>
+                                    <th>Cons</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Agent-Based</strong></td>
+                                    <td>Endpoints, servers</td>
+                                    <td>Reliable, can filter at source, encryption</td>
+                                    <td>Requires deployment, resource usage</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Syslog</strong></td>
+                                    <td>Network devices, Linux</td>
+                                    <td>Universal, no agent needed</td>
+                                    <td>UDP unreliable, limited metadata</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API Polling</strong></td>
+                                    <td>SaaS, cloud services</td>
+                                    <td>Native integration, rich data</td>
+                                    <td>Rate limits, latency</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Webhook/Push</strong></td>
+                                    <td>Cloud events, apps</td>
+                                    <td>Real-time, efficient</td>
+                                    <td>Requires endpoint exposure</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Database Query</strong></td>
+                                    <td>Database audit logs</td>
+                                    <td>Direct access</td>
+                                    <td>Performance impact, complexity</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Agent Comparison</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Vendor</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Universal Forwarder</strong></td>
+                                    <td>Splunk</td>
+                                    <td>Splunk deployments, robust features</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Monitor Agent</strong></td>
+                                    <td>Microsoft</td>
+                                    <td>Azure/Sentinel, Windows/Linux</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Elastic Agent</strong></td>
+                                    <td>Elastic</td>
+                                    <td>Elastic stack, unified agent</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fluentd/Fluent Bit</strong></td>
+                                    <td>CNCF</td>
+                                    <td>Cloud-native, Kubernetes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cribl Edge</strong></td>
+                                    <td>Cribl</td>
+                                    <td>Edge processing, multi-destination</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Processing Layer</h2>
+                    
+                    <h3>Parsing & Normalization</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Cribl: Field Extraction</div>
+                        <pre><code>// Extract fields from raw syslog
+filter: sourcetype=='syslog'
+final: true
+functions:
+  - id: regex_extract
+    filter: "true"
+    description: Extract CEF fields
+    regex: /CEF:(?<cef_version>\d+)\|(?<device_vendor>[^|]+)\|(?<device_product>[^|]+)\|(?<device_version>[^|]+)\|(?<signature_id>[^|]+)\|(?<name>[^|]+)\|(?<severity>[^|]+)\|(?<extension>.*)/
+    
+  - id: rename
+    currentName: host
+    newName: src_host
+
+  - id: eval
+    add:
+      - name: timestamp
+        value: Date.now() / 1000</code></pre>
+                    </div>
+
+                    <h3>Enrichment</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Pipeline Enrichment Examples</div>
+                        <pre><code>// GeoIP Enrichment
+{
+  "type": "geoip",
+  "field": "src_ip",
+  "target_field": "src_geo",
+  "properties": ["country_name", "city_name", "location"]
+}
+
+// Threat Intel Lookup
+{
+  "type": "lookup",
+  "field": "dest_ip",
+  "lookup_file": "threat_intel.csv",
+  "output_fields": ["threat_type", "confidence", "source"]
+}
+
+// Asset Context
+{
+  "type": "lookup",
+  "field": "src_ip",
+  "lookup_file": "asset_inventory.csv",
+  "output_fields": ["asset_type", "criticality", "owner", "location"]
+}</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Routing Strategies</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Tiered Storage Architecture</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       DATA ROUTING BY VALUE                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  HIGH VALUE (Real-time SIEM)           MEDIUM VALUE (Data Lake)            │
+│  ┌─────────────────────────────┐      ┌─────────────────────────────┐      │
+│  │ • Security events           │      │ • Detailed access logs      │      │
+│  │ • Authentication logs       │      │ • Web proxy verbose         │      │
+│  │ • Endpoint detections       │      │ • Flow data (sampled)       │      │
+│  │ • Cloud security alerts     │      │ • DNS queries               │      │
+│  │ • Network threat logs       │      │ • Application logs          │      │
+│  │                             │      │                             │      │
+│  │ Retention: 90 days          │      │ Retention: 1 year           │      │
+│  │ Cost: $$$                   │      │ Cost: $$                    │      │
+│  │ Query: Real-time            │      │ Query: Minutes              │      │
+│  └─────────────────────────────┘      └─────────────────────────────┘      │
+│                                                                             │
+│  LOW VALUE (Archive)                   DROP (Never Store)                  │
+│  ┌─────────────────────────────┐      ┌─────────────────────────────┐      │
+│  │ • Debug/trace logs          │      │ • Heartbeat/health checks   │      │
+│  │ • Compliance retention      │      │ • Redundant events          │      │
+│  │ • Raw network captures      │      │ • Internal monitoring noise │      │
+│  │                             │      │ • Known benign patterns     │      │
+│  │ Retention: 7 years          │      │                             │      │
+│  │ Cost: $                     │      │ Cost: $0                    │      │
+│  │ Query: Hours                │      │                             │      │
+│  └─────────────────────────────┘      └─────────────────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Cribl: Routing Rules</div>
+                        <pre><code>// Route high-value to SIEM, rest to lake
+routes:
+  - id: security_events
+    filter: sourcetype IN ['WinEventLog:Security', 'sysmon', 'endpoint_alerts']
+    output: splunk_hec
+    
+  - id: cloud_security
+    filter: sourcetype IN ['aws:cloudtrail', 'azure:activitylog', 'gcp:audit']
+    output: splunk_hec
+    
+  - id: verbose_logs
+    filter: sourcetype IN ['proxy_access', 'dns_query', 'netflow']
+    output: s3_data_lake
+    
+  - id: compliance_archive
+    filter: _index == 'compliance'
+    output: glacier_archive
+    
+  - id: drop_noise
+    filter: sourcetype == 'heartbeat' OR message LIKE '%health check%'
+    output: devnull</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Volume Reduction Techniques</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Technique</th>
+                                    <th>Reduction</th>
+                                    <th>Risk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Field Removal</strong></td>
+                                    <td>10-30%</td>
+                                    <td>Low - remove truly unnecessary fields</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Event Filtering</strong></td>
+                                    <td>20-50%</td>
+                                    <td>Medium - may miss edge cases</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sampling</strong></td>
+                                    <td>50-90%</td>
+                                    <td>Medium - statistical validity required</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Aggregation</strong></td>
+                                    <td>80-95%</td>
+                                    <td>Medium - lose individual events</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Deduplication</strong></td>
+                                    <td>10-40%</td>
+                                    <td>Low - if done correctly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Aggregation Example</div>
+                        <pre><code>// Before: 1000 events per minute
+{
+  "timestamp": "2024-03-15T10:00:01Z",
+  "action": "allow",
+  "src_ip": "10.1.1.100",
+  "dest_ip": "8.8.8.8",
+  "bytes": 1024
+}
+// ... x1000
+
+// After aggregation: 1 event per minute
+{
+  "timestamp": "2024-03-15T10:00:00Z",
+  "action": "allow",
+  "src_ip": "10.1.1.100",
+  "dest_ip": "8.8.8.8",
+  "event_count": 1000,
+  "bytes_total": 1024000,
+  "bytes_avg": 1024
+}
+
+// 99.9% reduction while preserving metrics</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Pipeline Tools</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Strength</th>
+                                    <th>Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Cribl Stream</strong></td>
+                                    <td>Routing, transformation, reduction</td>
+                                    <td>Enterprise data routing hub</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kafka</strong></td>
+                                    <td>Scalable message queue</td>
+                                    <td>High-volume buffering</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Logstash</strong></td>
+                                    <td>Parsing, enrichment</td>
+                                    <td>Elastic ecosystem</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fluentd</strong></td>
+                                    <td>Cloud-native, plugins</td>
+                                    <td>Kubernetes environments</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vector</strong></td>
+                                    <td>High performance</td>
+                                    <td>Resource-constrained environments</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you design a log pipeline for cost optimization?"</strong></p>
+                        <p><strong>A:</strong> "I design pipelines with a tiered approach:</p>
+                        <ol>
+                            <li><strong>Classify data by value:</strong> Not all logs are equal. Security events need real-time SIEM access. Verbose logs like proxy access can go to cheaper storage with slower query times.</li>
+                            <li><strong>Process at the edge:</strong> Filter noise before it traverses the network. Drop heartbeats, deduplicate events, and aggregate high-volume sources at collection.</li>
+                            <li><strong>Enrich early:</strong> Add GeoIP, threat intel, and asset context in the pipeline. This enables routing decisions and saves SIEM compute cycles.</li>
+                            <li><strong>Route by use case:</strong> Real-time detection needs go to SIEM. Threat hunting data goes to a data lake. Compliance archives go to cold storage.</li>
+                            <li><strong>Aggregate where safe:</strong> Connection logs can often be aggregated to 1-minute buckets without losing detection capability while reducing volume 90%+.</li>
+                        </ol>
+                        <p>Tools like Cribl make this practical—I can implement complex routing logic that sends the right data to the right destination at the right cost."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Pipeline Quick Reference</div>
+                        <h4>Collection Methods</h4>
+                        <ul>
+                            <li>Agent: Endpoints, servers</li>
+                            <li>Syslog: Network devices</li>
+                            <li>API: SaaS, cloud</li>
+                            <li>Webhook: Real-time events</li>
+                        </ul>
+                        <h4>Volume Reduction</h4>
+                        <ul>
+                            <li>Field removal: 10-30%</li>
+                            <li>Filtering: 20-50%</li>
+                            <li>Sampling: 50-90%</li>
+                            <li>Aggregation: 80-95%</li>
+                        </ul>
+                        <h4>Routing Tiers</h4>
+                        <ul>
+                            <li>Hot (SIEM): Security events</li>
+                            <li>Warm (Lake): Verbose logs</li>
+                            <li>Cold (Archive): Compliance</li>
+                            <li>Drop: Noise, duplicates</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-architecture.html" class="card-link">← SIEM Architecture</a>
+                    <a href="siem-data-flow.html" class="card-link">Data Flow →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

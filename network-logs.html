@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Network Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Network Logs</h1>
+                    <p class="page-subtitle">Firewall, proxy, and network device logging</p>
+                </header>
+                
+                
+                <h2>Network Log Sources</h2>
+                
+                <p>Network logs provide visibility into traffic patterns, policy violations, and potential threats at the network layer:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source Type</th>
+                                <th>What It Shows</th>
+                                <th>Detection Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Firewall</strong></td>
+                                <td>Allow/deny decisions, traffic flow</td>
+                                <td>Policy violations, lateral movement, C2</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Web Proxy</strong></td>
+                                <td>HTTP/HTTPS requests, URLs, user agent</td>
+                                <td>Malware callbacks, data exfiltration</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DNS</strong></td>
+                                <td>Domain queries and responses</td>
+                                <td>C2, DGA, DNS tunneling</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IDS/IPS</strong></td>
+                                <td>Signature-based threat detection</td>
+                                <td>Known attack patterns, exploits</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NetFlow/IPFIX</strong></td>
+                                <td>Traffic metadata (not content)</td>
+                                <td>Anomaly detection, traffic patterns</td>
+                            </tr>
+                            <tr>
+                                <td><strong>VPN</strong></td>
+                                <td>Remote access sessions</td>
+                                <td>Compromised credentials, impossible travel</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Firewall Log Essentials</h2>
+                
+                <p>Key fields to collect from firewalls:</p>
+                
+                <ul>
+                    <li><strong>Action:</strong> Allow, deny, drop, reset</li>
+                    <li><strong>Source/Dest IP:</strong> Traffic endpoints</li>
+                    <li><strong>Source/Dest Port:</strong> Service identification</li>
+                    <li><strong>Protocol:</strong> TCP, UDP, ICMP</li>
+                    <li><strong>Bytes/Packets:</strong> Volume (exfiltration detection)</li>
+                    <li><strong>Rule/Policy:</strong> Which rule matched</li>
+                    <li><strong>Zone:</strong> Inside, outside, DMZ</li>
+                </ul>
+                
+                <h2>DNS Logging for Security</h2>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Why DNS is Gold for Detection</div>
+                    <p>Almost all malware needs DNS to function. Attackers can encrypt traffic, but they still need to resolve C2 domains. DNS logging enables:</p>
+                    <ul>
+                        <li>C2 beacon detection (periodic queries to unusual domains)</li>
+                        <li>DGA detection (algorithmically generated domains)</li>
+                        <li>DNS tunneling (data hidden in DNS queries)</li>
+                        <li>Brand impersonation (typosquatting)</li>
+                    </ul>
+                </div>
+                
+                <h2>Collection Considerations</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Challenge</th>
+                                <th>Solution</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>High volume</strong></td>
+                                <td>Filter allowed traffic, focus on denies and anomalies</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Various formats</strong></td>
+                                <td>CEF/LEEF normalization, vendor-specific parsers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TLS inspection gaps</strong></td>
+                                <td>Proxy with SSL inspection, or focus on metadata</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Syslog reliability</strong></td>
+                                <td>Use TCP syslog, implement buffering</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How would you detect data exfiltration using network logs?"</p>
+                    <p><strong>Answer:</strong> "I'd look for several indicators: unusual outbound data volumes to uncommon destinations in firewall logs, DNS queries for large TXT records or high query volumes to single domains (DNS tunneling), proxy logs showing uploads to file-sharing sites or cloud storage, connections to known-bad IPs from threat intelligence, and after-hours traffic from sensitive systems. Baseline normal traffic patterns first, then alert on deviations."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="linux-logs.html" class="card-link">← Linux Logs</a>
+                    <a href="identity-logs.html" class="card-link">Identity Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ransomware Detection | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-engineering.html" class="nav-item">Detection Engineering</a>
+                    <a href="ransomware-detection.html" class="nav-item active">Ransomware</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Ransomware Detection</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Ransomware Detection</h1>
+                    <p class="page-subtitle">Ransomware attacks follow predictable patterns: initial access, credential theft, lateral movement, and encryption. Detecting early stages prevents catastrophic data loss.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Ransomware Attack Lifecycle</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Ransomware Kill Chain</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    RANSOMWARE ATTACK STAGES                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  STAGE 1: INITIAL ACCESS (Days -30 to -7)                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Phishing email with malicious attachment                          │   │
+│  │ • Exploitation of public-facing application (VPN, RDP)              │   │
+│  │ • Compromised credentials (Initial Access Brokers)                  │   │
+│  │                                                                      │   │
+│  │ Detection: Email security alerts, VPN brute force, new device login │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STAGE 2: PERSISTENCE & DISCOVERY (Days -7 to -3)                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Cobalt Strike / Sliver beacon deployment                          │   │
+│  │ • Active Directory enumeration (BloodHound, AdFind)                 │   │
+│  │ • Network mapping and asset discovery                               │   │
+│  │                                                                      │   │
+│  │ Detection: C2 beaconing, LDAP queries spike, reconnaissance tools   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STAGE 3: CREDENTIAL ACCESS & LATERAL MOVEMENT (Days -3 to -1)             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • LSASS dumping (Mimikatz, comsvcs.dll)                             │   │
+│  │ • Kerberoasting, DCSync attacks                                     │   │
+│  │ • PsExec, WMI, RDP to spread                                        │   │
+│  │                                                                      │   │
+│  │ Detection: LSASS access, TGS requests spike, admin tool usage       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STAGE 4: EXFILTRATION & ENCRYPTION (Day 0)                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Data staged and exfiltrated (double extortion)                    │   │
+│  │ • Shadow copies deleted                                             │   │
+│  │ • Mass file encryption across network shares                        │   │
+│  │                                                                      │   │
+│  │ Detection: Large outbound transfers, vssadmin, mass file changes    │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Early Warning Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Cobalt Strike Beacon Detection</div>
+                        <pre><code>// Detect regular beaconing patterns (C2 communication)
+DeviceNetworkEvents
+| where TimeGenerated > ago(24h)
+| where RemotePort in (80, 443, 8080, 8443)
+| summarize 
+    Connections = count(),
+    Times = make_list(TimeGenerated)
+  by DeviceName, RemoteIP, RemotePort
+| where Connections > 50
+| extend TimeDiffs = series_diff(Times)
+| mv-expand TimeDiff = TimeDiffs to typeof(long)
+| summarize 
+    AvgInterval = avg(TimeDiff),
+    StdDevInterval = stdev(TimeDiff)
+  by DeviceName, RemoteIP, RemotePort
+| where StdDevInterval < 5000  // Very regular = beaconing
+| project DeviceName, RemoteIP, RemotePort, AvgInterval, StdDevInterval</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: AD Enumeration Tools</div>
+                        <pre><code>index=windows (EventCode=4688 OR EventCode=1)
+| where New_Process_Name IN ("*\\AdFind.exe", "*\\BloodHound.exe", 
+        "*\\SharpHound.exe", "*\\nltest.exe", "*\\dsquery.exe")
+     OR Process_Command_Line LIKE "%Get-ADUser%" 
+     OR Process_Command_Line LIKE "%Get-ADComputer%"
+     OR Process_Command_Line LIKE "%Get-DomainController%"
+| stats count, values(Process_Command_Line) as commands by ComputerName, Account_Name
+| where count > 3</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Credential Theft Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: LSASS Access Detection</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where FileName =~ "lsass.exe"
+| where ActionType == "ProcessAccessed"
+| where InitiatingProcessFileName !in~ ("csrss.exe", "services.exe", 
+        "MsMpEng.exe", "WmiPrvSE.exe", "svchost.exe")
+| project TimeGenerated, DeviceName, 
+          InitiatingProcessFileName, 
+          InitiatingProcessCommandLine,
+          AccountName</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Kerberoasting Detection</div>
+                        <pre><code>index=windows EventCode=4769 Ticket_Encryption_Type=0x17
+| where Service_Name != "krbtgt"
+| where Account_Name NOT LIKE "%$"  // Not computer accounts
+| stats count as tgs_requests, 
+        dc(Service_Name) as unique_services,
+        values(Service_Name) as services
+  by Account_Name, Client_Address
+| where tgs_requests > 10 AND unique_services > 5
+| sort -tgs_requests</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: DCSync Detection</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 4662
+| where ObjectType contains "domainDNS"
+| where Properties has "Replicating Directory Changes"
+| where SubjectUserName !endswith "$"  // Not computer accounts
+| where SubjectUserName !in ("admin", "backup-svc")  // Not expected
+| project TimeGenerated, SubjectUserName, ObjectName, Properties</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Lateral Movement Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: PsExec Usage</div>
+                        <pre><code>index=windows EventCode=7045 Service_Name="PSEXESVC"
+| stats count, values(Service_File_Name) as service_path by ComputerName
+| table _time, ComputerName, count, service_path</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Admin Share Access</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 5140  // Network share accessed
+| where ShareName in ("\\\\*\\C$", "\\\\*\\ADMIN$", "\\\\*\\IPC$")
+| summarize 
+    AccessCount = count(),
+    UniqueHosts = dcount(Computer),
+    Hosts = make_set(Computer)
+  by SubjectUserName, IpAddress
+| where UniqueHosts > 5  // Accessing many hosts
+| order by UniqueHosts desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Pre-Encryption Indicators</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Shadow Copy Deletion</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where ProcessCommandLine has_any ("vssadmin", "wmic", "bcdedit", "wbadmin")
+| where ProcessCommandLine has_any ("delete", "shadowcopy", "shadows", 
+        "recoveryenabled", "catalog")
+| project TimeGenerated, DeviceName, AccountName, 
+          FileName, ProcessCommandLine</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Mass File Modifications</div>
+                        <pre><code>index=windows EventCode=4663 Accesses="WriteData*"
+| eval file_ext = lower(mvindex(split(Object_Name, "."), -1))
+| where file_ext IN ("encrypted", "locked", "crypted", "enc", "cry")
+     OR file_ext NOT IN ("tmp", "log", "bak", "temp")
+| bucket _time span=5m
+| stats count as modifications, dc(Object_Name) as unique_files 
+  by _time, ComputerName, Account_Name
+| where modifications > 100 AND unique_files > 50
+| sort -modifications</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Ransomware File Extensions</div>
+                        <pre><code>DeviceFileEvents
+| where TimeGenerated > ago(1h)
+| where ActionType == "FileCreated" or ActionType == "FileRenamed"
+| extend FileExtension = tostring(split(FileName, ".")[-1])
+| where FileExtension in ("encrypted", "locked", "crypted", "enc", 
+        "locky", "zepto", "cerber", "wcry", "wncry")
+| summarize 
+    FileCount = count(),
+    Folders = dcount(FolderPath)
+  by DeviceName, AccountName, FileExtension
+| where FileCount > 10</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Ransomware Detection Rules</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Stage</th>
+                                    <th>Detection</th>
+                                    <th>MITRE Technique</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Initial Access</strong></td>
+                                    <td>Phishing delivery, RDP brute force</td>
+                                    <td>T1566, T1133</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Execution</strong></td>
+                                    <td>Cobalt Strike, encoded PowerShell</td>
+                                    <td>T1059.001</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Persistence</strong></td>
+                                    <td>Scheduled tasks, services</td>
+                                    <td>T1053, T1543</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Discovery</strong></td>
+                                    <td>AD enumeration tools</td>
+                                    <td>T1087, T1069</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Credential Access</strong></td>
+                                    <td>LSASS dump, Kerberoasting</td>
+                                    <td>T1003, T1558</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lateral Movement</strong></td>
+                                    <td>PsExec, RDP, admin shares</td>
+                                    <td>T1021, T1570</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Impact</strong></td>
+                                    <td>Shadow copy deletion, encryption</td>
+                                    <td>T1490, T1486</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect ransomware before encryption?"</strong></p>
+                        <p><strong>A:</strong> "Ransomware follows a predictable pattern that offers multiple detection opportunities:</p>
+                        <ol>
+                            <li><strong>Initial access:</strong> Most ransomware starts with phishing or exposed RDP. I monitor for email threats and brute force attempts.</li>
+                            <li><strong>C2 beaconing:</strong> Attackers establish command and control before doing anything else. Regular network connections with consistent intervals indicate beaconing.</li>
+                            <li><strong>AD enumeration:</strong> Before moving laterally, attackers map the environment. Tools like BloodHound, AdFind, or heavy LDAP queries are red flags.</li>
+                            <li><strong>Credential theft:</strong> LSASS access from unexpected processes, Kerberoasting (many TGS requests), or DCSync attempts indicate credential harvesting.</li>
+                            <li><strong>Lateral movement:</strong> PsExec service creation, admin share access from workstations, or RDP to servers from unusual sources.</li>
+                            <li><strong>Pre-encryption:</strong> Shadow copy deletion (vssadmin, wmic) is often the last warning before encryption starts.</li>
+                        </ol>
+                        <p>The key is correlating these stages. Any single indicator might be benign, but the sequence tells the story. Detecting at stage 2-3 gives time to respond before data loss."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Ransomware Detection Quick Reference</div>
+                        <h4>Critical Alerts</h4>
+                        <ul>
+                            <li>LSASS access from unusual process</li>
+                            <li>vssadmin delete shadows</li>
+                            <li>Mass file encryption</li>
+                            <li>Cobalt Strike beaconing</li>
+                            <li>PsExec service creation</li>
+                        </ul>
+                        <h4>Common Tools</h4>
+                        <ul>
+                            <li>Cobalt Strike / Sliver</li>
+                            <li>Mimikatz / comsvcs.dll</li>
+                            <li>BloodHound / SharpHound</li>
+                            <li>PsExec / Impacket</li>
+                            <li>Rclone (exfiltration)</li>
+                        </ul>
+                        <h4>Response Priorities</h4>
+                        <ul>
+                            <li>Isolate affected hosts</li>
+                            <li>Block C2 IPs/domains</li>
+                            <li>Reset compromised accounts</li>
+                            <li>Verify backup integrity</li>
+                            <li>Hunt for persistence</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-engineering.html" class="card-link">← Detection Engineering</a>
+                    <a href="threat-hunting.html" class="card-link">Threat Hunting →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

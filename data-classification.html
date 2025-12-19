@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Classification | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Data Protection</div>
+                    <a href="dlp-monitoring.html" class="nav-item">DLP Monitoring</a>
+                    <a href="data-classification.html" class="nav-item active">Data Classification</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Data Classification</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Data Classification for Security Monitoring</h1>
+                    <p class="page-subtitle">Data classification enables risk-based security monitoring. Understanding what data is sensitive, where it resides, and how it's accessed drives detection priorities and alert severity.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Classification Framework</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Data Classification Levels</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    DATA CLASSIFICATION TIERS                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ RESTRICTED / HIGHLY CONFIDENTIAL                                    │   │
+│  │ • PII, PHI, PCI data                                                │   │
+│  │ • Trade secrets, IP                                                 │   │
+│  │ • M&A documents                                                      │   │
+│  │ • Executive communications                                          │   │
+│  │                                                                      │   │
+│  │ SIEM Priority: CRITICAL - Real-time alerting, strict DLP           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ CONFIDENTIAL                                                        │   │
+│  │ • Internal financial data                                           │   │
+│  │ • Employee records                                                  │   │
+│  │ • Customer contracts                                                │   │
+│  │ • Product roadmaps                                                  │   │
+│  │                                                                      │   │
+│  │ SIEM Priority: HIGH - Alert on external sharing, bulk access       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ INTERNAL                                                            │   │
+│  │ • Internal policies                                                 │   │
+│  │ • Project documentation                                             │   │
+│  │ • Team communications                                               │   │
+│  │                                                                      │   │
+│  │ SIEM Priority: MEDIUM - Monitor external sharing patterns          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ PUBLIC                                                              │   │
+│  │ • Marketing materials                                               │   │
+│  │ • Published content                                                 │   │
+│  │ • Public documentation                                              │   │
+│  │                                                                      │   │
+│  │ SIEM Priority: LOW - No data protection alerts                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sensitivity Labels in SIEM</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Monitor Labeled Data Access</div>
+                        <pre><code>// Track access to classified data
+OfficeActivity
+| where TimeGenerated > ago(24h)
+| where OfficeWorkload in ("SharePoint", "OneDrive")
+| where Operation in ("FileAccessed", "FileDownloaded", "FileCopied")
+| extend SensitivityLabel = tostring(SensitivityLabelId)
+| where isnotempty(SensitivityLabel)
+| lookup kind=leftouter (
+    externaldata(LabelId:string, LabelName:string, Priority:int)
+    [@"https://storage/sensitivity_labels.csv"]
+) on $left.SensitivityLabel == $right.LabelId
+| where Priority >= 3  // Confidential and above
+| summarize 
+    AccessCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    Operations = make_set(Operation)
+  by UserId, LabelName, bin(TimeGenerated, 1h)
+| where AccessCount > 20
+| order by Priority desc, AccessCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: External Sharing of Sensitive Data</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("SharingSet", "AnonymousLinkCreated")
+| where TargetUserOrGroupType == "Guest" or Operation == "AnonymousLinkCreated"
+| extend SensitivityLabel = tostring(SensitivityLabelId)
+| lookup kind=leftouter (
+    externaldata(LabelId:string, LabelName:string, AllowExternal:bool)
+    [@"https://storage/sensitivity_labels.csv"]
+) on $left.SensitivityLabel == $right.LabelId
+| where AllowExternal == false  // External sharing not allowed
+| project TimeGenerated, UserId, SourceFileName, LabelName, 
+          SharedWith = TargetUserOrGroupName, Operation</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Regulatory Data Types</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data Type</th>
+                                    <th>Regulation</th>
+                                    <th>Detection Patterns</th>
+                                    <th>SIEM Response</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>PII</strong></td>
+                                    <td>GDPR, CCPA</td>
+                                    <td>SSN, passport, driver license patterns</td>
+                                    <td>High-priority DLP alerts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PHI</strong></td>
+                                    <td>HIPAA</td>
+                                    <td>Medical records, diagnosis codes</td>
+                                    <td>Critical alerts, audit logging</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PCI</strong></td>
+                                    <td>PCI DSS</td>
+                                    <td>Credit card numbers (Luhn check)</td>
+                                    <td>Immediate blocking, incident</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Financial</strong></td>
+                                    <td>SOX, GLBA</td>
+                                    <td>Account numbers, financial statements</td>
+                                    <td>Access monitoring, DLP</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Credentials</strong></td>
+                                    <td>Various</td>
+                                    <td>API keys, passwords, tokens</td>
+                                    <td>Critical alert, auto-revoke</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Classification-Based Alerting</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Risk-Based Alert Severity</div>
+                        <pre><code>index=dlp_events
+| lookup data_classification file_path OUTPUT classification, risk_score
+| eval alert_severity = case(
+    classification="Restricted" AND action="blocked", "Critical",
+    classification="Restricted" AND action="allowed", "Critical",
+    classification="Confidential" AND action="blocked", "High",
+    classification="Confidential" AND action="allowed", "High",
+    classification="Internal" AND action="blocked", "Medium",
+    "Low"
+)
+| where alert_severity IN ("Critical", "High")
+| table _time, user, file_path, classification, action, alert_severity, destination</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Asset Criticality Correlation</div>
+                        <pre><code>// Correlate alerts with data classification
+let DataAssets = externaldata(AssetId:string, Classification:string, Owner:string)
+[@"https://storage/asset_classification.csv"];
+SecurityAlert
+| where TimeGenerated > ago(24h)
+| extend AffectedAssets = parse_json(Entities)
+| mv-expand Asset = AffectedAssets
+| where Asset.Type == "Host" or Asset.Type == "File"
+| extend AssetId = tostring(Asset.Name)
+| lookup kind=leftouter DataAssets on AssetId
+| extend AdjustedSeverity = case(
+    Classification == "Restricted", "Critical",
+    Classification == "Confidential" and Severity == "Medium", "High",
+    Severity
+)
+| project TimeGenerated, AlertName, AssetId, Classification, 
+          OriginalSeverity = Severity, AdjustedSeverity, Owner</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Discovery</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Find Unclassified Sensitive Data</div>
+                        <pre><code>index=file_access file_extension IN ("xlsx", "csv", "docx", "pdf")
+| where NOT [| inputlookup classified_files | fields file_path]
+| rex field=file_content "(?<ssn>\d{3}-\d{2}-\d{4})"
+| rex field=file_content "(?<cc>\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4})"
+| rex field=file_content "(?<email>\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)"
+| where isnotnull(ssn) OR isnotnull(cc) OR isnotnull(email)
+| stats count as sensitive_matches,
+        values(ssn) as ssn_found,
+        values(cc) as cc_found
+  by file_path, file_owner
+| where sensitive_matches > 0</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How does data classification improve security monitoring?"</strong></p>
+                        <p><strong>A:</strong> "Classification enables risk-based security operations:</p>
+                        <ol>
+                            <li><strong>Alert prioritization:</strong> When I know data sensitivity, I can adjust alert severity. Access to public data is low priority; access to restricted data is critical.</li>
+                            <li><strong>Detection tuning:</strong> I apply stricter detection rules to sensitive data stores. Bulk downloads from a restricted database warrant investigation; from marketing materials, they don't.</li>
+                            <li><strong>DLP integration:</strong> Classification labels feed directly into DLP policies. SIEM ingests DLP events with classification context, enabling meaningful alerts.</li>
+                            <li><strong>Incident response:</strong> When responding to incidents, knowing data classification helps assess impact. Breach of restricted data is reportable; internal data may not be.</li>
+                            <li><strong>Compliance mapping:</strong> Different data types have different regulatory requirements. Classification enables compliance-specific monitoring and reporting.</li>
+                            <li><strong>Resource allocation:</strong> Security teams have limited capacity. Classification ensures effort focuses on protecting what matters most.</li>
+                        </ol>
+                        <p>Without classification, all data gets equal protection—which means important data is under-protected."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Data Classification Quick Reference</div>
+                        <h4>Classification Levels</h4>
+                        <ul>
+                            <li>Restricted / Highly Confidential</li>
+                            <li>Confidential</li>
+                            <li>Internal Use Only</li>
+                            <li>Public</li>
+                        </ul>
+                        <h4>Sensitive Data Patterns</h4>
+                        <ul>
+                            <li>SSN: \d{3}-\d{2}-\d{4}</li>
+                            <li>Credit Card: \d{4}[\s-]?\d{4}...</li>
+                            <li>Email: regex pattern</li>
+                            <li>API Key: common prefixes</li>
+                        </ul>
+                        <h4>Integration Points</h4>
+                        <ul>
+                            <li>Microsoft Purview labels</li>
+                            <li>DLP policy matches</li>
+                            <li>CMDB asset classification</li>
+                            <li>File metadata/properties</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="dlp-monitoring.html" class="card-link">← DLP Monitoring</a>
+                    <a href="data-exfiltration.html" class="card-link">Data Exfiltration →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

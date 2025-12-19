@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M365 Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item">Cloud Overview</a>
+                    <a href="m365-security.html" class="nav-item active">Microsoft 365</a>
+                    <a href="azure-security.html" class="nav-item">Azure Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">M365 Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Microsoft 365 Security Monitoring</h1>
+                    <p class="page-subtitle">Microsoft 365 is the backbone of enterprise productivity—and a prime target for attackers. Comprehensive monitoring of Entra ID, Exchange, SharePoint, and Teams is essential for detecting compromise.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>M365 Security Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">M365 Security Log Sources</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MICROSOFT 365 SECURITY MONITORING                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  IDENTITY (Entra ID)              PRODUCTIVITY                              │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ • Sign-in logs      │         │ Exchange Online             │           │
+│  │ • Audit logs        │         │ • Mail flow, phishing       │           │
+│  │ • Risky users/signs │         │ • Inbox rules, forwarding   │           │
+│  │ • MFA events        │         │                             │           │
+│  │ • Conditional Access│         │ SharePoint/OneDrive         │           │
+│  │ • App registrations │         │ • File access, sharing      │           │
+│  │ • Role changes      │         │ • External collaboration    │           │
+│  └─────────────────────┘         │                             │           │
+│                                  │ Teams                       │           │
+│  SECURITY                        │ • Channel creation          │           │
+│  ┌─────────────────────┐         │ • Guest access              │           │
+│  │ • Defender alerts   │         │ • App installations         │           │
+│  │ • Safe Links clicks │         └─────────────────────────────┘           │
+│  │ • Safe Attachments  │                                                   │
+│  │ • DLP matches       │         ADMIN                                     │
+│  │ • Cloud App Security│         ┌─────────────────────────────┐           │
+│  └─────────────────────┘         │ • Admin audit log           │           │
+│                                  │ • PowerShell sessions       │           │
+│                                  │ • Exchange admin            │           │
+│                                  │ • SharePoint admin          │           │
+│                                  └─────────────────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Entra ID Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Sign-In Patterns</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType != 0  // Failed sign-ins
+| summarize 
+    FailureCount = count(),
+    FailureReasons = make_set(ResultDescription),
+    UniqueIPs = dcount(IPAddress),
+    Countries = make_set(LocationDetails.countryOrRegion)
+  by UserPrincipalName
+| where FailureCount > 10 OR UniqueIPs > 5
+| order by FailureCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Impossible Travel Detection</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| project TimeGenerated, UserPrincipalName, IPAddress,
+          City = tostring(LocationDetails.city),
+          Country = tostring(LocationDetails.countryOrRegion)
+| sort by UserPrincipalName, TimeGenerated asc
+| extend PrevTime = prev(TimeGenerated),
+         PrevCity = prev(City),
+         PrevCountry = prev(Country),
+         PrevUser = prev(UserPrincipalName)
+| where UserPrincipalName == PrevUser
+| extend TimeDiffMinutes = datetime_diff('minute', TimeGenerated, PrevTime)
+| where TimeDiffMinutes < 60 and Country != PrevCountry
+| project TimeGenerated, UserPrincipalName, 
+          FromLocation = strcat(PrevCity, ", ", PrevCountry),
+          ToLocation = strcat(City, ", ", Country),
+          TimeDiffMinutes</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Role Changes</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName has "Add member to role"
+| where TargetResources[0].modifiedProperties[1].newValue has_any 
+    ("Global Administrator", "Exchange Administrator", 
+     "Security Administrator", "Privileged Role Administrator")
+| extend Actor = InitiatedBy.user.userPrincipalName
+| extend Target = TargetResources[0].userPrincipalName
+| extend Role = tostring(TargetResources[0].modifiedProperties[1].newValue)
+| project TimeGenerated, Actor, Target, Role, OperationName</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Exchange Online Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Inbox Rules</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("New-InboxRule", "Set-InboxRule")
+| extend RuleParams = parse_json(Parameters)
+| extend RuleName = tostring(RuleParams[0].Value)
+| where RuleParams has "DeleteMessage" 
+     or RuleParams has "ForwardTo" 
+     or RuleParams has "RedirectTo"
+| extend ForwardTo = extract(@"ForwardTo['""]?:\s*['""]?([^'""}\]]+)", 1, tostring(RuleParams))
+| project TimeGenerated, UserId, RuleName, Operation, ForwardTo, ClientIP
+| where isnotempty(ForwardTo)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Email Forwarding Rules</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation == "Set-Mailbox"
+| where Parameters has "ForwardingSmtpAddress" or Parameters has "ForwardingAddress"
+| extend Params = parse_json(Parameters)
+| mv-expand Params
+| where Params.Name in ("ForwardingSmtpAddress", "ForwardingAddress")
+| extend ForwardTo = tostring(Params.Value)
+| where isnotempty(ForwardTo) and ForwardTo != "null"
+| project TimeGenerated, UserId, ForwardTo, ClientIP, UserAgent</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SharePoint & OneDrive</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Mass File Downloads</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(24h)
+| where OfficeWorkload in ("SharePoint", "OneDrive")
+| where Operation == "FileDownloaded"
+| summarize 
+    DownloadCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    Sites = make_set(Site_Url, 5)
+  by UserId, ClientIP, bin(TimeGenerated, 1h)
+| where DownloadCount > 50
+| order by DownloadCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: External Sharing Detection</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where OfficeWorkload == "SharePoint"
+| where Operation in ("SharingSet", "AnonymousLinkCreated", 
+                      "CompanyLinkCreated", "SecureLinkCreated")
+| where TargetUserOrGroupType == "Guest" 
+     or Operation == "AnonymousLinkCreated"
+| extend SharedWith = TargetUserOrGroupName
+| extend FileName = SourceFileName
+| project TimeGenerated, UserId, Operation, FileName, 
+          SharedWith, Site_Url, ClientIP
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>OAuth & App Permissions</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Risky OAuth Consent</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Consent to application"
+| extend AppName = TargetResources[0].displayName
+| extend Permissions = TargetResources[0].modifiedProperties
+| mv-expand Permissions
+| where Permissions.displayName == "ConsentAction.Permissions"
+| extend GrantedPermissions = tostring(Permissions.newValue)
+| where GrantedPermissions has_any ("Mail.Read", "Mail.Send", 
+        "Files.ReadWrite", "Directory.ReadWrite", "User.ReadWrite.All")
+| extend UserWhoConsented = InitiatedBy.user.userPrincipalName
+| project TimeGenerated, UserWhoConsented, AppName, GrantedPermissions</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: New App Registrations</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Add application"
+| extend Actor = InitiatedBy.user.userPrincipalName
+| extend AppName = TargetResources[0].displayName
+| extend AppId = TargetResources[0].id
+| project TimeGenerated, Actor, AppName, AppId, CorrelationId</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Key Detection Scenarios</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Threat</th>
+                                    <th>Detection</th>
+                                    <th>M365 Log Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Account Takeover</strong></td>
+                                    <td>Impossible travel, new device, password change</td>
+                                    <td>SigninLogs, AuditLogs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>BEC</strong></td>
+                                    <td>Inbox rules, mail forwarding, impersonation</td>
+                                    <td>OfficeActivity, EmailEvents</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Exfiltration</strong></td>
+                                    <td>Mass downloads, external sharing</td>
+                                    <td>OfficeActivity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Privilege Escalation</strong></td>
+                                    <td>Role assignments, group changes</td>
+                                    <td>AuditLogs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>OAuth Phishing</strong></td>
+                                    <td>Suspicious app consent</td>
+                                    <td>AuditLogs</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What are the key M365 security events to monitor?"</strong></p>
+                        <p><strong>A:</strong> "M365 monitoring focuses on identity, data, and configuration:</p>
+                        <ol>
+                            <li><strong>Identity attacks:</strong> SigninLogs for failed logins, impossible travel, new devices. These indicate credential compromise or brute force.</li>
+                            <li><strong>BEC indicators:</strong> Inbox rules that delete or forward mail, especially with financial keywords. Email forwarding to external addresses. Reply-to manipulation.</li>
+                            <li><strong>Data exposure:</strong> SharePoint/OneDrive external sharing, especially anonymous links. Mass file downloads suggesting exfiltration.</li>
+                            <li><strong>Privilege changes:</strong> AuditLogs for role assignments, especially Global Admin or Exchange Admin. These should be rare and approved.</li>
+                            <li><strong>OAuth abuse:</strong> Application consent events, especially for apps requesting Mail.Read, Mail.Send, or Files.ReadWrite. Consent phishing is common.</li>
+                            <li><strong>Admin activity:</strong> PowerShell sessions, Exchange admin commands, especially from unexpected IPs or users.</li>
+                        </ol>
+                        <p>The unified audit log in M365 captures most of this, but you need to know what to look for."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 M365 Monitoring Quick Reference</div>
+                        <h4>Critical Tables</h4>
+                        <ul>
+                            <li>SigninLogs - Authentication</li>
+                            <li>AuditLogs - Admin/config changes</li>
+                            <li>OfficeActivity - User activity</li>
+                            <li>EmailEvents - Mail telemetry</li>
+                            <li>CloudAppEvents - MCAS</li>
+                        </ul>
+                        <h4>High-Risk Operations</h4>
+                        <ul>
+                            <li>New-InboxRule (forwarding)</li>
+                            <li>Set-Mailbox (forwarding)</li>
+                            <li>Add member to role</li>
+                            <li>Consent to application</li>
+                            <li>AnonymousLinkCreated</li>
+                        </ul>
+                        <h4>Key Sign-In Signals</h4>
+                        <ul>
+                            <li>ResultType != 0 (failures)</li>
+                            <li>RiskLevel (Identity Protection)</li>
+                            <li>MfaDetail (MFA bypass)</li>
+                            <li>DeviceDetail (new devices)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="cloud-security-monitoring.html" class="card-link">← Cloud Security</a>
+                    <a href="azure-security.html" class="card-link">Azure Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

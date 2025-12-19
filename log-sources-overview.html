@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Sources Overview | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Log Sources Overview</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Log Sources Overview</h1>
+                    <p class="page-subtitle">Prioritization framework for security log collection</p>
+                </header>
+                
+                
+                <h2>The Log Source Prioritization Framework</h2>
+                
+                <p>Not all logs are equal. A strategic approach prioritizes sources that provide the highest security value relative to their volume and cost.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 The 80/20 Rule of Log Sources</div>
+                    <p>Approximately 80% of your detection capability comes from 20% of your log sources. Focus on getting the critical sources right before expanding coverage.</p>
+                </div>
+                
+                <h3>Tier 1: Critical (Day 1 Priority)</h3>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Why Critical</th>
+                                <th>Key Events</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Identity Provider</strong></td>
+                                <td>All authentication flows through here</td>
+                                <td>Logins, failures, MFA challenges, password changes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Firewall/Proxy</strong></td>
+                                <td>Network boundary visibility</td>
+                                <td>Allow/deny, C2 indicators, data exfiltration</td>
+                            </tr>
+                            <tr>
+                                <td><strong>EDR/Endpoint</strong></td>
+                                <td>Where attacks execute</td>
+                                <td>Process creation, file writes, network connections</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email Gateway</strong></td>
+                                <td>#1 initial access vector</td>
+                                <td>Phishing, malware attachments, BEC</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Tier 2: Important (Week 1-2)</h3>
+                
+                <ul>
+                    <li><strong>Windows Security Events</strong> - Authentication, process auditing</li>
+                    <li><strong>DNS Logs</strong> - C2 detection, data exfiltration</li>
+                    <li><strong>VPN Logs</strong> - Remote access visibility</li>
+                    <li><strong>Cloud Provider Logs</strong> - AWS CloudTrail, Azure Activity</li>
+                </ul>
+                
+                <h3>Tier 3: Valuable (Month 1)</h3>
+                
+                <ul>
+                    <li><strong>Web Application Logs</strong> - Custom app attacks</li>
+                    <li><strong>Database Audit Logs</strong> - Data access patterns</li>
+                    <li><strong>Linux/Unix Logs</strong> - Server activity</li>
+                    <li><strong>SaaS Application Logs</strong> - Salesforce, Workday, etc.</li>
+                </ul>
+                
+                <h2>Volume vs Value Matrix</h2>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Log Source Prioritization Matrix</div>
+                    <pre><code>
+                    HIGH VALUE
+                        │
+        ┌───────────────┼───────────────┐
+        │               │               │
+        │   OPTIMIZE    │   CRITICAL    │
+        │   (reduce     │   (collect    │
+        │   volume)     │   everything) │
+        │               │               │
+   LOW ─┼───────────────┼───────────────┼─ HIGH
+ VOLUME │               │               │  VOLUME
+        │               │               │
+        │   NICE TO     │   FILTER      │
+        │   HAVE        │   HEAVILY     │
+        │   (low cost)  │   (high cost) │
+        │               │               │
+        └───────────────┼───────────────┘
+                        │
+                    LOW VALUE
+                    </code></pre>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How do you decide which log sources to onboard first?"</p>
+                    <p><strong>Answer:</strong> "I prioritize based on security value and detection coverage. Tier 1 includes identity (all auth flows here), perimeter (firewall/proxy for network visibility), endpoints (where attacks execute), and email (top initial access vector). These four source types give you visibility into 80% of attack scenarios. After that, I add Windows events, DNS, VPN, and cloud logs. The goal is quick wins first - sources that are easy to onboard and immediately enable high-value detections."</p>
+                </div>
+                
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Quick Reference</div>
+                    <h4>Day 1 Sources (Must Have)</h4>
+                    <ul>
+                        <li>Identity Provider (Azure AD, Okta)</li>
+                        <li>Firewall/Proxy</li>
+                        <li>EDR (CrowdStrike, MDE, etc.)</li>
+                        <li>Email Gateway</li>
+                    </ul>
+                    <h4>Volume Optimization</h4>
+                    <ul>
+                        <li>Filter verbose sources at collection</li>
+                        <li>Drop debug/info level from production SIEM</li>
+                        <li>Use summary indexes for high-volume metrics</li>
+                    </ul>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-data-flow.html" class="card-link">← SIEM Data Flow</a>
+                    <a href="windows-logs.html" class="card-link">Windows Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

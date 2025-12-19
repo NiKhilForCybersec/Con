@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="application-logs.html" class="nav-item">Application Logs</a>
+                    <a href="email-security.html" class="nav-item active">Email Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Email Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Email Security Monitoring</h1>
+                    <p class="page-subtitle">Email remains the primary initial access vector. Monitoring email security logs helps detect phishing, business email compromise, and malware delivery before they result in breaches.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Email Threat Landscape</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Email-Based Attack Vectors</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       EMAIL ATTACK CATEGORIES                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CREDENTIAL PHISHING           MALWARE DELIVERY           BEC/FRAUD         │
+│  ┌─────────────────┐          ┌─────────────────┐       ┌──────────────┐   │
+│  │ • Fake login    │          │ • Macro-enabled │       │ • CEO fraud  │   │
+│  │   pages         │          │   documents     │       │ • Invoice    │   │
+│  │ • OAuth consent │          │ • ISO/IMG files │       │   redirect   │   │
+│  │ • QR code       │          │ • ZIP + password│       │ • Gift card  │   │
+│  │   phishing      │          │ • HTML smuggling│       │   scams      │   │
+│  │ • MFA bypass    │          │ • OneNote files │       │ • Wire fraud │   │
+│  └─────────────────┘          └─────────────────┘       └──────────────┘   │
+│                                                                             │
+│  DETECTION OPPORTUNITIES:                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • New sender domains       • Attachment analysis   • Reply-to !=    │   │
+│  │ • Failed SPF/DKIM/DMARC   • URL reputation        • From mismatch   │   │
+│  │ • Link click tracking      • Sandbox detonation   • Urgency patterns│   │
+│  │ • User-reported phishing   • File hash matching   • Executive       │   │
+│  │                                                      impersonation  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft 365 Email Monitoring</h2>
+                    
+                    <h3>Phishing Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Phishing Emails Delivered</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where ThreatTypes has "Phish"
+| where DeliveryAction == "Delivered"
+| summarize 
+    EmailCount = count(),
+    Recipients = make_set(RecipientEmailAddress, 10),
+    Subjects = make_set(Subject, 5)
+  by SenderFromAddress, SenderMailFromDomain
+| order by EmailCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: URL Clicks from Emails</div>
+                        <pre><code>UrlClickEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "ClickAllowed"
+| where ThreatTypes != ""
+| project TimeGenerated, AccountUpn, Url, 
+          ThreatTypes, NetworkMessageId
+| join kind=inner (
+    EmailEvents
+    | project NetworkMessageId, Subject, SenderFromAddress
+) on NetworkMessageId
+| project TimeGenerated, AccountUpn, Url, ThreatTypes, 
+          Subject, SenderFromAddress</code></pre>
+                    </div>
+
+                    <h3>Malware in Email</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Malware Attachments</div>
+                        <pre><code>EmailAttachmentInfo
+| where TimeGenerated > ago(24h)
+| where ThreatTypes has "Malware"
+| project NetworkMessageId, FileName, FileType, 
+          SHA256, ThreatTypes, ThreatNames
+| join kind=inner (
+    EmailEvents
+    | project NetworkMessageId, RecipientEmailAddress, 
+              SenderFromAddress, Subject, DeliveryAction
+) on NetworkMessageId
+| summarize 
+    DeliveryCount = count(),
+    Recipients = make_set(RecipientEmailAddress, 10)
+  by FileName, SHA256, ThreatNames, DeliveryAction</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Business Email Compromise (BEC)</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Executive Impersonation</div>
+                        <pre><code>// Detect emails impersonating executives
+let Executives = dynamic(["ceo@company.com", "cfo@company.com", "coo@company.com"]);
+EmailEvents
+| where TimeGenerated > ago(24h)
+| where SenderFromAddress !in (Executives)  // Not actually from executive
+| where SenderDisplayName has_any ("CEO", "CFO", "Chief") 
+    or SenderDisplayName has_any (
+        extract(@"([^@]+)@", 1, tostring(Executives[0])),
+        extract(@"([^@]+)@", 1, tostring(Executives[1]))
+    )
+| project TimeGenerated, SenderFromAddress, SenderDisplayName,
+          RecipientEmailAddress, Subject
+| where SenderFromDomain != "company.com"</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Reply-To Patterns</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| extend ReplyTo = tostring(parse_json(AdditionalFields).ReplyTo)
+| where isnotempty(ReplyTo)
+| where ReplyTo != SenderFromAddress  // Reply-to differs from sender
+| where SenderFromDomain == "company.com"  // Appears internal
+| where ReplyTo !has "company.com"  // But replies go external
+| project TimeGenerated, SenderFromAddress, ReplyTo,
+          RecipientEmailAddress, Subject</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Inbox Rule Abuse</h2>
+                    <p>Attackers often create inbox rules to hide their activity:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Inbox Rules</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("New-InboxRule", "Set-InboxRule", "Enable-InboxRule")
+| extend RuleParams = tostring(Parameters)
+| where RuleParams has_any (
+    "DeleteMessage",
+    "MoveToFolder",
+    "ForwardTo",
+    "RedirectTo"
+)
+| where RuleParams has_any (
+    "invoice", "payment", "wire", "bank", "urgent",
+    "security", "password", "helpdesk"
+)
+| project TimeGenerated, UserId, Operation, 
+          RuleParams, ClientIP</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Mail Forwarding Rules</div>
+                        <pre><code>index=o365 Operation IN ("New-InboxRule", "Set-InboxRule")
+| spath Parameters
+| where Parameters LIKE "%ForwardTo%" OR Parameters LIKE "%RedirectTo%"
+| rex field=Parameters "ForwardTo[^:]+:\s*(?<forward_to>[^,\]]+)"
+| where forward_to!=""
+| table _time, UserId, Operation, forward_to, ClientIP</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Email Authentication Failures</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: SPF/DKIM/DMARC Failures</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where AuthenticationDetails has "fail"
+| extend SPFResult = extract(@"spf=(\w+)", 1, AuthenticationDetails)
+| extend DKIMResult = extract(@"dkim=(\w+)", 1, AuthenticationDetails)
+| extend DMARCResult = extract(@"dmarc=(\w+)", 1, AuthenticationDetails)
+| where SPFResult == "fail" or DKIMResult == "fail" or DMARCResult == "fail"
+| summarize 
+    EmailCount = count(),
+    FailedAuth = make_set(pack("SPF", SPFResult, "DKIM", DKIMResult, "DMARC", DMARCResult))
+  by SenderMailFromDomain
+| where EmailCount > 10
+| order by EmailCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Exfiltration via Email</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Large Outbound Attachments</div>
+                        <pre><code>EmailAttachmentInfo
+| where TimeGenerated > ago(24h)
+| join kind=inner (
+    EmailEvents
+    | where EmailDirection == "Outbound"
+    | project NetworkMessageId, SenderFromAddress, 
+              RecipientEmailAddress, RecipientDomain
+) on NetworkMessageId
+| where RecipientDomain !in ("company.com", "partner.com")  // External
+| summarize 
+    TotalSize = sum(FileSize),
+    FileCount = count(),
+    FileTypes = make_set(FileType)
+  by SenderFromAddress, RecipientDomain
+| where TotalSize > 10000000  // Over 10MB
+| order by TotalSize desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Auto-Forwarding to External</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(30d)
+| where Operation == "Set-Mailbox"
+| where Parameters has "ForwardingSmtpAddress"
+| extend ForwardTo = extract(@"ForwardingSmtpAddress[^:]+:\s*smtp:([^,\]]+)", 1, tostring(Parameters))
+| where ForwardTo !has "company.com"
+| project TimeGenerated, UserId, ForwardTo, ClientIP</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>User-Reported Phishing</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Analyze Reported Phishing</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(7d)
+| where UserReportedEmail == true
+| summarize 
+    ReportCount = count(),
+    ReportingUsers = dcount(RecipientEmailAddress)
+  by SenderMailFromDomain, SenderFromAddress
+| where ReportCount > 3  // Multiple users reported
+| order by ReportCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect business email compromise attempts?"</strong></p>
+                        <p><strong>A:</strong> "BEC detection requires multiple signals since these attacks often have no malware or malicious links:</p>
+                        <ol>
+                            <li><strong>Impersonation detection:</strong> I look for display name spoofing—emails claiming to be from executives but sent from external domains. Mismatches between display name, From address, and Reply-To are red flags.</li>
+                            <li><strong>Domain lookalikes:</strong> I maintain watchlists for typosquatting versions of our domain and partner domains. Attacks often use domains like 'company-inc.com' instead of 'company.com'.</li>
+                            <li><strong>Inbox rule monitoring:</strong> After compromising an account, attackers create rules to hide their activity—forwarding to external addresses or deleting responses. New rules with delete/forward actions on financial keywords are investigated.</li>
+                            <li><strong>Behavioral anomalies:</strong> An executive who never sends wire transfer requests suddenly doing so, especially with urgency language, warrants verification.</li>
+                            <li><strong>Authentication failures:</strong> Legitimate senders pass SPF/DKIM/DMARC. BEC often fails these checks even when impersonating internal users.</li>
+                        </ol>
+                        <p>BEC is hard because there's nothing technically malicious to detect—it's social engineering. The SIEM's job is surfacing anomalies for human verification."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Email Security Quick Reference</div>
+                        <h4>BEC Indicators</h4>
+                        <ul>
+                            <li>Display name ≠ From address</li>
+                            <li>Reply-To ≠ From address</li>
+                            <li>Lookalike domains</li>
+                            <li>Urgency + financial request</li>
+                            <li>Failed SPF/DKIM/DMARC</li>
+                        </ul>
+                        <h4>Suspicious Inbox Rules</h4>
+                        <ul>
+                            <li>ForwardTo external addresses</li>
+                            <li>DeleteMessage on keywords</li>
+                            <li>MoveToFolder (hiding emails)</li>
+                            <li>Rules on "invoice", "payment"</li>
+                        </ul>
+                        <h4>M365 Tables</h4>
+                        <ul>
+                            <li>EmailEvents - Email metadata</li>
+                            <li>EmailAttachmentInfo - Attachments</li>
+                            <li>EmailUrlInfo - URLs in emails</li>
+                            <li>UrlClickEvents - Link clicks</li>
+                            <li>OfficeActivity - Admin actions</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="application-logs.html" class="card-link">← Application Logs</a>
+                    <a href="cloud-security-monitoring.html" class="card-link">Cloud Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Data Lake | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Architecture</div>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="security-data-lake.html" class="nav-item active">Security Data Lake</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Security Data Lake</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Security Data Lake</h1>
+                    <p class="page-subtitle">Security data lakes complement SIEMs by providing cost-effective storage for high-volume logs, enabling long-term retention, historical analysis, and advanced analytics at scale.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>SIEM vs Data Lake</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Complementary Architecture</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SIEM + DATA LAKE ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  LOG SOURCES ────────────────► STREAM PROCESSOR ──────┬──────────────────  │
+│                                (Cribl, Kafka)          │                    │
+│                                                        │                    │
+│                    ┌───────────────────────────────────┼─────────────┐      │
+│                    │                                   │             │      │
+│                    ▼                                   ▼             ▼      │
+│  ┌─────────────────────────┐    ┌─────────────────────────┐  ┌──────────┐ │
+│  │        SIEM             │    │     DATA LAKE           │  │ ARCHIVE  │ │
+│  │                         │    │                         │  │          │ │
+│  │ • Real-time detection   │    │ • High-volume storage   │  │ • Cold   │ │
+│  │ • Alert correlation     │    │ • Historical analysis   │  │   storage│ │
+│  │ • Incident management   │    │ • ML/analytics          │  │ • 7 year │ │
+│  │ • 90 days hot           │    │ • 1-3 years             │  │   retain │ │
+│  │                         │    │                         │  │          │ │
+│  │ Cost: $$$$/GB           │    │ Cost: $/GB              │  │ Cost: ¢  │ │
+│  └─────────────────────────┘    └─────────────────────────┘  └──────────┘ │
+│           │                              │                                  │
+│           │    ◄─────── Federation ──────►                                  │
+│           │     Query across both                                           │
+│           ▼                              ▼                                  │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                     UNIFIED SECURITY ANALYTICS                        │ │
+│  │  • Threat hunting across all data                                     │ │
+│  │  • Long-term trend analysis                                           │ │
+│  │  • ML model training                                                  │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Lake Technologies</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Technology</th>
+                                    <th>Use Case</th>
+                                    <th>Query Engine</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Amazon Security Lake</strong></td>
+                                    <td>AWS-native, OCSF format</td>
+                                    <td>Athena, OpenSearch</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Snowflake</strong></td>
+                                    <td>Multi-cloud analytics</td>
+                                    <td>Native SQL, Python</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Databricks</strong></td>
+                                    <td>ML-heavy workloads</td>
+                                    <td>Spark SQL, Python</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Google BigQuery</strong></td>
+                                    <td>GCP-native, serverless</td>
+                                    <td>SQL, Chronicle</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Data Explorer</strong></td>
+                                    <td>Azure-native, KQL</td>
+                                    <td>KQL, Sentinel</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>S3 + Athena</strong></td>
+                                    <td>Cost-optimized storage</td>
+                                    <td>Presto SQL</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Lake Query Examples</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SQL: Athena Query on S3 Logs</div>
+                        <pre><code>-- Query VPC Flow Logs in S3
+SELECT 
+    source_ip,
+    dest_ip,
+    dest_port,
+    SUM(bytes) as total_bytes,
+    COUNT(*) as connection_count
+FROM vpc_flow_logs
+WHERE year = '2024' AND month = '01'
+  AND action = 'ACCEPT'
+  AND dest_port IN (22, 3389, 445)
+GROUP BY source_ip, dest_ip, dest_port
+HAVING connection_count > 100
+ORDER BY total_bytes DESC
+LIMIT 100;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SQL: Snowflake Threat Hunting</div>
+                        <pre><code>-- Hunt for beaconing patterns
+WITH connection_intervals AS (
+    SELECT 
+        src_ip,
+        dest_ip,
+        timestamp,
+        LAG(timestamp) OVER (
+            PARTITION BY src_ip, dest_ip 
+            ORDER BY timestamp
+        ) as prev_timestamp,
+        DATEDIFF('second', prev_timestamp, timestamp) as interval_secs
+    FROM network_logs
+    WHERE timestamp > DATEADD('day', -7, CURRENT_TIMESTAMP())
+)
+SELECT 
+    src_ip,
+    dest_ip,
+    COUNT(*) as connections,
+    AVG(interval_secs) as avg_interval,
+    STDDEV(interval_secs) as stddev_interval
+FROM connection_intervals
+WHERE interval_secs IS NOT NULL
+GROUP BY src_ip, dest_ip
+HAVING connections > 100 AND stddev_interval < 10
+-- Low stddev = regular beaconing
+ORDER BY stddev_interval ASC;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Spark Analytics</div>
+                        <pre><code># Databricks notebook for anomaly detection
+from pyspark.sql import functions as F
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.clustering import KMeans
+
+# Load authentication logs
+auth_logs = spark.read.parquet("s3://security-lake/auth_logs/")
+
+# Feature engineering
+features = auth_logs.groupBy("user_id", "date") \
+    .agg(
+        F.count("*").alias("login_count"),
+        F.countDistinct("src_ip").alias("unique_ips"),
+        F.countDistinct("app").alias("unique_apps"),
+        F.sum(F.when(F.col("success") == False, 1).otherwise(0)).alias("failures")
+    )
+
+# Cluster to find anomalies
+assembler = VectorAssembler(
+    inputCols=["login_count", "unique_ips", "unique_apps", "failures"],
+    outputCol="features"
+)
+kmeans = KMeans(k=5, seed=42)
+model = kmeans.fit(assembler.transform(features))
+
+# Identify outlier cluster
+predictions = model.transform(assembler.transform(features))
+anomalies = predictions.filter(F.col("prediction") == outlier_cluster)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>OCSF Schema</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Open Cybersecurity Schema Framework</div>
+                        <p>OCSF provides a common schema for security logs, enabling cross-vendor normalization:</p>
+                        <ul>
+                            <li><strong>Event classes:</strong> Authentication, Network Activity, File Activity, etc.</li>
+                            <li><strong>Common fields:</strong> time, severity, actor, target, device</li>
+                            <li><strong>Extensions:</strong> Vendor-specific additions</li>
+                            <li><strong>Adoption:</strong> AWS Security Lake, Splunk, IBM, CrowdStrike</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SQL: OCSF Query Example</div>
+                        <pre><code>-- OCSF-formatted query (Amazon Security Lake)
+SELECT 
+    time,
+    actor.user.name as user,
+    src_endpoint.ip as source_ip,
+    dst_endpoint.ip as dest_ip,
+    activity_name,
+    status
+FROM security_lake.authentication_events
+WHERE class_uid = 3002  -- Authentication class
+  AND status_id = 2     -- Failure
+  AND time > current_timestamp - interval '24' hour
+ORDER BY time DESC;</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Federation with SIEM</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Federated Search to S3</div>
+                        <pre><code>// Splunk Federated Search to AWS
+| from federated:aws_security_lake 
+    connection=aws_lake 
+    dataset=vpc_flow_logs
+| where dest_port=22 AND action="ACCEPT"
+| stats count by src_ip, dest_ip
+| join type=left src_ip [
+    search index=assets | fields ip, hostname, owner
+]
+| where count > 100</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: ADX External Table</div>
+                        <pre><code>// Query external data in Azure Data Explorer
+external_table('HistoricalLogs')
+| where Timestamp > ago(365d)
+| where EventType == "Authentication"
+| where Result == "Failure"
+| summarize FailureCount = count() by UserPrincipalName, bin(Timestamp, 1d)
+| order by FailureCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "When would you use a security data lake vs SIEM?"</strong></p>
+                        <p><strong>A:</strong> "They're complementary, not competing:</p>
+                        <ol>
+                            <li><strong>SIEM for:</strong> Real-time detection, alert correlation, incident management, compliance dashboards. This is your operational security platform.</li>
+                            <li><strong>Data Lake for:</strong> High-volume logs that don't need real-time alerting (netflow, verbose app logs), long-term retention beyond SIEM economics, and ML/analytics workloads.</li>
+                            <li><strong>Cost driver:</strong> SIEM costs $5-15/GB ingested. Data lakes cost $0.02-0.05/GB stored. For 100TB of netflow, the math is clear.</li>
+                            <li><strong>Hunting:</strong> Threat hunting over 12 months of data is expensive in SIEM but affordable in data lake. I route hunting workloads accordingly.</li>
+                            <li><strong>Federation:</strong> Modern architectures federate queries across both. Hunt in the lake, pivot to SIEM for real-time context.</li>
+                            <li><strong>Schema matters:</strong> OCSF or similar normalization enables cross-platform analytics. Without common schema, data lake becomes a data swamp.</li>
+                        </ol>
+                        <p>The trend is SIEM for detection, data lake for analytics and retention."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Data Lake Quick Reference</div>
+                        <h4>Best for Data Lake</h4>
+                        <ul>
+                            <li>VPC/network flow logs</li>
+                            <li>DNS query logs</li>
+                            <li>Web proxy verbose</li>
+                            <li>Application debug logs</li>
+                            <li>Historical archives</li>
+                        </ul>
+                        <h4>Keep in SIEM</h4>
+                        <ul>
+                            <li>Security alerts</li>
+                            <li>Authentication events</li>
+                            <li>Endpoint detection</li>
+                            <li>Cloud audit logs</li>
+                            <li>Active incidents</li>
+                        </ul>
+                        <h4>Key Technologies</h4>
+                        <ul>
+                            <li>Amazon Security Lake</li>
+                            <li>Snowflake / Databricks</li>
+                            <li>S3 + Athena</li>
+                            <li>Azure Data Explorer</li>
+                            <li>OCSF schema</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-architecture.html" class="card-link">← SIEM Architecture</a>
+                    <a href="cost-optimization.html" class="card-link">Cost Optimization →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

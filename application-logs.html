@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Application Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Application Logs</h1>
+                    <p class="page-subtitle">Web applications, SaaS, and custom application logging</p>
+                </header>
+                
+                
+                <h2>Application Logging for Security</h2>
+                
+                <p>Application logs are often overlooked but critical for detecting application-layer attacks and business logic abuse.</p>
+                
+                <h3>Web Application Logs</h3>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Log Type</th>
+                                <th>Contents</th>
+                                <th>Security Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Access Logs</strong></td>
+                                <td>HTTP requests (URL, status, IP)</td>
+                                <td>Attack patterns, scanning, WAF bypass</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Error Logs</strong></td>
+                                <td>Application errors, stack traces</td>
+                                <td>Exploitation attempts, injection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Authentication Logs</strong></td>
+                                <td>Login success/failure</td>
+                                <td>Credential attacks, account takeover</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Audit Logs</strong></td>
+                                <td>User actions, data access</td>
+                                <td>Insider threat, data exfiltration</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>SaaS Application Logs</h2>
+                
+                <p>Critical SaaS sources for security monitoring:</p>
+                
+                <ul>
+                    <li><strong>Microsoft 365:</strong> Exchange, SharePoint, Teams activity</li>
+                    <li><strong>Google Workspace:</strong> Gmail, Drive, Admin console</li>
+                    <li><strong>Salesforce:</strong> Login history, Setup Audit Trail</li>
+                    <li><strong>GitHub/GitLab:</strong> Code access, repo changes</li>
+                    <li><strong>Slack:</strong> Message activity, file sharing</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 O365/M365 Key Audit Events</div>
+                    <ul>
+                        <li>MailItemsAccessed - Email accessed</li>
+                        <li>FileDownloaded - SharePoint/OneDrive downloads</li>
+                        <li>Set-InboxRule - Email forwarding rules</li>
+                        <li>Add-MailboxPermission - Mailbox delegation</li>
+                    </ul>
+                </div>
+                
+                <h2>Custom Application Logging</h2>
+                
+                <p>When building or advising on custom applications, recommend:</p>
+                
+                <ul>
+                    <li>Structured logging (JSON format)</li>
+                    <li>Consistent timestamp format (ISO 8601)</li>
+                    <li>User identification in every event</li>
+                    <li>Session/request correlation IDs</li>
+                    <li>Security-relevant events: auth, access, errors, admin actions</li>
+                </ul>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How would you detect a business email compromise (BEC)?"</p>
+                    <p><strong>Answer:</strong> "BEC indicators in O365 logs: new inbox rules forwarding to external addresses, mailbox permission changes granting access to other users, login from unusual locations or IPs, and mass email access (MailItemsAccessed). I correlate with identity logs for impossible travel and new device sign-ins. Also watch for replies to messages that were auto-forwarded - suggests attacker monitoring conversations."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="endpoint-logs.html" class="card-link">← Endpoint Logs</a>
+                    <a href="migration-methodology.html" class="card-link">Migration Methodology →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

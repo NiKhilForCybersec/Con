@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item active">Cloud Monitoring</a>
+                    <a href="azure-security.html" class="nav-item">Azure Security</a>
+                    <a href="aws-security.html" class="nav-item">AWS Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Cloud Security Monitoring</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Cloud Security Monitoring</h1>
+                    <p class="page-subtitle">Cloud environments require different monitoring strategies than on-premises. The attack surface is different, the log sources are different, and the threats are different. This guide covers cloud-specific security monitoring.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Cloud Security Model</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Shared Responsibility Model</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SHARED RESPONSIBILITY MODEL                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                    IaaS          PaaS          SaaS                        │
+│                                                                             │
+│  CUSTOMER     ┌──────────┐   ┌──────────┐   ┌──────────┐                  │
+│  RESPONSIBLE  │ Data     │   │ Data     │   │ Data     │                  │
+│               │ Apps     │   │ Apps     │   │ Config   │                  │
+│               │ Runtime  │   │          │   │          │                  │
+│               │ Middleware   │          │   │          │                  │
+│               │ OS       │   │          │   │          │                  │
+│               └──────────┘   └──────────┘   └──────────┘                  │
+│                                                                             │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  CLOUD        ┌──────────┐   ┌──────────┐   ┌──────────┐                  │
+│  PROVIDER     │          │   │ Runtime  │   │ Apps     │                  │
+│  RESPONSIBLE  │          │   │ Middleware   │ Runtime  │                  │
+│               │          │   │ OS       │   │ Middleware                  │
+│               │ Compute  │   │ Compute  │   │ OS       │                  │
+│               │ Storage  │   │ Storage  │   │ Compute  │                  │
+│               │ Network  │   │ Network  │   │ Storage  │                  │
+│               │ Physical │   │ Physical │   │ Network  │                  │
+│               └──────────┘   └──────────┘   │ Physical │                  │
+│                                             └──────────┘                  │
+│                                                                             │
+│  KEY: You must monitor what you're responsible for securing!               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Critical Cloud Log Sources</h2>
+                    
+                    <h3>Azure / Microsoft 365</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Log Source</th>
+                                    <th>Sentinel Table</th>
+                                    <th>Key Use Cases</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Azure AD Sign-ins</strong></td>
+                                    <td>SigninLogs</td>
+                                    <td>Auth attacks, impossible travel, MFA bypass</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure AD Audit</strong></td>
+                                    <td>AuditLogs</td>
+                                    <td>Role changes, app consent, directory changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Activity</strong></td>
+                                    <td>AzureActivity</td>
+                                    <td>Resource creation, config changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Office 365</strong></td>
+                                    <td>OfficeActivity</td>
+                                    <td>File access, sharing, email rules</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Key Vault</strong></td>
+                                    <td>AzureDiagnostics</td>
+                                    <td>Secret access, key operations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Defender</strong></td>
+                                    <td>SecurityAlert</td>
+                                    <td>Cloud threat detections</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>AWS</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Log Source</th>
+                                    <th>Description</th>
+                                    <th>Key Use Cases</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>CloudTrail</strong></td>
+                                    <td>API activity logs</td>
+                                    <td>IAM changes, resource access, config changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GuardDuty</strong></td>
+                                    <td>Threat detection</td>
+                                    <td>Malicious activity, compromised credentials</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>VPC Flow Logs</strong></td>
+                                    <td>Network traffic</td>
+                                    <td>Network anomalies, data exfil, C2</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>S3 Access Logs</strong></td>
+                                    <td>Bucket access</td>
+                                    <td>Data access, unauthorized access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Config</strong></td>
+                                    <td>Resource config</td>
+                                    <td>Compliance, config drift</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud-Specific Threats</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Cloud Attack Vectors</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       CLOUD ATTACK SURFACE                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  IDENTITY ATTACKS                     DATA EXPOSURE                         │
+│  ┌─────────────────────────┐         ┌─────────────────────────┐           │
+│  │ • Credential theft      │         │ • Public S3 buckets     │           │
+│  │ • Token hijacking       │         │ • Overly permissive     │           │
+│  │ • Consent phishing      │         │   blob storage          │           │
+│  │ • MFA bypass            │         │ • Snapshot exposure     │           │
+│  │ • Federated identity    │         │ • Database exposure     │           │
+│  │   compromise            │         │                         │           │
+│  └─────────────────────────┘         └─────────────────────────┘           │
+│                                                                             │
+│  PRIVILEGE ESCALATION                 PERSISTENCE                           │
+│  ┌─────────────────────────┐         ┌─────────────────────────┐           │
+│  │ • Role assumption       │         │ • Malicious app         │           │
+│  │ • IAM policy abuse      │         │   registrations         │           │
+│  │ • Service account       │         │ • Rogue OAuth grants    │           │
+│  │   impersonation         │         │ • Backdoor IAM users    │           │
+│  │ • Resource policy       │         │ • Lambda/function       │           │
+│  │   misconfiguration      │         │   backdoors             │           │
+│  └─────────────────────────┘         └─────────────────────────┘           │
+│                                                                             │
+│  RESOURCE ABUSE                       LATERAL MOVEMENT                      │
+│  ┌─────────────────────────┐         ┌─────────────────────────┐           │
+│  │ • Crypto mining         │         │ • Cross-account access  │           │
+│  │ • Spam/botnet hosting   │         │ • Metadata service      │           │
+│  │ • C2 infrastructure     │         │   exploitation          │           │
+│  │ • Data staging          │         │ • Shared storage access │           │
+│  └─────────────────────────┘         └─────────────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud Detection Queries</h2>
+                    
+                    <h3>Azure AD: Risky Sign-ins</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: High-Risk Authentication</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where RiskLevelDuringSignIn in ("high", "medium")
+| summarize 
+    SignInCount = count(),
+    RiskEvents = make_set(RiskEventTypes),
+    Locations = make_set(Location),
+    Apps = make_set(AppDisplayName)
+  by UserPrincipalName, IPAddress, RiskLevelDuringSignIn
+| extend Severity = case(
+    RiskLevelDuringSignIn == "high", "Critical",
+    RiskLevelDuringSignIn == "medium", "High",
+    "Medium")
+| order by Severity asc, SignInCount desc</code></pre>
+                    </div>
+
+                    <h3>Azure AD: Impossible Travel</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Impossible Travel Detection</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(7d)
+| where ResultType == 0  // Successful
+| project TimeGenerated, UserPrincipalName, Location, IPAddress
+| order by UserPrincipalName, TimeGenerated asc
+| extend PrevTime = prev(TimeGenerated), 
+         PrevLocation = prev(Location),
+         PrevUser = prev(UserPrincipalName)
+| where UserPrincipalName == PrevUser
+| where Location != PrevLocation
+| extend TimeDiffHours = datetime_diff('hour', TimeGenerated, PrevTime)
+| where TimeDiffHours < 2  // Less than 2 hours between distant locations
+| where Location != "" and PrevLocation != ""
+| project TimeGenerated, UserPrincipalName, Location, PrevLocation, 
+          TimeDiffHours, IPAddress</code></pre>
+                    </div>
+
+                    <h3>Azure AD: Suspicious App Consent</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: OAuth App Consent Monitoring</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Consent to application"
+| extend AppName = tostring(TargetResources[0].displayName)
+| extend ConsentingUser = tostring(InitiatedBy.user.userPrincipalName)
+| extend Permissions = tostring(TargetResources[0].modifiedProperties)
+| where Permissions has_any ("Mail.Read", "Files.ReadWrite", "User.Read.All")
+| project TimeGenerated, ConsentingUser, AppName, Permissions
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Azure: Privileged Role Assignment</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Role Assignment Monitoring</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName has "Add member to role"
+| extend RoleName = tostring(TargetResources[0].displayName)
+| extend AddedUser = tostring(TargetResources[1].displayName)
+| extend AddedBy = tostring(InitiatedBy.user.userPrincipalName)
+| where RoleName in (
+    "Global Administrator", "Privileged Role Administrator",
+    "Application Administrator", "Cloud Application Administrator",
+    "Exchange Administrator", "SharePoint Administrator"
+)
+| project TimeGenerated, AddedBy, AddedUser, RoleName</code></pre>
+                    </div>
+
+                    <h3>Office 365: Inbox Rule Creation</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Inbox Rules (BEC Indicator)</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation == "New-InboxRule"
+| extend RuleName = tostring(parse_json(Parameters)[0].Value)
+| extend RuleCondition = tostring(parse_json(Parameters))
+| where RuleCondition has_any ("DeleteMessage", "MoveToFolder", "ForwardTo")
+| project TimeGenerated, UserId, RuleName, RuleCondition, ClientIP
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Azure: Resource Exposure</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Public Resource Detection</div>
+                        <pre><code>AzureActivity
+| where TimeGenerated > ago(7d)
+| where OperationNameValue has_any (
+    "Microsoft.Storage/storageAccounts/write",
+    "Microsoft.Sql/servers/firewallRules/write",
+    "Microsoft.Network/networkSecurityGroups/write"
+)
+| where ActivityStatusValue == "Success"
+| extend Resource = tostring(parse_json(Properties).resource)
+| project TimeGenerated, Caller, OperationNameValue, Resource, 
+          SubscriptionId, ResourceGroup</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud Security Best Practices</h2>
+                    
+                    <h3>Identity-Centric Security</h3>
+                    <p>In cloud, identity is the perimeter:</p>
+                    <ul>
+                        <li><strong>MFA everywhere:</strong> Require MFA for all users, especially privileged</li>
+                        <li><strong>Conditional Access:</strong> Block risky sign-ins, enforce device compliance</li>
+                        <li><strong>Least privilege:</strong> Use PIM/PAM for just-in-time access</li>
+                        <li><strong>Monitor identity events:</strong> Sign-ins, role changes, app consents</li>
+                    </ul>
+
+                    <h3>Data Security</h3>
+                    <ul>
+                        <li><strong>Encrypt at rest:</strong> Enable encryption for all storage</li>
+                        <li><strong>Private endpoints:</strong> Avoid public exposure where possible</li>
+                        <li><strong>Access logging:</strong> Enable and monitor storage access logs</li>
+                        <li><strong>DLP:</strong> Monitor for sensitive data in logs</li>
+                    </ul>
+
+                    <h3>Configuration Monitoring</h3>
+                    <ul>
+                        <li><strong>CSPM:</strong> Use Cloud Security Posture Management tools</li>
+                        <li><strong>Config baselines:</strong> Detect drift from secure configuration</li>
+                        <li><strong>Network security:</strong> Monitor NSG/security group changes</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What are the key differences in monitoring cloud vs on-premises environments?"</strong></p>
+                        <p><strong>A:</strong> "Several fundamental shifts:</p>
+                        <ol>
+                            <li><strong>Identity is the perimeter:</strong> In cloud, the primary attack vector is identity compromise—credential theft, OAuth abuse, MFA bypass. I prioritize monitoring sign-in logs, app consents, and role changes.</li>
+                            <li><strong>API-centric:</strong> Cloud actions happen via APIs. CloudTrail, Azure Activity logs become the equivalent of endpoint telemetry—every resource change is an API call I can monitor.</li>
+                            <li><strong>Shared responsibility:</strong> I need to understand what the cloud provider secures vs what I'm responsible for. In IaaS, I still monitor the OS. In SaaS, I focus on configuration and data access.</li>
+                            <li><strong>Scale and ephemeral resources:</strong> Resources spin up and down dynamically. I can't rely on static asset inventories—I need to detect new resource creation and ensure it's configured securely.</li>
+                            <li><strong>Different threat model:</strong> Attackers target exposed storage, metadata services, overly permissive IAM, and OAuth applications. My detection rules must cover these cloud-specific vectors.</li>
+                        </ol>
+                        <p>The core SIEM skills transfer, but the log sources, threat models, and detection focus areas are fundamentally different."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Cloud Security Quick Reference</div>
+                        <h4>Priority Log Sources</h4>
+                        <table>
+                            <tr><th>Azure</th><th>AWS</th></tr>
+                            <tr><td>SigninLogs</td><td>CloudTrail</td></tr>
+                            <tr><td>AuditLogs</td><td>GuardDuty</td></tr>
+                            <tr><td>AzureActivity</td><td>VPC Flow Logs</td></tr>
+                            <tr><td>OfficeActivity</td><td>S3 Access Logs</td></tr>
+                        </table>
+                        <h4>Top Cloud Threats</h4>
+                        <ul>
+                            <li>Credential theft / account takeover</li>
+                            <li>Malicious OAuth app consent</li>
+                            <li>Data exposure (public storage)</li>
+                            <li>Privilege escalation via IAM</li>
+                            <li>Resource hijacking (crypto mining)</li>
+                        </ul>
+                        <h4>Key Detections</h4>
+                        <ul>
+                            <li>Impossible travel</li>
+                            <li>Risky sign-ins</li>
+                            <li>Privileged role changes</li>
+                            <li>Inbox rule creation (BEC)</li>
+                            <li>Public resource exposure</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="cloud-logs.html" class="card-link">← Cloud Logs</a>
+                    <a href="azure-security.html" class="card-link">Azure Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

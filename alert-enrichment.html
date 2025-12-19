@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Enrichment | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="alert-enrichment.html" class="nav-item active">Alert Enrichment</a>
+                    <a href="tuning-methodology.html" class="nav-item">Tuning</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="detection-fundamentals.html">Detection</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Alert Enrichment</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Alert Enrichment</h1>
+                    <p class="page-subtitle">Raw alerts lack context. Enrichment adds asset information, threat intelligence, user context, and historical data—transforming alerts from data points into actionable intelligence.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Enrichment Categories</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Alert Enrichment Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       ALERT ENRICHMENT LAYERS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  RAW ALERT                                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Source: 10.1.1.50  │  Dest: 192.168.1.100  │  Alert: Port Scan       │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│           ┌────────────────────────┼────────────────────────┐              │
+│           ▼                        ▼                        ▼              │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
+│  │  ASSET CONTEXT  │    │  THREAT INTEL   │    │  USER CONTEXT   │        │
+│  │ • Hostname      │    │ • IP reputation │    │ • Username      │        │
+│  │ • OS/Type       │    │ • Domain age    │    │ • Department    │        │
+│  │ • Owner         │    │ • Malware family│    │ • Role          │        │
+│  │ • Criticality   │    │ • Actor         │    │ • Risk score    │        │
+│  │ • Location      │    │ • Campaign      │    │ • Access level  │        │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
+│           │                        │                        │              │
+│           └────────────────────────┼────────────────────────┘              │
+│                                    ▼                                        │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
+│  │   GEO CONTEXT   │    │ VULN CONTEXT    │    │ HISTORY CONTEXT │        │
+│  │ • Country       │    │ • CVEs present  │    │ • Prior alerts  │        │
+│  │ • City          │    │ • CVSS scores   │    │ • Past incidents│        │
+│  │ • ASN           │    │ • Exploitable   │    │ • Behavior trend│        │
+│  │ • ISP           │    │ • Last scan     │    │ • First seen    │        │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ENRICHED ALERT                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Source: WORKSTATION-42 (jsmith, Finance, Low-risk)                   │   │
+│  │ Dest: PROD-SQL-01 (Critical, 3 Critical CVEs, Finance DB)           │   │
+│  │ Alert: Port Scan │ Priority: HIGH (auto-elevated)                   │   │
+│  │ Context: Source has no prior security events                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Asset Enrichment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Asset Context Lookup</div>
+                        <pre><code>index=security_alerts
+| lookup asset_inventory ip as src_ip 
+    OUTPUT hostname as src_hostname, 
+           asset_type as src_type,
+           owner as src_owner,
+           department as src_dept,
+           criticality as src_criticality
+| lookup asset_inventory ip as dest_ip 
+    OUTPUT hostname as dest_hostname,
+           asset_type as dest_type,
+           owner as dest_owner,
+           criticality as dest_criticality
+| eval priority = case(
+    dest_criticality="Critical", "High",
+    dest_criticality="High", "Medium",
+    true(), severity
+)
+| table _time, alert_name, src_ip, src_hostname, src_owner,
+        dest_ip, dest_hostname, dest_criticality, priority</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Asset Enrichment</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(24h)
+| extend SourceIP = tostring(parse_json(ExtendedProperties).["Source IP"])
+| extend DestIP = tostring(parse_json(ExtendedProperties).["Destination IP"])
+| join kind=leftouter (
+    _GetWatchlist('AssetInventory')
+    | project IPAddress, Hostname, AssetType, Owner, Criticality
+) on $left.DestIP == $right.IPAddress
+| extend EnrichedPriority = case(
+    Criticality == "Critical", "High",
+    Criticality == "High", "Medium",
+    AlertSeverity
+)
+| project TimeGenerated, AlertName, SourceIP, DestIP,
+          Hostname, AssetType, Owner, Criticality, EnrichedPriority</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GeoIP Enrichment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: GeoIP Lookup</div>
+                        <pre><code>index=firewall action=blocked direction=inbound
+| iplocation src_ip
+| eval risk_country = if(Country IN ("Russia", "China", "North Korea", "Iran"), 
+                         "High-Risk", "Normal")
+| stats count by Country, City, risk_country
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Geo Enrichment</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| extend GeoInfo = geo_info_from_ip_address(IPAddress)
+| extend Country = tostring(GeoInfo.country)
+| extend City = tostring(GeoInfo.city)
+| extend Latitude = toreal(GeoInfo.latitude)
+| extend Longitude = toreal(GeoInfo.longitude)
+| where Country !in ("United States", "Canada")  // Unexpected countries
+| project TimeGenerated, UserPrincipalName, IPAddress, 
+          Country, City, AppDisplayName</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>User Enrichment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: User Context</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(24h)
+| extend User = tostring(parse_json(ExtendedProperties).User)
+| join kind=leftouter (
+    IdentityInfo
+    | project AccountUPN, Department, JobTitle, 
+              ManagerEmail, IsPrivilegedUser, RiskScore
+) on $left.User == $right.AccountUPN
+| extend UserContext = strcat(
+    "Dept: ", Department, 
+    " | Title: ", JobTitle,
+    " | Privileged: ", IsPrivilegedUser,
+    " | Risk: ", RiskScore
+)
+| project TimeGenerated, AlertName, User, UserContext, AlertSeverity</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: User Risk Integration</div>
+                        <pre><code>index=security_alerts
+| lookup user_directory user OUTPUT department, title, manager, 
+                                    privileged, last_review_date
+| lookup user_risk_scores user OUTPUT risk_score, risk_factors
+| eval is_privileged = if(privileged="true", "⚠️ PRIVILEGED", "Standard")
+| eval risk_level = case(
+    risk_score > 80, "🔴 High",
+    risk_score > 50, "🟡 Medium",
+    "🟢 Low"
+)
+| table _time, alert_name, user, department, is_privileged, 
+        risk_level, risk_factors</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Historical Context</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Prior Alert History</div>
+                        <pre><code>index=security_alerts
+| eval current_time = now()
+| join type=left src_ip [
+    search index=security_alerts earliest=-30d
+    | stats count as prior_alerts,
+            values(alert_name) as prior_alert_types,
+            max(_time) as last_alert_time
+      by src_ip
+]
+| eval days_since_last = round((current_time - last_alert_time) / 86400, 1)
+| eval history_context = case(
+    prior_alerts > 10, "⚠️ Frequent offender ("+ tostring(prior_alerts) +" alerts)",
+    prior_alerts > 0, "Has " + tostring(prior_alerts) + " prior alerts",
+    "First time seen"
+)
+| table _time, alert_name, src_ip, history_context, prior_alert_types</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: First Seen Analysis</div>
+                        <pre><code>let CurrentAlerts = SecurityAlert
+| where TimeGenerated > ago(24h)
+| extend SourceIP = tostring(parse_json(ExtendedProperties).["Source IP"]);
+let HistoricalIPs = SecurityAlert
+| where TimeGenerated between (ago(90d) .. ago(24h))
+| extend SourceIP = tostring(parse_json(ExtendedProperties).["Source IP"])
+| distinct SourceIP;
+CurrentAlerts
+| join kind=leftanti HistoricalIPs on SourceIP
+| extend FirstSeenContext = "🆕 First time seen in 90 days"
+| project TimeGenerated, AlertName, SourceIP, FirstSeenContext</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Threat Intel Enrichment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Multi-Source TI Lookup</div>
+                        <pre><code>index=security_alerts
+| lookup threat_intel_ip ip as src_ip 
+    OUTPUT ti_source, threat_type, confidence, actor, campaign
+| lookup threat_intel_ip ip as dest_ip 
+    OUTPUT ti_source as dest_ti_source, threat_type as dest_threat_type
+| eval ti_context = case(
+    isnotnull(threat_type), "🔴 Known Threat: " + threat_type + " (" + actor + ")",
+    isnotnull(dest_threat_type), "🟡 Dest is Known Bad: " + dest_threat_type,
+    "No TI match"
+)
+| where ti_context != "No TI match" OR severity="high"
+| table _time, alert_name, src_ip, dest_ip, ti_context, confidence, campaign</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automated Priority Adjustment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Dynamic Priority Scoring</div>
+                        <pre><code>index=security_alerts
+// Base score from severity
+| eval base_score = case(
+    severity="critical", 100,
+    severity="high", 75,
+    severity="medium", 50,
+    severity="low", 25,
+    0
+)
+// Asset criticality modifier
+| lookup asset_inventory ip as dest_ip OUTPUT criticality
+| eval asset_modifier = case(
+    criticality="Critical", 1.5,
+    criticality="High", 1.2,
+    1.0
+)
+// Threat intel modifier
+| lookup threat_intel_ip ip as src_ip OUTPUT threat_type
+| eval ti_modifier = if(isnotnull(threat_type), 1.3, 1.0)
+
+// User privilege modifier
+| lookup user_directory user OUTPUT privileged
+| eval user_modifier = if(privileged="true", 1.4, 1.0)
+
+// Calculate final score
+| eval final_score = round(base_score * asset_modifier * ti_modifier * user_modifier)
+| eval adjusted_priority = case(
+    final_score >= 150, "Critical",
+    final_score >= 100, "High",
+    final_score >= 50, "Medium",
+    "Low"
+)
+| table _time, alert_name, severity, final_score, adjusted_priority,
+        criticality, threat_type, privileged</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Enrichment Data Sources</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data Source</th>
+                                    <th>Provides</th>
+                                    <th>Update Frequency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>CMDB/Asset Inventory</strong></td>
+                                    <td>Hostname, owner, criticality, type</td>
+                                    <td>Daily</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Active Directory/HR</strong></td>
+                                    <td>User department, title, manager, status</td>
+                                    <td>Daily/Real-time</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Threat Intelligence</strong></td>
+                                    <td>IP/domain reputation, IOCs</td>
+                                    <td>Hourly</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vulnerability Scanner</strong></td>
+                                    <td>CVEs, CVSS scores, patch status</td>
+                                    <td>After each scan</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GeoIP Database</strong></td>
+                                    <td>Country, city, ASN</td>
+                                    <td>Weekly</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>UEBA/Risk Scores</strong></td>
+                                    <td>User risk, anomaly scores</td>
+                                    <td>Real-time</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you implement alert enrichment in a SIEM?"</strong></p>
+                        <p><strong>A:</strong> "Enrichment happens at multiple stages:</p>
+                        <ol>
+                            <li><strong>Ingestion-time enrichment:</strong> For static lookups like GeoIP and asset inventory, I enrich during parsing. This adds fields to every event, making them available for any search.</li>
+                            <li><strong>Search-time enrichment:</strong> For dynamic data or expensive lookups, I use search-time joins. Threat intel that changes frequently stays in lookup tables joined at query time.</li>
+                            <li><strong>Priority automation:</strong> I calculate risk scores combining multiple enrichment factors. Asset criticality × threat intel match × user privilege = dynamic priority that auto-elevates important alerts.</li>
+                            <li><strong>Context panels:</strong> In the alert interface, I show enrichment data in context panels—prior alerts for this IP, user's recent activity, asset details. This accelerates triage.</li>
+                            <li><strong>Freshness management:</strong> Stale enrichment data is dangerous. I track lookup table freshness and alert when asset inventory is over 24 hours old or TI feeds haven't updated.</li>
+                        </ol>
+                        <p>The goal is that when an analyst opens an alert, they have everything needed to make a decision without running additional queries. Good enrichment cuts investigation time significantly."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Alert Enrichment Quick Reference</div>
+                        <h4>Key Enrichment Fields</h4>
+                        <ul>
+                            <li>Asset: hostname, owner, criticality</li>
+                            <li>User: department, privileged, risk score</li>
+                            <li>Geo: country, city, ASN</li>
+                            <li>TI: threat type, actor, confidence</li>
+                            <li>History: prior alerts, first seen</li>
+                        </ul>
+                        <h4>Priority Multipliers</h4>
+                        <ul>
+                            <li>Critical asset: 1.5x</li>
+                            <li>TI match: 1.3x</li>
+                            <li>Privileged user: 1.4x</li>
+                            <li>First time seen: 1.2x</li>
+                        </ul>
+                        <h4>Lookup Table Freshness</h4>
+                        <ul>
+                            <li>Asset inventory: < 24 hours</li>
+                            <li>Threat intel: < 4 hours</li>
+                            <li>User directory: < 24 hours</li>
+                            <li>GeoIP: < 7 days</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-fundamentals.html" class="card-link">← Detection Fundamentals</a>
+                    <a href="tuning-methodology.html" class="card-link">Tuning Methodology →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Endpoint Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Endpoint Logs</h1>
+                    <p class="page-subtitle">EDR telemetry and endpoint security logging</p>
+                </header>
+                
+                
+                <h2>Endpoint Security Logs</h2>
+                
+                <p>EDR (Endpoint Detection and Response) tools provide the richest telemetry for detecting attacks at the execution level.</p>
+                
+                <h3>EDR vs Traditional AV Logs</h3>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Traditional AV</th>
+                                <th>Modern EDR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Signature-based detection</td>
+                                <td>Behavioral + signature detection</td>
+                            </tr>
+                            <tr>
+                                <td>Malware detected/blocked</td>
+                                <td>Full process tree, command lines</td>
+                            </tr>
+                            <tr>
+                                <td>Limited context</td>
+                                <td>Network connections, file writes, registry</td>
+                            </tr>
+                            <tr>
+                                <td>Reactive alerts only</td>
+                                <td>Proactive hunting capability</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Key EDR Telemetry</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Telemetry Type</th>
+                                <th>Detection Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Process Creation</strong></td>
+                                <td>Malware execution, living-off-the-land</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Network Connections</strong></td>
+                                <td>C2 communication, lateral movement</td>
+                            </tr>
+                            <tr>
+                                <td><strong>File Operations</strong></td>
+                                <td>Ransomware, data staging</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Registry Changes</strong></td>
+                                <td>Persistence mechanisms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Script Execution</strong></td>
+                                <td>PowerShell, WMI, VBS attacks</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Module Loads</strong></td>
+                                <td>DLL injection, LSASS access</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Major EDR Platforms</h2>
+                
+                <ul>
+                    <li><strong>CrowdStrike Falcon:</strong> Market leader, cloud-native</li>
+                    <li><strong>Microsoft Defender for Endpoint:</strong> Integrated with M365</li>
+                    <li><strong>SentinelOne:</strong> AI-focused, autonomous response</li>
+                    <li><strong>Carbon Black:</strong> VMware ecosystem</li>
+                    <li><strong>Cortex XDR:</strong> Palo Alto Networks platform</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 SIEM + EDR Integration</div>
+                    <p>Most organizations send EDR alerts to SIEM but NOT raw telemetry (too high volume). Use EDR's native console for hunting, SIEM for correlation with other sources and unified incident management.</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "What's the relationship between EDR and SIEM?"</p>
+                    <p><strong>Answer:</strong> "They're complementary. EDR provides deep endpoint visibility and response capabilities - process trees, memory analysis, isolation. SIEM provides cross-source correlation and compliance. Typically, we send EDR alerts and high-fidelity events to SIEM for unified incident management, but keep detailed hunting in EDR's native interface. Some organizations also forward select telemetry like process creation to enable SIEM-based hunting across endpoint and other sources."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="cloud-logs.html" class="card-link">← Cloud Logs</a>
+                    <a href="application-logs.html" class="card-link">Application Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

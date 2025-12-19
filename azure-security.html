@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item">Cloud Monitoring</a>
+                    <a href="azure-security.html" class="nav-item active">Azure Security</a>
+                    <a href="aws-security.html" class="nav-item">AWS Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="cloud-security-monitoring.html">Cloud Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Azure Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Azure Security Monitoring</h1>
+                    <p class="page-subtitle">Microsoft Azure and Microsoft 365 security monitoring with Sentinel. This guide covers Azure-specific log sources, detection strategies, and common attack patterns in Microsoft cloud environments.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Azure Security Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Azure Security Monitoring Components</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      AZURE SECURITY MONITORING                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                     MICROSOFT SENTINEL                               │   │
+│  │                     (Cloud-Native SIEM)                              │   │
+│  └───────────────────────────────┬─────────────────────────────────────┘   │
+│                                  │                                          │
+│         ┌────────────────────────┼────────────────────────┐                │
+│         │                        │                        │                │
+│         ▼                        ▼                        ▼                │
+│  ┌─────────────┐          ┌─────────────┐          ┌─────────────┐        │
+│  │ ENTRA ID    │          │   AZURE     │          │ MICROSOFT   │        │
+│  │ (Azure AD)  │          │ RESOURCES   │          │    365      │        │
+│  ├─────────────┤          ├─────────────┤          ├─────────────┤        │
+│  │ SigninLogs  │          │AzureActivity│          │OfficeActivity       │
+│  │ AuditLogs   │          │AzureDiagnost│          │MailItemsAccessed    │
+│  │ AADNonInter │          │ SecurityAlert          │ SharePointActivity  │
+│  │ RiskyUsers  │          │ AzureMetrics│          │ TeamsActivity│        │
+│  └─────────────┘          └─────────────┘          └─────────────┘        │
+│                                                                             │
+│  ┌─────────────┐          ┌─────────────┐          ┌─────────────┐        │
+│  │ DEFENDER    │          │   NETWORK   │          │  IDENTITY   │        │
+│  │ FOR CLOUD   │          │  SECURITY   │          │ PROTECTION  │        │
+│  ├─────────────┤          ├─────────────┤          ├─────────────┤        │
+│  │ SecurityAlert          │ NSG Flow Logs          │ AADRiskyUser│        │
+│  │ SecurityRec │          │ AzureFirewall          │AADRiskySignIn       │
+│  │ Compliance  │          │ AppGW Access │          │IdentityInfo │        │
+│  └─────────────┘          └─────────────┘          └─────────────┘        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Entra ID (Azure AD) Monitoring</h2>
+                    <p>Identity is the primary control plane in Azure. Entra ID logs are critical.</p>
+                    
+                    <h3>Sign-in Log Analysis</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Description</th>
+                                    <th>Detection Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>ResultType</code></td>
+                                    <td>Sign-in result code</td>
+                                    <td>0=success, others=failure types</td>
+                                </tr>
+                                <tr>
+                                    <td><code>RiskLevelDuringSignIn</code></td>
+                                    <td>Risk assessment</td>
+                                    <td>high, medium, low, none</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ConditionalAccessStatus</code></td>
+                                    <td>CA policy result</td>
+                                    <td>success, failure, notApplied</td>
+                                </tr>
+                                <tr>
+                                    <td><code>AuthenticationRequirement</code></td>
+                                    <td>MFA requirement</td>
+                                    <td>singleFactorAuthentication, multiFactorAuthentication</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Location</code></td>
+                                    <td>Geographic location</td>
+                                    <td>Impossible travel, unusual locations</td>
+                                </tr>
+                                <tr>
+                                    <td><code>DeviceDetail</code></td>
+                                    <td>Device info</td>
+                                    <td>Unmanaged device access</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Sign-in Failure Analysis</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType != 0  // Failed sign-ins
+| extend FailureReason = case(
+    ResultType == 50126, "Invalid credentials",
+    ResultType == 50053, "Account locked",
+    ResultType == 50057, "Account disabled",
+    ResultType == 50074, "MFA required",
+    ResultType == 50076, "MFA not completed",
+    ResultType == 53003, "Blocked by CA",
+    ResultType == 50158, "External security challenge",
+    tostring(ResultType))
+| summarize 
+    FailureCount = count(),
+    Users = dcount(UserPrincipalName),
+    UserList = make_set(UserPrincipalName, 10)
+  by FailureReason, IPAddress
+| order by FailureCount desc</code></pre>
+                    </div>
+
+                    <h3>MFA Gap Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Successful Sign-ins Without MFA</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(7d)
+| where ResultType == 0  // Successful
+| where AuthenticationRequirement == "singleFactorAuthentication"
+| where AppDisplayName != "Windows Sign In"  // Exclude device sign-in
+| summarize 
+    SignInCount = count(),
+    Apps = make_set(AppDisplayName, 10),
+    Locations = make_set(Location, 5)
+  by UserPrincipalName
+| order by SignInCount desc</code></pre>
+                    </div>
+
+                    <h3>Conditional Access Bypass Attempts</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: CA Policy Failures</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ConditionalAccessStatus == "failure"
+| mv-expand ConditionalAccessPolicies
+| extend PolicyName = tostring(ConditionalAccessPolicies.displayName)
+| extend PolicyResult = tostring(ConditionalAccessPolicies.result)
+| where PolicyResult == "failure"
+| summarize 
+    BlockCount = count(),
+    Users = make_set(UserPrincipalName, 10)
+  by PolicyName, IPAddress
+| order by BlockCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Privilege Escalation Detection</h2>
+                    
+                    <h3>Directory Role Assignments</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Role Changes</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName has "Add member to role"
+| extend TargetUser = tostring(TargetResources[0].userPrincipalName)
+| extend RoleName = tostring(TargetResources[0].displayName)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| where RoleName in (
+    "Global Administrator",
+    "Privileged Role Administrator", 
+    "Security Administrator",
+    "Exchange Administrator",
+    "SharePoint Administrator",
+    "Application Administrator",
+    "Cloud Application Administrator",
+    "Intune Administrator"
+)
+| project TimeGenerated, Actor, TargetUser, RoleName
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Service Principal Abuse</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Service Principal Credential Addition</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName in (
+    "Add service principal credentials",
+    "Update application – Certificates and secrets management"
+)
+| extend AppName = tostring(TargetResources[0].displayName)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| project TimeGenerated, Actor, AppName, OperationName
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>PIM Activation Monitoring</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Identity Management Activations</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName == "Add member to role in PIM completed (permanent)"
+    or OperationName == "Add eligible member to role in PIM completed (timebound)"
+| extend User = tostring(TargetResources[0].userPrincipalName)
+| extend Role = tostring(parse_json(tostring(TargetResources[0].modifiedProperties))[0].newValue)
+| project TimeGenerated, User, Role, OperationName
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Application Security</h2>
+                    
+                    <h3>OAuth Application Consent</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: High-Risk App Consents</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Consent to application"
+| extend AppName = tostring(TargetResources[0].displayName)
+| extend User = tostring(InitiatedBy.user.userPrincipalName)
+| extend Permissions = tostring(TargetResources[0].modifiedProperties)
+| where Permissions has_any (
+    "Mail.Read", "Mail.ReadWrite", "Mail.Send",
+    "Files.ReadWrite.All", "Files.Read.All",
+    "Directory.Read.All", "User.Read.All",
+    "full_access_as_app"
+)
+| project TimeGenerated, User, AppName, Permissions
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Illicit Consent Grant Detection</h3>
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Consent Phishing Attack Pattern</div>
+                        <p>Attackers create malicious apps and trick users into granting permissions. Key indicators:</p>
+                        <ul>
+                            <li>New/unknown application names</li>
+                            <li>High-privilege permissions (Mail, Files, Directory)</li>
+                            <li>Multiple users consenting in short timeframe</li>
+                            <li>App registered in different tenant</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft 365 Security</h2>
+                    
+                    <h3>Email Security (Exchange Online)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Suspicious Inbox Rules (BEC)</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("New-InboxRule", "Set-InboxRule")
+| extend RuleParams = tostring(Parameters)
+| where RuleParams has_any (
+    "DeleteMessage", "MoveToDeletedItems",
+    "ForwardTo", "ForwardAsAttachmentTo",
+    "RedirectTo"
+)
+| project TimeGenerated, UserId, Operation, RuleParams, ClientIP
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Email Forwarding Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: External Email Forwarding</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("Set-Mailbox", "New-InboxRule", "Set-InboxRule")
+| extend Params = tostring(Parameters)
+| where Params has "ForwardingSmtpAddress" 
+    or Params has "ForwardTo"
+    or Params has "RedirectTo"
+| where Params !has "@yourdomain.com"  // External forwarding
+| project TimeGenerated, UserId, Operation, Params, ClientIP</code></pre>
+                    </div>
+
+                    <h3>SharePoint/OneDrive Data Access</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Mass File Downloads</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(24h)
+| where Operation in ("FileDownloaded", "FileSyncDownloadedFull")
+| summarize 
+    DownloadCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    FileList = make_set(SourceFileName, 20)
+  by UserId, ClientIP, bin(TimeGenerated, 1h)
+| where DownloadCount > 50  // Threshold for mass download
+| order by DownloadCount desc</code></pre>
+                    </div>
+
+                    <h3>External Sharing</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Anonymous/External Share Links</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in (
+    "AnonymousLinkCreated", "SecureLinkCreated",
+    "AddedToSecureLink", "SharingInvitationCreated"
+)
+| extend TargetFile = SourceFileName
+| extend SharedWith = TargetUserOrGroupName
+| where SharedWith !has "@yourdomain.com"  // External
+| project TimeGenerated, UserId, Operation, TargetFile, SharedWith
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Azure Resource Security</h2>
+                    
+                    <h3>Resource Creation/Modification</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Critical Resource Changes</div>
+                        <pre><code>AzureActivity
+| where TimeGenerated > ago(24h)
+| where ActivityStatusValue == "Success"
+| where OperationNameValue has_any (
+    "Microsoft.Compute/virtualMachines/write",
+    "Microsoft.Storage/storageAccounts/write",
+    "Microsoft.Network/networkSecurityGroups/write",
+    "Microsoft.KeyVault/vaults/write",
+    "Microsoft.Sql/servers/firewallRules/write"
+)
+| project TimeGenerated, Caller, OperationNameValue, 
+          ResourceGroup, Resource = _ResourceId
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <h3>Key Vault Access</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Key Vault Secret Access</div>
+                        <pre><code>AzureDiagnostics
+| where TimeGenerated > ago(24h)
+| where ResourceType == "VAULTS"
+| where OperationName in ("SecretGet", "SecretList", "KeyGet", "KeyList")
+| project TimeGenerated, CallerIPAddress, 
+          identity_claim_upn_s, OperationName, 
+          Resource = id_s, ResultType
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Azure Attack Patterns</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Attack</th>
+                                    <th>Indicators</th>
+                                    <th>Detection Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Password Spray</strong></td>
+                                    <td>Many users, same error code, single IP</td>
+                                    <td>SigninLogs: ResultType 50126 patterns</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Token Theft</strong></td>
+                                    <td>Same token used from different IPs/locations</td>
+                                    <td>AADNonInteractiveUserSignInLogs analysis</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Consent Phishing</strong></td>
+                                    <td>Users consenting to unknown apps</td>
+                                    <td>AuditLogs: Consent to application</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>BEC</strong></td>
+                                    <td>Inbox rules, email forwarding</td>
+                                    <td>OfficeActivity: New-InboxRule</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Privilege Escalation</strong></td>
+                                    <td>Role assignments, SP credential adds</td>
+                                    <td>AuditLogs: Add member to role</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Exfiltration</strong></td>
+                                    <td>Mass downloads, external sharing</td>
+                                    <td>OfficeActivity: FileDownloaded patterns</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What are the most critical Azure AD events to monitor?"</strong></p>
+                        <p><strong>A:</strong> "I prioritize based on attack impact:</p>
+                        <ol>
+                            <li><strong>Privileged role assignments:</strong> Any addition to Global Admin, Security Admin, or other privileged roles. This is the most impactful event—it grants full control.</li>
+                            <li><strong>Application consent grants:</strong> Especially for permissions like Mail.Read, Files.ReadWrite.All. Consent phishing is a growing attack vector.</li>
+                            <li><strong>Service principal credential changes:</strong> Adding credentials to apps enables persistent access that survives password resets.</li>
+                            <li><strong>Conditional Access policy changes:</strong> Attackers may weaken CA to enable easier access.</li>
+                            <li><strong>Risky sign-ins:</strong> Azure's risk detection catches impossible travel, anonymous IPs, password spray, and more.</li>
+                        </ol>
+                        <p>I combine these with behavioral baselines—first-time app consent, unusual role activation, sign-ins from new locations—to catch attacks that don't trigger specific rules."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Azure Security Quick Reference</div>
+                        <h4>Critical Tables</h4>
+                        <table>
+                            <tr><th>Table</th><th>Use Case</th></tr>
+                            <tr><td>SigninLogs</td><td>Authentication, MFA, CA</td></tr>
+                            <tr><td>AuditLogs</td><td>Directory changes, roles</td></tr>
+                            <tr><td>OfficeActivity</td><td>M365 user activity</td></tr>
+                            <tr><td>AzureActivity</td><td>Azure resource changes</td></tr>
+                        </table>
+                        <h4>Key Result Types (SigninLogs)</h4>
+                        <ul>
+                            <li>0 = Success</li>
+                            <li>50126 = Invalid credentials</li>
+                            <li>50053 = Account locked</li>
+                            <li>53003 = Blocked by CA</li>
+                            <li>50074 = MFA required</li>
+                        </ul>
+                        <h4>Priority Detections</h4>
+                        <ul>
+                            <li>Role assignments to privileged groups</li>
+                            <li>OAuth consent for high-risk permissions</li>
+                            <li>Inbox rules with forwarding/deletion</li>
+                            <li>Mass file downloads</li>
+                            <li>Sign-ins without MFA</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="cloud-security-monitoring.html" class="card-link">← Cloud Monitoring</a>
+                    <a href="aws-security.html" class="card-link">AWS Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

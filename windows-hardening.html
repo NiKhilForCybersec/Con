@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Hardening | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Windows Security</div>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="active-directory.html" class="nav-item">Active Directory</a>
+                    <a href="windows-attack-techniques.html" class="nav-item">Attack Techniques</a>
+                    <a href="windows-hardening.html" class="nav-item active">Hardening</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="windows-logs.html">Windows Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Windows Hardening</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Windows Hardening Detection</h1>
+                    <p class="page-subtitle">Detecting when hardening controls are weakened or bypassed is critical. Attackers often disable security features before executing their payloads. Monitor for defense evasion attempts.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Security Feature Monitoring</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Windows Security Controls</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    WINDOWS SECURITY CONTROLS TO MONITOR                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ENDPOINT PROTECTION           LOGGING & AUDIT              ACCESS CONTROL  │
+│  ┌─────────────────┐          ┌─────────────────┐         ┌──────────────┐ │
+│  │ Windows Defender│          │ Event Log       │         │ UAC Settings │ │
+│  │ • Real-time     │          │ • Security log  │         │ • Elevation  │ │
+│  │ • Cloud protect │          │ • PowerShell    │         │ • Consent    │ │
+│  │ • Tamper protect│          │ • Sysmon        │         │              │ │
+│  └─────────────────┘          └─────────────────┘         └──────────────┘ │
+│                                                                             │
+│  EXECUTION CONTROL             NETWORK PROTECTION           CREDENTIAL      │
+│  ┌─────────────────┐          ┌─────────────────┐         ┌──────────────┐ │
+│  │ AppLocker/WDAC  │          │ Windows Firewall│         │ Credential   │ │
+│  │ • Script rules  │          │ • Inbound rules │         │ Guard        │ │
+│  │ • Exe rules     │          │ • Profile       │         │ • LSA        │ │
+│  │ • DLL rules     │          │ • Logging       │         │   Protection │ │
+│  └─────────────────┘          └─────────────────┘         └──────────────┘ │
+│                                                                             │
+│  AMSI (Antimalware            POWERSHELL                   ATTACK SURFACE  │
+│  Scan Interface)              CONSTRAINED MODE             REDUCTION (ASR) │
+│  ┌─────────────────┐          ┌─────────────────┐         ┌──────────────┐ │
+│  │ Script scanning │          │ Language mode   │         │ Office macros│ │
+│  │ • PowerShell    │          │ • Full          │         │ • Script     │ │
+│  │ • VBScript      │          │ • Constrained   │         │   execution  │ │
+│  │ • JavaScript    │          │                 │         │ • Child proc │ │
+│  └─────────────────┘          └─────────────────┘         └──────────────┘ │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Windows Defender Tampering</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Defender Disabled via Registry</div>
+                        <pre><code>// Detect Defender being disabled
+DeviceRegistryEvents
+| where TimeGenerated > ago(24h)
+| where RegistryKey has_any (
+    @"SOFTWARE\Microsoft\Windows Defender",
+    @"SOFTWARE\Policies\Microsoft\Windows Defender"
+)
+| where RegistryValueName in (
+    "DisableAntiSpyware",
+    "DisableRealtimeMonitoring",
+    "DisableBehaviorMonitoring",
+    "DisableOnAccessProtection",
+    "DisableScanOnRealtimeEnable"
+)
+| where RegistryValueData == "1"
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName,
+          RegistryKey, RegistryValueName, InitiatingProcessCommandLine</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Defender Service Stopped</div>
+                        <pre><code>index=windows EventCode=7036
+| where Service_Name IN ("Windows Defender Antivirus Service", 
+                         "WinDefend", "WdNisSvc", "SecurityHealthService")
+| where Service_State="stopped"
+| stats count, values(ComputerName) as hosts by Service_Name
+| where count > 0</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Defender Exclusions Added</div>
+                        <pre><code>// Detect suspicious exclusion additions
+DeviceRegistryEvents
+| where TimeGenerated > ago(24h)
+| where RegistryKey has @"Windows Defender\Exclusions"
+| where ActionType == "RegistryValueSet"
+| extend ExclusionType = case(
+    RegistryKey has "Paths", "Path",
+    RegistryKey has "Extensions", "Extension",
+    RegistryKey has "Processes", "Process",
+    "Other"
+)
+| project TimeGenerated, DeviceName, ExclusionType, 
+          RegistryValueName, InitiatingProcessCommandLine</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Audit Policy Changes</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Audit Policy Modified</div>
+                        <pre><code>index=windows EventCode=4719
+| table _time, ComputerName, SubjectUserName, SubjectDomainName,
+        CategoryId, SubcategoryGuid, AuditPolicyChanges
+| lookup audit_subcategory_names guid as SubcategoryGuid 
+    OUTPUT subcategory_name
+| where AuditPolicyChanges LIKE "%removed%" OR 
+        AuditPolicyChanges LIKE "%disabled%"</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Security Log Cleared</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 1102  // Security log cleared
+| project TimeGenerated, Computer, Account, 
+          Activity = "Security Log Cleared"
+
+union (
+    SecurityEvent
+    | where EventID == 104  // System log cleared
+    | project TimeGenerated, Computer, Account,
+              Activity = "System Log Cleared"
+)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>PowerShell Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: PowerShell Logging Disabled</div>
+                        <pre><code>index=windows source="WinRegistry"
+| where key_path LIKE "%\\PowerShell\\ScriptBlockLogging%"
+    OR key_path LIKE "%\\PowerShell\\ModuleLogging%"
+    OR key_path LIKE "%\\PowerShell\\Transcription%"
+| where data="0" OR ValueName="EnableScriptBlockLogging" AND data="0"
+| table _time, host, key_path, ValueName, data</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: AMSI Bypass Attempts</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where ProcessCommandLine has_any (
+    "AmsiScanBuffer",
+    "amsiInitFailed",
+    "AmsiUtils",
+    "amsi.dll",
+    "[Ref].Assembly.GetType",
+    "System.Management.Automation.AmsiUtils"
+)
+| project TimeGenerated, DeviceName, AccountName,
+          FileName, ProcessCommandLine</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Constrained Language Mode Bypass</div>
+                        <pre><code>index=windows EventCode=4104
+| where ScriptBlockText LIKE "%FullLanguage%"
+    OR ScriptBlockText LIKE "%__PSLockdownPolicy%"
+    OR ScriptBlockText LIKE "%SystemPolicy%"
+| table _time, ComputerName, UserName, ScriptBlockText</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Windows Firewall</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Firewall Disabled</div>
+                        <pre><code>index=windows EventCode=4950
+| eval profile = case(
+    ProfileChanged LIKE "%Domain%", "Domain",
+    ProfileChanged LIKE "%Private%", "Private",
+    ProfileChanged LIKE "%Public%", "Public",
+    true(), "Unknown"
+)
+| where NewSetting="Off"
+| table _time, ComputerName, profile, OldSetting, NewSetting</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Firewall Rule Added</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 4946  // Firewall rule added
+| project TimeGenerated, Computer, RuleName, 
+          RuleId, Direction, Action
+| where Direction == "Inbound" and Action == "Allow"</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Netsh Firewall Commands</div>
+                        <pre><code>index=windows (EventCode=4688 OR EventCode=1)
+| where CommandLine LIKE "%netsh%firewall%"
+    OR CommandLine LIKE "%netsh%advfirewall%"
+| where CommandLine LIKE "%disable%" 
+    OR CommandLine LIKE "%set%opmode%"
+    OR CommandLine LIKE "%add%rule%"
+| table _time, ComputerName, User, CommandLine</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>UAC & Privilege</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: UAC Bypass Indicators</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where InitiatingProcessFileName in~ ("explorer.exe", "cmd.exe", "powershell.exe")
+| where FileName in~ (
+    "fodhelper.exe",
+    "computerdefaults.exe", 
+    "sdclt.exe",
+    "eventvwr.exe",
+    "mmc.exe"
+)
+| where ProcessIntegrityLevel == "High"
+| project TimeGenerated, DeviceName, AccountName,
+          InitiatingProcessFileName, FileName, ProcessCommandLine</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: UAC Settings Modified</div>
+                        <pre><code>index=windows source="WinRegistry"
+| where key_path LIKE "%\\Policies\\System%"
+| where ValueName IN (
+    "EnableLUA",
+    "ConsentPromptBehaviorAdmin",
+    "ConsentPromptBehaviorUser",
+    "PromptOnSecureDesktop"
+)
+| where data="0"  // Disabled
+| table _time, host, ValueName, data</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Credential Protection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: LSA Protection Disabled</div>
+                        <pre><code>DeviceRegistryEvents
+| where TimeGenerated > ago(24h)
+| where RegistryKey has @"SYSTEM\CurrentControlSet\Control\Lsa"
+| where RegistryValueName in ("RunAsPPL", "LsaCfgFlags")
+| where RegistryValueData == "0"
+| project TimeGenerated, DeviceName, 
+          RegistryValueName, RegistryValueData,
+          InitiatingProcessCommandLine</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: WDigest Credential Caching Enabled</div>
+                        <pre><code>index=windows source="WinRegistry"
+| where key_path LIKE "%\\Control\\SecurityProviders\\WDigest%"
+| where ValueName="UseLogonCredential"
+| where data="1"  // Enabled - credentials stored in plaintext
+| table _time, host, key_path, ValueName, data</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Attack Surface Reduction (ASR)</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: ASR Rules Triggered</div>
+                        <pre><code>DeviceEvents
+| where TimeGenerated > ago(24h)
+| where ActionType startswith "Asr"
+| summarize 
+    TriggerCount = count(),
+    Devices = dcount(DeviceName),
+    SampleCommands = make_set(InitiatingProcessCommandLine, 3)
+  by ActionType
+| order by TriggerCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Key ASR Rules</div>
+                        <ul>
+                            <li><strong>Block Office apps from creating child processes</strong> - Prevents macro-based attacks</li>
+                            <li><strong>Block Office apps from injecting into processes</strong> - Prevents process injection</li>
+                            <li><strong>Block credential stealing from LSASS</strong> - Prevents Mimikatz-style attacks</li>
+                            <li><strong>Block executable content from email</strong> - Prevents email-borne malware</li>
+                            <li><strong>Block untrusted processes from USB</strong> - Prevents USB-based attacks</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hardening Compliance Dashboard</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Security Control Status</div>
+                        <pre><code>| inputlookup endpoint_inventory.csv
+| join type=left host [
+    search index=windows EventCode=7036 Service_Name="WinDefend"
+    | dedup host
+    | eval defender_status = if(Service_State="running", "Enabled", "Disabled")
+    | table host, defender_status
+]
+| join type=left host [
+    search index=windows source="WinRegistry" 
+           key_path="*Windows Defender*DisableAntiSpyware*"
+    | dedup host
+    | eval defender_policy = if(data="1", "Policy Disabled", "Policy OK")
+    | table host, defender_policy
+]
+| fillnull value="Unknown"
+| stats count by defender_status, defender_policy
+| eval compliance = if(defender_status="Enabled" AND defender_policy="Policy OK", 
+                       "Compliant", "Non-Compliant")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect when security controls are being disabled?"</strong></p>
+                        <p><strong>A:</strong> "I monitor defense evasion at multiple layers:</p>
+                        <ol>
+                            <li><strong>Registry monitoring:</strong> Most security controls are configured via registry. I watch for changes to Defender, LSA, UAC, and PowerShell logging keys—specifically for values being set to disabled (usually 0 or 1 depending on the setting).</li>
+                            <li><strong>Service monitoring:</strong> Event 7036 tells me when security services stop. WinDefend, EventLog, and security-related services stopping unexpectedly is always investigated.</li>
+                            <li><strong>Command-line monitoring:</strong> Tools like netsh for firewall, Set-MpPreference for Defender, and auditpol for audit policy are watched. Any command disabling protections alerts.</li>
+                            <li><strong>Process behavior:</strong> I look for patterns like UAC bypass techniques—specific executables being spawned with high integrity from unexpected parents.</li>
+                            <li><strong>Baseline comparison:</strong> I maintain a baseline of expected security configurations and alert on deviations, not just explicit disable commands.</li>
+                        </ol>
+                        <p>The key insight is that attackers often try to disable security before their main payload. Detecting defense evasion early can stop an attack before data exfiltration."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Windows Hardening Quick Reference</div>
+                        <h4>Critical Registry Paths</h4>
+                        <ul>
+                            <li>Defender: <code>HKLM\SOFTWARE\Microsoft\Windows Defender</code></li>
+                            <li>LSA: <code>HKLM\SYSTEM\CurrentControlSet\Control\Lsa</code></li>
+                            <li>UAC: <code>HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</code></li>
+                            <li>PowerShell: <code>HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell</code></li>
+                        </ul>
+                        <h4>Key Event IDs</h4>
+                        <ul>
+                            <li>1102 - Security log cleared</li>
+                            <li>4719 - Audit policy changed</li>
+                            <li>4946 - Firewall rule added</li>
+                            <li>4950 - Firewall profile changed</li>
+                            <li>7036 - Service state changed</li>
+                        </ul>
+                        <h4>Defense Evasion Indicators</h4>
+                        <ul>
+                            <li>Defender exclusions added</li>
+                            <li>Audit logging disabled</li>
+                            <li>UAC bypass executables</li>
+                            <li>AMSI bypass strings</li>
+                            <li>LSA protection disabled</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="windows-attack-techniques.html" class="card-link">← Attack Techniques</a>
+                    <a href="active-directory.html" class="card-link">Active Directory →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

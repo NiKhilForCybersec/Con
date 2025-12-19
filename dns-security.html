@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Network Security</div>
+                    <a href="network-security-monitoring.html" class="nav-item">Network Monitoring</a>
+                    <a href="dns-security.html" class="nav-item active">DNS Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="network-security-monitoring.html">Network Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">DNS Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">DNS Security Monitoring</h1>
+                    <p class="page-subtitle">DNS is involved in nearly every network connection. Monitoring DNS provides visibility into C2 communications, data exfiltration, and malicious infrastructure before other indicators appear.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Why DNS Matters for Security</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">DNS Attack Surface</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DNS SECURITY USE CASES                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  COMMAND & CONTROL              DATA EXFILTRATION           INITIAL ACCESS  │
+│  ┌─────────────────┐           ┌─────────────────┐        ┌──────────────┐ │
+│  │ • Malware       │           │ • DNS Tunneling │        │ • Phishing   │ │
+│  │   beaconing     │           │   (TXT records) │        │   callbacks  │ │
+│  │ • DGA domains   │           │ • Subdomain     │        │ • Typosquat  │ │
+│  │ • Fast-flux DNS │           │   encoding      │        │   domains    │ │
+│  │ • DNS over HTTPS│           │ • Large queries │        │ • Lookalike  │ │
+│  └─────────────────┘           └─────────────────┘        └──────────────┘ │
+│                                                                             │
+│  RECONNAISSANCE                 DEFENSE EVASION            PERSISTENCE     │
+│  ┌─────────────────┐           ┌─────────────────┐        ┌──────────────┐ │
+│  │ • Zone transfers│           │ • DNS over HTTPS│        │ • Dynamic    │ │
+│  │ • Subdomain     │           │   (DoH)         │        │   DNS (DDNS) │ │
+│  │   enumeration   │           │ • DNS over TLS  │        │ • Bulletproof│ │
+│  │ • Record queries│           │   (DoT)         │        │   hosting    │ │
+│  └─────────────────┘           └─────────────────┘        └──────────────┘ │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DNS Log Sources</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Coverage</th>
+                                    <th>Key Fields</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Windows DNS Server</strong></td>
+                                    <td>Internal queries to AD DNS</td>
+                                    <td>QueryName, QueryType, ClientIP, ResponseCode</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DNS Firewall/RPZ</strong></td>
+                                    <td>Blocked malicious domains</td>
+                                    <td>Domain, Action, Category, Client</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sysmon Event 22</strong></td>
+                                    <td>Endpoint DNS queries</td>
+                                    <td>QueryName, QueryResults, ProcessId, Image</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Passive DNS</strong></td>
+                                    <td>Network-level capture</td>
+                                    <td>All query/response data</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cloud DNS (Route53, Azure DNS)</strong></td>
+                                    <td>Cloud workload queries</td>
+                                    <td>HostedZone, QueryName, ResponseCode</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>EDR DNS Telemetry</strong></td>
+                                    <td>Process-to-domain mapping</td>
+                                    <td>Domain, Process, User, QueryType</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DNS Tunneling Detection</h2>
+                    <p>Attackers encode data in DNS queries to exfiltrate data or communicate with C2:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">DNS Tunneling Indicators</div>
+                        <pre><code>
+Normal DNS Query:
+  www.google.com                    ← Short, readable subdomain
+
+DNS Tunneling:
+  aGVsbG8gd29ybGQ.c2VjcmV0.evil.com  ← Long, encoded subdomain
+  ├── Base64 or hex encoded data
+  ├── High entropy (random-looking)
+  ├── Unusual query types (TXT, NULL, CNAME)
+  └── High query volume to single domain
+                        </code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: DNS Tunneling Detection</div>
+                        <pre><code>index=dns
+| eval subdomain_length = len(replace(query, "\..*", ""))
+| eval query_entropy = sum(mvmap(split(query, ""), if(match(x, "[a-zA-Z0-9]"), 1, 0)))
+| where subdomain_length > 30
+| stats count, avg(subdomain_length) as avg_length, 
+        dc(query) as unique_queries
+  by src_ip, domain
+| where unique_queries > 50 AND avg_length > 30
+| sort -unique_queries</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Long Subdomain Detection</div>
+                        <pre><code>DnsEvents
+| where TimeGenerated > ago(1h)
+| extend SubdomainLength = strlen(tostring(split(Name, ".")[0]))
+| where SubdomainLength > 30
+| summarize 
+    QueryCount = count(),
+    AvgLength = avg(SubdomainLength),
+    UniqueQueries = dcount(Name)
+  by ClientIP, tostring(split(Name, ".")[-2]) // Parent domain
+| where QueryCount > 50 and AvgLength > 30
+| order by QueryCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: TXT Record Abuse</div>
+                        <pre><code>index=dns query_type=TXT
+| stats count, dc(query) as unique_queries, values(query) as sample_queries 
+  by src_ip
+| where count > 100
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DGA Detection</h2>
+                    <p>Domain Generation Algorithms create random-looking domains for C2:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: DGA-Like Domains</div>
+                        <pre><code>index=dns
+| rex field=query "(?<domain>[^.]+)\.[^.]+$"
+| eval domain_length = len(domain)
+| eval consonant_ratio = (len(replace(domain, "[aeiouAEIOU0-9-]", ""))) / domain_length
+| eval digit_ratio = (len(replace(domain, "[^0-9]", ""))) / domain_length
+| where domain_length > 10 
+        AND (consonant_ratio > 0.7 OR digit_ratio > 0.3)
+| stats count by src_ip, domain, query
+| where count < 5  // Rare queries (not cached/repeated)
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: High Entropy Domains</div>
+                        <pre><code>DnsEvents
+| where TimeGenerated > ago(24h)
+| extend Domain = tostring(split(Name, ".")[-2])
+| extend DomainLength = strlen(Domain)
+| where DomainLength > 12
+// Simple entropy approximation - unique chars / length
+| extend UniqueChars = array_length(split(Domain, ""))
+| where DomainLength > 15
+| summarize QueryCount = count() by ClientIP, Domain, Name
+| where QueryCount < 3  // Rare queries
+| order by QueryCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Newly Registered Domains</h2>
+                    <p>Malicious domains are often recently registered. Threat intel integration helps:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: New Domain Queries</div>
+                        <pre><code>index=dns
+| lookup domain_whois domain OUTPUT creation_date, registrar
+| eval domain_age_days = round((now() - strptime(creation_date, "%Y-%m-%d")) / 86400)
+| where domain_age_days < 30
+| stats count, values(src_ip) as clients, values(registrar) as registrar 
+  by domain, domain_age_days
+| sort domain_age_days</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Domain Age with TI</div>
+                        <pre><code>DnsEvents
+| where TimeGenerated > ago(24h)
+| extend Domain = tostring(split(Name, ".")[-2])
+| join kind=leftouter (
+    ThreatIntelligenceIndicator
+    | where ExpirationDateTime > now()
+    | where isnotempty(DomainName)
+    | project Domain = DomainName, ThreatType, ConfidenceScore
+) on Domain
+| where isnotempty(ThreatType)
+| summarize 
+    QueryCount = count(),
+    Clients = make_set(ClientIP, 10)
+  by Domain, ThreatType, ConfidenceScore
+| order by ConfidenceScore desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DNS Query Volume Anomalies</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Excessive DNS Queries</div>
+                        <pre><code>index=dns
+| bucket _time span=1h
+| stats count by src_ip, _time
+| streamstats window=168 avg(count) as baseline, stdev(count) as stdev by src_ip
+| eval threshold = baseline + (stdev * 3)
+| where count > threshold AND count > 1000
+| eval anomaly_factor = round(count / baseline, 1)
+| sort -anomaly_factor</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Single Domain Query Spike</div>
+                        <pre><code>index=dns
+| rex field=query "(?<parent_domain>[^.]+\.[^.]+)$"
+| stats count by src_ip, parent_domain
+| where count > 500
+| sort -count
+| head 20</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DNS over HTTPS (DoH) Detection</h2>
+                    <p>DoH bypasses traditional DNS monitoring by encrypting queries:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Known DoH Providers</div>
+                        <pre><code>index=proxy OR index=firewall
+| where dest_domain IN (
+    "dns.google", "dns.google.com",
+    "cloudflare-dns.com", "1.1.1.1", "1.0.0.1",
+    "dns.quad9.net", "9.9.9.9",
+    "doh.opendns.com",
+    "dns.adguard.com",
+    "dns.nextdns.io"
+) OR dest_ip IN ("8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1", "9.9.9.9")
+| stats count by src_ip, dest_domain, dest_ip, user
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ DoH Monitoring Challenge</div>
+                        <p>DoH traffic appears as normal HTTPS. Detect by blocking known DoH endpoints or using TLS inspection. Some organizations block DoH entirely and force internal DNS usage.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>NXDOMAIN Analysis</h2>
+                    <p>Failed DNS lookups can indicate malware or misconfiguration:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: High NXDOMAIN Rate</div>
+                        <pre><code>index=dns response_code=NXDOMAIN
+| stats count as nxdomain_count by src_ip
+| join src_ip [
+    search index=dns
+    | stats count as total_queries by src_ip
+]
+| eval nxdomain_rate = round(nxdomain_count / total_queries * 100, 1)
+| where nxdomain_rate > 30 AND nxdomain_count > 100
+| sort -nxdomain_rate</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you detect DNS tunneling?"</strong></p>
+                        <p><strong>A:</strong> "DNS tunneling has several telltale characteristics I look for:</p>
+                        <ol>
+                            <li><strong>Long subdomains:</strong> Normal subdomains are short ('www', 'mail'). Tunneling uses long, encoded strings—often base64 or hex—that can be 50+ characters.</li>
+                            <li><strong>High query volume:</strong> A single client making hundreds or thousands of queries to the same parent domain is suspicious. Normal browsing hits many different domains.</li>
+                            <li><strong>Unusual record types:</strong> TXT, NULL, and CNAME records can carry more data than A records. High volumes of these types warrant investigation.</li>
+                            <li><strong>High entropy:</strong> Tunneled data looks random. Normal domains are readable words. I calculate character distribution to identify high-entropy domains.</li>
+                            <li><strong>Response size:</strong> DNS tunneling often returns large TXT records. Normal queries have small responses.</li>
+                        </ol>
+                        <p>I correlate these indicators—a single one might be legitimate, but multiple together strongly suggest tunneling. I also baseline normal DNS behavior per endpoint to catch deviations."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 DNS Security Quick Reference</div>
+                        <h4>Tunneling Indicators</h4>
+                        <ul>
+                            <li>Subdomain length > 30 chars</li>
+                            <li>High query volume to single domain</li>
+                            <li>TXT/NULL record abuse</li>
+                            <li>Base64/hex encoded strings</li>
+                        </ul>
+                        <h4>DGA Indicators</h4>
+                        <ul>
+                            <li>Random-looking domain names</li>
+                            <li>High consonant ratio</li>
+                            <li>Mixed numbers and letters</li>
+                            <li>Rare queries (not cached)</li>
+                        </ul>
+                        <h4>Query Types</h4>
+                        <ul>
+                            <li>A (1) - IPv4 address</li>
+                            <li>AAAA (28) - IPv6 address</li>
+                            <li>TXT (16) - Text records</li>
+                            <li>MX (15) - Mail servers</li>
+                            <li>CNAME (5) - Aliases</li>
+                        </ul>
+                        <h4>Response Codes</h4>
+                        <ul>
+                            <li>NOERROR (0) - Success</li>
+                            <li>NXDOMAIN (3) - Domain doesn't exist</li>
+                            <li>SERVFAIL (2) - Server failure</li>
+                            <li>REFUSED (5) - Query refused</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="network-security-monitoring.html" class="card-link">← Network Monitoring</a>
+                    <a href="identity-logs.html" class="card-link">Identity Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

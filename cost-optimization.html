@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Optimization | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Operations</div>
+                    <a href="siem-architecture.html" class="nav-item">Architecture</a>
+                    <a href="performance-optimization.html" class="nav-item">Performance</a>
+                    <a href="cost-optimization.html" class="nav-item active">Cost Optimization</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Cost Optimization</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Cost Optimization</h1>
+                    <p class="page-subtitle">SIEM costs can spiral without governance. Understanding pricing models and implementing data hygiene reduces costs while maintaining security coverage.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>SIEM Pricing Models</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Common SIEM Pricing</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       SIEM PRICING MODELS                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  DATA VOLUME                    EVENTS/EPS                 USER/ASSET       │
+│  ┌─────────────────┐           ┌─────────────────┐        ┌──────────────┐ │
+│  │ Splunk          │           │ QRadar          │        │ Some legacy  │ │
+│  │ • GB/day        │           │ • Events/second │        │ SIEMs        │ │
+│  │ • Ingest pricing│           │ • Flow rate     │        │ • Per seat   │ │
+│  │                 │           │                 │        │ • Per device │ │
+│  │ Sentinel        │           │ LogRhythm       │        │              │ │
+│  │ • GB ingested   │           │ • MPS licensed  │        │              │ │
+│  │ • Retention     │           │                 │        │              │ │
+│  └─────────────────┘           └─────────────────┘        └──────────────┘ │
+│                                                                             │
+│  COST COMPONENTS:                                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ INGESTION        │  Charged per GB/day or events/second             │   │
+│  │ RETENTION        │  Storage costs, often tiered (hot/warm/cold)     │   │
+│  │ COMPUTE          │  Search/query processing, correlation engines    │   │
+│  │ FEATURES         │  UEBA, SOAR, TI feeds often add-on costs        │   │
+│  │ SUPPORT          │  Premium support tiers                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Volume Analysis</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Ingestion by Source</div>
+                        <pre><code>index=_internal source=*license_usage.log type=Usage
+| eval GB = b/1024/1024/1024
+| stats sum(GB) as TotalGB by idx, st
+| sort -TotalGB
+| head 20</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Sentinel Ingestion Analysis</div>
+                        <pre><code>Usage
+| where TimeGenerated > ago(30d)
+| where DataType != ""
+| summarize 
+    TotalGB = sum(Quantity) / 1000,
+    AvgDailyGB = avg(Quantity) / 1000
+  by DataType
+| order by TotalGB desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Cost Projection</div>
+                        <pre><code>// Estimate monthly costs
+let PricePerGB = 2.76;  // Example Sentinel price
+Usage
+| where TimeGenerated > ago(7d)
+| summarize DailyGB = sum(Quantity) / 1000 / 7 by DataType
+| extend MonthlyGB = DailyGB * 30
+| extend MonthlyCost = MonthlyGB * PricePerGB
+| summarize 
+    TotalMonthlyGB = sum(MonthlyGB),
+    TotalMonthlyCost = sum(MonthlyCost)
+| extend AnnualCost = TotalMonthlyCost * 12</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cost Reduction Strategies</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Data Tiering Strategy</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    DATA VALUE TIERING                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  TIER 1: SIEM (Full Analytics)           Cost: $$$                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Security events requiring correlation and real-time detection     │   │
+│  │ • Authentication logs, security alerts, endpoint telemetry          │   │
+│  │ • Retention: 90 days hot, 1 year searchable                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  TIER 2: Data Lake (Basic Analytics)     Cost: $$                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Verbose logs needed for investigation but not real-time detection │   │
+│  │ • Flow data, DNS queries, web proxy logs (aggregated)               │   │
+│  │ • Query on-demand, not continuous monitoring                        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  TIER 3: Archive (Compliance Only)       Cost: $                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Long-term retention for compliance, rarely accessed               │   │
+│  │ • Raw logs, audit trails                                            │   │
+│  │ • Restore required before query                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  TIER 4: Drop (No Value)                 Cost: $0                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Debug/trace logs, health checks, noise                            │   │
+│  │ • Filter before ingestion                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Filtering & Reduction</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk: Filter at Forwarder</div>
+                        <pre><code># inputs.conf on forwarder - filter before sending
+
+[monitor:///var/log/application.log]
+blacklist = DEBUG|TRACE|HealthCheck
+# Only send WARN, ERROR, INFO
+
+[WinEventLog://Security]
+blacklist1 = EventCode="4688" Message=".*conhost\.exe.*"
+blacklist2 = EventCode="4688" Message=".*RuntimeBroker\.exe.*"
+# Don't send noisy process creation events</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Basic Logs Tier (Reduced Cost)</div>
+                        <pre><code>// Configure table for Basic logs (lower cost, limited queries)
+// In Azure portal: Log Analytics > Tables > Configure
+
+// Basic logs support:
+// - Simple queries (no joins, limited aggregations)
+// - 8-day interactive retention
+// - Significantly lower cost
+
+// Good candidates for Basic logs:
+// - ContainerLog (verbose container output)
+// - AzureDiagnostics (some resource types)
+// - Custom verbose application logs</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Cribl: Route by Value</div>
+                        <pre><code>// Cribl route configuration
+{
+  "id": "route_by_value",
+  "filter": "true",
+  "pipeline": "default",
+  "output": "default",
+  "rules": [
+    {
+      "filter": "_raw.match(/DEBUG|TRACE/)",
+      "output": "devnull",  // Drop debug logs
+      "final": true
+    },
+    {
+      "filter": "sourcetype=='netflow'",
+      "output": "s3_archive",  // Send flows to cheap storage
+      "final": true
+    },
+    {
+      "filter": "sourcetype=='security'",
+      "output": "splunk_siem",  // Security to SIEM
+      "final": true
+    }
+  ]
+}</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sentinel-Specific Optimization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Data Collection Rules (DCR)</div>
+                        <pre><code>// Use DCR to filter before ingestion
+// Example: Filter Windows Security Events
+
+{
+  "dataFlows": [
+    {
+      "streams": ["Microsoft-SecurityEvent"],
+      "transformKql": "source | where EventID in (4624, 4625, 4648, 4672, 4720, 4726)",
+      "outputStream": "Microsoft-SecurityEvent"
+    }
+  ]
+}
+
+// Only ingest important security events, not all 400+ event types</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Commitment Tiers</div>
+                        <pre><code>// Sentinel commitment tier savings
+// Example pricing (check current):
+
+// Pay-as-you-go: $2.76/GB
+// 100 GB/day commitment: $1.96/GB (29% savings)
+// 200 GB/day commitment: $1.73/GB (37% savings)
+// 500 GB/day commitment: $1.56/GB (43% savings)
+
+// Analysis query
+Usage
+| where TimeGenerated > ago(30d)
+| summarize DailyGB = sum(Quantity)/1000/30
+| extend RecommendedTier = case(
+    DailyGB >= 500, "500 GB/day",
+    DailyGB >= 200, "200 GB/day",
+    DailyGB >= 100, "100 GB/day",
+    "Pay-as-you-go"
+)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>ROI Justification</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cost Element</th>
+                                    <th>Without SIEM</th>
+                                    <th>With Optimized SIEM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Mean Time to Detect</strong></td>
+                                    <td>197 days (industry avg)</td>
+                                    <td>< 24 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Breach Cost</strong></td>
+                                    <td>$4.45M average</td>
+                                    <td>Reduced by early detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Analyst Efficiency</strong></td>
+                                    <td>Manual log review</td>
+                                    <td>Automated correlation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Compliance</strong></td>
+                                    <td>Manual evidence</td>
+                                    <td>Automated reporting</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you manage SIEM costs?"</strong></p>
+                        <p><strong>A:</strong> "Cost management starts with understanding value:</p>
+                        <ol>
+                            <li><strong>Audit current ingestion:</strong> I analyze what's being collected and its security value. Often 30-40% of data provides no detection value.</li>
+                            <li><strong>Tiered architecture:</strong> Not all logs need real-time SIEM. High-value security events go to SIEM; verbose logs go to cheaper data lakes; noise gets dropped.</li>
+                            <li><strong>Filter at source:</strong> Drop debug logs, health checks, and known-good events before they reach the SIEM. Filtering after ingestion still costs.</li>
+                            <li><strong>Commitment planning:</strong> For predictable workloads, commitment tiers save 30-50%. I analyze 90 days of usage before committing.</li>
+                            <li><strong>Continuous review:</strong> Data volumes creep up. I run monthly ingestion reports and investigate spikes. New applications often over-log initially.</li>
+                            <li><strong>ROI framing:</strong> I justify SIEM cost against breach cost and analyst efficiency. A $500K/year SIEM is cheap compared to a $4M breach.</li>
+                        </ol>
+                        <p>The goal is maximizing security value per dollar, not minimizing spend."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Cost Optimization Quick Reference</div>
+                        <h4>Quick Wins</h4>
+                        <ul>
+                            <li>Drop DEBUG/TRACE logs</li>
+                            <li>Filter noisy Windows events</li>
+                            <li>Aggregate before ingesting</li>
+                            <li>Review retention periods</li>
+                            <li>Use commitment tiers</li>
+                        </ul>
+                        <h4>High-Volume Sources</h4>
+                        <ul>
+                            <li>DNS query logs (aggregate)</li>
+                            <li>Netflow/traffic data (sample)</li>
+                            <li>Web proxy logs (filter)</li>
+                            <li>Container logs (route)</li>
+                            <li>Debug/trace logs (drop)</li>
+                        </ul>
+                        <h4>Sentinel Cost Tiers</h4>
+                        <ul>
+                            <li>Analytics: Full features, highest cost</li>
+                            <li>Basic: Limited queries, ~70% cheaper</li>
+                            <li>Archive: Long-term, restore to query</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="performance-optimization.html" class="card-link">← Performance</a>
+                    <a href="siem-architecture.html" class="card-link">SIEM Architecture →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

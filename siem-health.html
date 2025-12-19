@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Health Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Operations</div>
+                    <a href="siem-metrics.html" class="nav-item">SIEM Metrics</a>
+                    <a href="siem-health.html" class="nav-item active">SIEM Health</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SIEM Health Monitoring</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Health Monitoring</h1>
+                    <p class="page-subtitle">A SIEM that isn't healthy can't protect the organization. Monitoring ingestion rates, search performance, and data quality ensures the SIEM operates effectively when needed most.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>SIEM Health Dimensions</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SIEM Health Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SIEM HEALTH MONITORING                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  INGESTION HEALTH                 SEARCH HEALTH                             │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ • Events per second │         │ • Query response time       │           │
+│  │ • Data volume (GB)  │         │ • Concurrent searches       │           │
+│  │ • Parse success rate│         │ • Search queue depth        │           │
+│  │ • Latency (event    │         │ • Scheduled search success  │           │
+│  │   to indexed)       │         │ • Dashboard load time       │           │
+│  │ • Queue depth       │         │                             │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  DATA SOURCE HEALTH               INFRASTRUCTURE HEALTH                     │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ • Source heartbeat  │         │ • CPU utilization           │           │
+│  │ • Expected vs actual│         │ • Memory usage              │           │
+│  │   volume            │         │ • Disk I/O                  │           │
+│  │ • Field extraction  │         │ • Disk capacity             │           │
+│  │   errors            │         │ • Cluster health            │           │
+│  │ • Timestamp drift   │         │ • License usage             │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  ALERT: Silent failures are worst - no data means no detection!            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Splunk Health Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Ingestion Rate by Source</div>
+                        <pre><code>index=_internal source=*license_usage.log type=Usage
+| eval MB = b / 1024 / 1024
+| timechart span=1h sum(MB) as MB_ingested by idx
+| addtotals</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Data Source Heartbeat</div>
+                        <pre><code>| tstats count where index=* by index, sourcetype, host span=1h
+| eventstats avg(count) as avg_count by index, sourcetype, host
+| eval health = case(
+    count = 0, "🔴 Silent",
+    count < avg_count * 0.5, "🟡 Low",
+    count > avg_count * 2, "🟡 High",
+    "🟢 Normal"
+)
+| where health != "🟢 Normal"
+| table _time, index, sourcetype, host, count, avg_count, health</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Search Performance</div>
+                        <pre><code>index=_audit action=search info=completed
+| eval runtime = total_run_time
+| eval status = case(
+    runtime < 30, "Fast",
+    runtime < 60, "Normal",
+    runtime < 300, "Slow",
+    "Critical"
+)
+| stats count by status, user
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Indexer Queue Health</div>
+                        <pre><code>index=_internal source=*metrics.log group=queue
+| eval fill_percent = current_size / max_size * 100
+| stats avg(fill_percent) as avg_fill, max(fill_percent) as max_fill by name
+| where avg_fill > 50 OR max_fill > 80
+| eval status = case(
+    max_fill > 90, "🔴 Critical",
+    max_fill > 70, "🟡 Warning",
+    "🟢 OK"
+)
+| table name, avg_fill, max_fill, status</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Sentinel Health</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Data Connector Health</div>
+                        <pre><code>SentinelHealth
+| where TimeGenerated > ago(24h)
+| where SentinelResourceType == "Data connector"
+| summarize 
+    LastHeartbeat = max(TimeGenerated),
+    HealthStatus = arg_max(TimeGenerated, Status)
+  by SentinelResourceName
+| extend HoursSinceHeartbeat = datetime_diff('hour', now(), LastHeartbeat)
+| extend Health = case(
+    HoursSinceHeartbeat > 24, "🔴 Critical",
+    HoursSinceHeartbeat > 4, "🟡 Warning",
+    "🟢 Healthy"
+)
+| order by HoursSinceHeartbeat desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Ingestion Anomaly Detection</div>
+                        <pre><code>Usage
+| where TimeGenerated > ago(7d)
+| summarize DailyGB = sum(Quantity) / 1000 by DataType, bin(TimeGenerated, 1d)
+| summarize AvgDaily = avg(DailyGB), StdDev = stdev(DailyGB), 
+            LatestDaily = arg_max(TimeGenerated, DailyGB) by DataType
+| extend ZScore = (LatestDaily - AvgDaily) / StdDev
+| where ZScore > 2 or ZScore < -2  // Significant deviation
+| extend Anomaly = iff(ZScore > 0, "📈 Spike", "📉 Drop")
+| project DataType, AvgDaily, LatestDaily, ZScore, Anomaly</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Analytics Rule Health</div>
+                        <pre><code>SentinelHealth
+| where TimeGenerated > ago(7d)
+| where SentinelResourceType == "Analytic rule"
+| where Status != "Success"
+| summarize 
+    FailureCount = count(),
+    LastFailure = max(TimeGenerated),
+    FailureReasons = make_set(Description)
+  by SentinelResourceName
+| where FailureCount > 3
+| order by FailureCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Quality Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Parse Failure Detection</div>
+                        <pre><code>index=_internal source=*splunkd.log "Error" "parsing"
+| stats count by sourcetype, host
+| where count > 10
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Timestamp Issues</div>
+                        <pre><code>index=* earliest=-1h
+| eval time_drift = abs(_time - _indextime)
+| where time_drift > 3600  // More than 1 hour drift
+| stats count as events_with_drift,
+        avg(time_drift) as avg_drift_seconds
+  by index, sourcetype
+| where events_with_drift > 100
+| eval avg_drift_hours = round(avg_drift_seconds / 3600, 1)
+| table index, sourcetype, events_with_drift, avg_drift_hours</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Missing Required Fields</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where isempty(Account) or isempty(Computer) or isempty(EventID)
+| summarize MissingFields = count() by Type
+| where MissingFields > 100</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Health Dashboard Alerts</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Alert</th>
+                                    <th>Condition</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Data source silent</strong></td>
+                                    <td>No events for > 1 hour</td>
+                                    <td>🔴 Critical</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ingestion queue backing up</strong></td>
+                                    <td>Queue fill > 80%</td>
+                                    <td>🔴 Critical</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scheduled search failing</strong></td>
+                                    <td>Detection rule errors</td>
+                                    <td>🔴 Critical</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Volume anomaly</strong></td>
+                                    <td>> 50% deviation from baseline</td>
+                                    <td>🟡 Warning</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>High latency</strong></td>
+                                    <td>Event to index > 5 min</td>
+                                    <td>🟡 Warning</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>License threshold</strong></td>
+                                    <td>> 90% license consumed</td>
+                                    <td>🟡 Warning</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you ensure SIEM reliability?"</strong></p>
+                        <p><strong>A:</strong> "SIEM health monitoring is critical because a blind SIEM is worse than no SIEM:</p>
+                        <ol>
+                            <li><strong>Data source heartbeats:</strong> I monitor every log source for expected volume. If a source goes silent, I get alerted before it impacts detection.</li>
+                            <li><strong>Ingestion monitoring:</strong> Queue depths, parse failures, and latency tell me if the SIEM is keeping up. Backlogs mean delayed detection.</li>
+                            <li><strong>Detection rule health:</strong> Scheduled searches and analytics rules can fail silently. I monitor for execution failures and query errors.</li>
+                            <li><strong>Volume anomalies:</strong> Sudden spikes might be attacks or logging storms. Drops might be collection failures. Both need investigation.</li>
+                            <li><strong>Data quality:</strong> Parse failures, missing fields, and timestamp drift degrade detection effectiveness. I validate data quality continuously.</li>
+                            <li><strong>Capacity planning:</strong> License usage, disk capacity, and infrastructure metrics prevent surprises.</li>
+                        </ol>
+                        <p>I treat SIEM health as a security control—if it fails, our detection capability fails."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 SIEM Health Quick Reference</div>
+                        <h4>Critical Metrics</h4>
+                        <ul>
+                            <li>Events per second (EPS)</li>
+                            <li>GB ingested per day</li>
+                            <li>Ingestion latency (P95)</li>
+                            <li>Queue fill percentage</li>
+                            <li>Search response time</li>
+                        </ul>
+                        <h4>Health Check Schedule</h4>
+                        <ul>
+                            <li>Real-time: Ingestion rate, queues</li>
+                            <li>Hourly: Source heartbeats</li>
+                            <li>Daily: Volume trends, errors</li>
+                            <li>Weekly: Capacity planning</li>
+                        </ul>
+                        <h4>Common Issues</h4>
+                        <ul>
+                            <li>Forwarder connectivity lost</li>
+                            <li>API token expired</li>
+                            <li>Parse regex broken</li>
+                            <li>Time zone misconfiguration</li>
+                            <li>License exceeded</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-metrics.html" class="card-link">← SIEM Metrics</a>
+                    <a href="performance-optimization.html" class="card-link">Performance →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

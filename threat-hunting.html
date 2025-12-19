@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Hunting | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Context</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="incident-response.html" class="nav-item">Incident Response</a>
+                    <a href="threat-hunting.html" class="nav-item active">Threat Hunting</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="soc-operations.html">SOC Context</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Threat Hunting</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Threat Hunting</h1>
+                    <p class="page-subtitle">Threat hunting is proactive security—actively searching for threats that evade existing detections. It's the bridge between reactive SOC operations and proactive security improvement.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>What is Threat Hunting?</h2>
+                    <p>Threat hunting differs from traditional detection:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Detection vs Hunting</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  TRADITIONAL DETECTION                    THREAT HUNTING                    │
+│  ┌─────────────────────────┐             ┌─────────────────────────┐       │
+│  │                         │             │                         │       │
+│  │   Rules fire when       │             │   Analyst actively      │       │
+│  │   conditions match      │             │   searches for threats  │       │
+│  │                         │             │                         │       │
+│  │   REACTIVE              │             │   PROACTIVE             │       │
+│  │                         │             │                         │       │
+│  │   Known patterns        │             │   Unknown patterns      │       │
+│  │   Known threats         │             │   Novel threats         │       │
+│  │   Automated             │             │   Human-driven          │       │
+│  │                         │             │                         │       │
+│  └─────────────────────────┘             └─────────────────────────┘       │
+│                                                                             │
+│  ═══════════════════════════════════════════════════════════════════════   │
+│                                                                             │
+│  HUNTING ASSUMPTION: There are threats in your environment that            │
+│  existing detections have not caught. Your job is to find them.           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hunting Methodologies</h2>
+                    
+                    <h3>1. Hypothesis-Driven Hunting</h3>
+                    <p>Start with a theory about attacker behavior:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Hypothesis-Driven Workflow</div>
+                        <pre><code>
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│ HYPOTHESIS  │ → │   SEARCH    │ → │   ANALYZE   │ → │   OUTPUT    │
+├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤
+│"Attackers   │   │Build query  │   │Review       │   │• Findings   │
+│may be using │   │targeting    │   │results for  │   │• New rules  │
+│encoded PS   │   │encoded      │   │true threats │   │• Tuning     │
+│for C2"      │   │PowerShell   │   │vs benign    │   │• No finding │
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+
+Example Hypotheses:
+├─ "Attackers are using scheduled tasks for persistence"
+├─ "There's lateral movement via WMI we're not detecting"
+├─ "Service accounts are being abused for privileged access"
+└─ "Data is being exfiltrated to cloud storage"
+                        </code></pre>
+                    </div>
+
+                    <h3>2. Intelligence-Driven Hunting</h3>
+                    <p>Search for specific IOCs or TTPs from threat intelligence:</p>
+                    <ul>
+                        <li>New threat actor TTPs from threat reports</li>
+                        <li>IOCs from industry sharing (ISACs)</li>
+                        <li>Techniques from recent incidents at peer organizations</li>
+                    </ul>
+
+                    <h3>3. Baseline-Driven Hunting (Anomaly)</h3>
+                    <p>Find deviations from normal behavior:</p>
+                    <ul>
+                        <li>First-time execution of tools</li>
+                        <li>Unusual network connections</li>
+                        <li>Abnormal user behavior patterns</li>
+                        <li>Statistical outliers in any dimension</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hunt Examples</h2>
+                    
+                    <h3>Hunt: Encoded PowerShell Commands</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Hypothesis</div>
+                        <p>Attackers use encoded PowerShell to evade basic string-matching detections.</p>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Hunt Query</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(7d)
+| where EventID == 4688
+| where NewProcessName endswith "\\powershell.exe"
+| where CommandLine has "-enc" or CommandLine has "-encoded"
+| extend DecodedLength = strlen(extract(@"-[eE]nc[^\s]* ([A-Za-z0-9+/=]+)", 1, CommandLine))
+| where DecodedLength > 100  // Significant encoded content
+| summarize 
+    ExecutionCount = count(),
+    Hosts = make_set(Computer, 10),
+    Users = make_set(SubjectUserName, 10)
+  by CommandLine
+| order by ExecutionCount desc</code></pre>
+                    </div>
+
+                    <h3>Hunt: Rare Process Execution</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Hypothesis</div>
+                        <p>Attacker tools are rarely seen across the environment. Finding rare processes may surface threats.</p>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Hunt Query</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(7d)
+| where EventID == 4688
+| extend ProcessName = tostring(split(NewProcessName, "\\")[-1])
+| summarize 
+    ExecutionCount = count(),
+    UniqueHosts = dcount(Computer),
+    Hosts = make_set(Computer, 5),
+    Users = make_set(SubjectUserName, 5)
+  by ProcessName
+| where ExecutionCount < 5 and UniqueHosts == 1  // Very rare
+| where ProcessName !endswith ".tmp"
+| order by ExecutionCount asc</code></pre>
+                    </div>
+
+                    <h3>Hunt: Unusual Outbound Connections</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Hypothesis</div>
+                        <p>C2 communications may use unusual destination ports or rarely-contacted external IPs.</p>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Hunt Query</div>
+                        <pre><code>// Find outbound connections to rarely-seen destinations
+CommonSecurityLog
+| where TimeGenerated > ago(7d)
+| where DeviceAction == "allow"
+| where DestinationPort !in (80, 443, 53)  // Non-standard ports
+| where ipv4_is_private(DestinationIP) == false  // External
+| summarize 
+    ConnectionCount = count(),
+    SourceHosts = dcount(SourceIP),
+    Ports = make_set(DestinationPort)
+  by DestinationIP
+| where SourceHosts == 1 and ConnectionCount < 10  // Rare
+| order by ConnectionCount asc</code></pre>
+                    </div>
+
+                    <h3>Hunt: Service Account Anomalies</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Hypothesis</div>
+                        <p>Compromised service accounts may show interactive logons or access to unusual systems.</p>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Hunt Query</div>
+                        <pre><code>// Service accounts with interactive logons
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where EventID == 4624
+| where LogonType in (2, 10)  // Interactive, RemoteInteractive
+| where Account has "svc_" or Account has "service"
+| summarize 
+    LogonCount = count(),
+    Hosts = make_set(Computer, 10),
+    SourceIPs = make_set(IpAddress, 10)
+  by Account
+| order by LogonCount desc</code></pre>
+                    </div>
+
+                    <h3>Hunt: Scheduled Task Persistence</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Hypothesis</div>
+                        <p>Attackers create scheduled tasks for persistence. Tasks with suspicious commands may indicate compromise.</p>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Hunt Query</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(30d)
+| where EventID == 4698  // Scheduled task created
+| extend TaskContent = tostring(parse_xml(EventData).DataItem.TaskContent)
+| where TaskContent has_any (
+    "powershell", "cmd.exe", "wscript", "cscript",
+    "mshta", "rundll32", "regsvr32",
+    "http://", "https://",
+    "-enc", "-encoded"
+)
+| project TimeGenerated, Computer, SubjectUserName, TaskName, TaskContent
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hunt Documentation</h2>
+                    <p>Document every hunt for knowledge sharing and process improvement:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Hunt Documentation Template</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  HUNT REPORT                                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  METADATA                                                                   │
+│  ├─ Hunt ID: HUNT-2024-0042                                                │
+│  ├─ Date: 2024-03-15                                                       │
+│  ├─ Hunter: J. Smith                                                       │
+│  ├─ Duration: 4 hours                                                      │
+│  └─ Data Sources: SecurityEvent, CommonSecurityLog                         │
+│                                                                             │
+│  HYPOTHESIS                                                                 │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Attackers may be using encoded PowerShell for command and control         │
+│  communications that bypass signature-based detection.                     │
+│                                                                             │
+│  MITRE ATT&CK: T1059.001 (PowerShell), T1132 (Data Encoding)               │
+│                                                                             │
+│  METHODOLOGY                                                                │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  1. Queried for PowerShell executions with -enc/-encoded flags             │
+│  2. Filtered to encoded content >100 chars (significant payloads)          │
+│  3. Grouped by command to find patterns                                    │
+│  4. Investigated unique/rare executions                                    │
+│                                                                             │
+│  FINDINGS                                                                   │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  □ No malicious activity found                                             │
+│  ☑ Benign findings requiring attention                                     │
+│  □ Confirmed malicious activity (escalate to IR)                           │
+│                                                                             │
+│  Details:                                                                   │
+│  Found 3 legitimate admin scripts using encoded commands. Recommend        │
+│  updating scripts to use clear-text for better visibility. Added to        │
+│  exclusion list for detection rule.                                        │
+│                                                                             │
+│  RECOMMENDATIONS                                                            │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  1. Create detection rule for encoded PS with network activity             │
+│  2. Update admin scripts to avoid encoding                                 │
+│  3. Add legitimate scripts to exclusion list                               │
+│                                                                             │
+│  ARTIFACTS                                                                  │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  • Hunt query saved: /hunts/encoded-powershell.kql                         │
+│  • New detection rule: rules/encoded-ps-network.yaml                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hunt-to-Detection Pipeline</h2>
+                    <p>Successful hunts should improve automated detection:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Hunt to Detection Workflow</div>
+                        <pre><code>
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│    HUNT     │ → │   FINDING   │ → │ DETECTION   │ → │ AUTOMATED   │
+│             │   │             │   │   RULE      │   │  ALERTING   │
+├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤
+│Manual       │   │Pattern      │   │Formalize    │   │SOC receives │
+│exploration  │   │identified   │   │hunt query   │   │alerts       │
+│             │   │             │   │as rule      │   │             │
+│Hypothesis-  │   │Validated as │   │Add tuning   │   │Continuous   │
+│driven       │   │actionable   │   │& context    │   │detection    │
+│             │   │             │   │             │   │             │
+│Time-bounded │   │Documented   │   │Schedule &   │   │No manual    │
+│             │   │             │   │test         │   │hunting req'd│
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+
+KEY PRINCIPLE: Hunts that find real patterns should become automated 
+detections. The goal is to hunt once, detect forever.
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Hunt Prioritization</h2>
+                    <p>Focus hunting on high-value areas:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Priority Factor</th>
+                                    <th>High Priority</th>
+                                    <th>Lower Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Detection Gap</strong></td>
+                                    <td>No existing detection coverage</td>
+                                    <td>Already well-covered</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Threat Relevance</strong></td>
+                                    <td>Active threat to your industry</td>
+                                    <td>Theoretical or rare threat</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Asset Value</strong></td>
+                                    <td>Crown jewels, critical systems</td>
+                                    <td>Standard workstations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Availability</strong></td>
+                                    <td>Rich telemetry available</td>
+                                    <td>Limited or no data</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Intel Driver</strong></td>
+                                    <td>Fresh threat intel/TTP</td>
+                                    <td>Generic concern</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "Describe your approach to threat hunting."</strong></p>
+                        <p><strong>A:</strong> "I use hypothesis-driven hunting primarily. The process:</p>
+                        <ol>
+                            <li><strong>Form hypothesis:</strong> Based on threat intel, MITRE ATT&CK coverage gaps, or recent incidents. Example: 'Attackers may be using WMI for lateral movement that we're not detecting.'</li>
+                            <li><strong>Build hunt query:</strong> Create a query that would surface this behavior—process creation with WMI parent, remote WMI connections, etc.</li>
+                            <li><strong>Execute and analyze:</strong> Run against available data. Review results, separate true threats from benign activity.</li>
+                            <li><strong>Document findings:</strong> Whether I find something or not, document the hunt—methodology, data sources, results, recommendations.</li>
+                            <li><strong>Operationalize:</strong> If I find a pattern worth detecting, I convert the hunt query into an automated detection rule. Hunt once, detect forever.</li>
+                        </ol>
+                        <p>I prioritize hunts based on detection gaps and threat relevance to our industry. A good hunt either finds threats, improves detection, or confirms existing coverage is adequate."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Threat Hunting Quick Reference</div>
+                        <h4>Hunting Approaches</h4>
+                        <ul>
+                            <li><strong>Hypothesis-driven:</strong> Theory → Query → Analyze</li>
+                            <li><strong>Intel-driven:</strong> IOCs/TTPs → Search → Validate</li>
+                            <li><strong>Anomaly-driven:</strong> Baseline → Deviations → Investigate</li>
+                        </ul>
+                        <h4>Common Hunt Targets</h4>
+                        <ul>
+                            <li>Rare process execution</li>
+                            <li>Unusual network destinations</li>
+                            <li>Suspicious scheduled tasks</li>
+                            <li>Service account anomalies</li>
+                            <li>Encoded/obfuscated commands</li>
+                        </ul>
+                        <h4>Hunt Outputs</h4>
+                        <ul>
+                            <li>Threat findings → Incident response</li>
+                            <li>Patterns → New detection rules</li>
+                            <li>Gaps → Data source improvements</li>
+                            <li>Nothing found → Coverage validation</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="incident-response.html" class="card-link">← Incident Response</a>
+                    <a href="detection-fundamentals.html" class="card-link">Detection Fundamentals →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

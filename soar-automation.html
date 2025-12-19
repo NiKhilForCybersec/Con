@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOAR & Automation | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Automation</div>
+                    <a href="soar-automation.html" class="nav-item active">SOAR & Automation</a>
+                    <a href="powershell-security.html" class="nav-item">PowerShell</a>
+                    <a href="python-security.html" class="nav-item">Python</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SOAR & Automation</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SOAR & Automation</h1>
+                    <p class="page-subtitle">Security Orchestration, Automation and Response (SOAR) amplifies SOC effectiveness by automating repetitive tasks, enriching alerts with context, and enabling faster response. This guide covers SOAR concepts and automation strategies.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>What is SOAR?</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SOAR Components</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SOAR PLATFORM                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  ORCHESTRATION                                                       │   │
+│  │  Connecting and coordinating security tools                         │   │
+│  │  ├─ SIEM integration (alerts trigger workflows)                     │   │
+│  │  ├─ Threat intel platforms (IOC enrichment)                         │   │
+│  │  ├─ EDR/XDR (containment actions)                                   │   │
+│  │  ├─ Ticketing systems (case management)                             │   │
+│  │  ├─ Identity providers (account actions)                            │   │
+│  │  └─ Network security (firewall, proxy)                              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  AUTOMATION                                                          │   │
+│  │  Executing tasks without human intervention                         │   │
+│  │  ├─ Alert enrichment (add context automatically)                    │   │
+│  │  ├─ Triage automation (classify obvious cases)                      │   │
+│  │  ├─ Data collection (gather investigation info)                     │   │
+│  │  ├─ Response actions (contain threats)                              │   │
+│  │  └─ Reporting (generate status updates)                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  RESPONSE                                                            │   │
+│  │  Taking action on security events                                   │   │
+│  │  ├─ Playbooks (standardized response procedures)                    │   │
+│  │  ├─ Case management (track incidents)                               │   │
+│  │  ├─ Collaboration (notify stakeholders)                             │   │
+│  │  └─ Metrics (measure effectiveness)                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automation Levels</h2>
+                    <p>Not all automation is equal. Start simple and build up:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Description</th>
+                                    <th>Examples</th>
+                                    <th>Risk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Level 1: Enrichment</strong></td>
+                                    <td>Add context to alerts automatically</td>
+                                    <td>IP reputation, user info, asset data, related alerts</td>
+                                    <td>Very Low</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Level 2: Notification</strong></td>
+                                    <td>Alert the right people</td>
+                                    <td>Slack/Teams alerts, email to on-call, ticket creation</td>
+                                    <td>Low</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Level 3: Triage</strong></td>
+                                    <td>Auto-classify obvious cases</td>
+                                    <td>Close known false positives, set priority</td>
+                                    <td>Low-Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Level 4: Investigation</strong></td>
+                                    <td>Gather investigation data</td>
+                                    <td>Query SIEM for related events, check threat intel</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Level 5: Containment</strong></td>
+                                    <td>Take response actions</td>
+                                    <td>Block IP, disable account, isolate host</td>
+                                    <td>High</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Automation Risk Management</div>
+                        <p>Start with Level 1-2 automation. Only automate containment (Level 5) for high-confidence, high-impact scenarios. Always include human approval for destructive actions until confidence is established.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common SOAR Platforms</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Platform</th>
+                                    <th>Vendor</th>
+                                    <th>Key Strengths</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Sentinel Automation</strong></td>
+                                    <td>Microsoft</td>
+                                    <td>Native Sentinel integration, Logic Apps, low-code</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Splunk SOAR (Phantom)</strong></td>
+                                    <td>Splunk</td>
+                                    <td>Extensive app ecosystem, visual playbook builder</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XSOAR</strong></td>
+                                    <td>Palo Alto</td>
+                                    <td>Cortex integration, strong case management</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Chronicle SOAR</strong></td>
+                                    <td>Google</td>
+                                    <td>Chronicle integration, scalability</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tines</strong></td>
+                                    <td>Tines</td>
+                                    <td>No-code, flexible, API-first</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Shuffle</strong></td>
+                                    <td>Open Source</td>
+                                    <td>Free, extensible, OpenAPI support</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Playbook Design</h2>
+                    
+                    <h3>Playbook Structure</h3>
+                    <div class="diagram">
+                        <div class="diagram-title">Standard Playbook Template</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PLAYBOOK: Phishing Email Response                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  TRIGGER                                                                    │
+│  └─► Alert: "Phishing Email Detected"                                      │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  ENRICHMENT (Automatic)                                              │   │
+│  │  ├─► Get sender reputation from threat intel                        │   │
+│  │  ├─► Check if sender domain is typosquat                            │   │
+│  │  ├─► Extract URLs and check reputation                              │   │
+│  │  ├─► Get list of all recipients                                     │   │
+│  │  └─► Check if any recipient clicked links (proxy logs)              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              │                                              │
+│                              ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  DECISION POINT                                                      │   │
+│  │  IF: Known malicious sender OR malicious URLs                       │   │
+│  │  THEN: Continue to containment                                      │   │
+│  │  ELSE: Assign to analyst for review                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              │                                              │
+│                              ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  CONTAINMENT (Requires approval OR auto for high confidence)        │   │
+│  │  ├─► Delete email from all recipient mailboxes                      │   │
+│  │  ├─► Block sender domain in email gateway                           │   │
+│  │  ├─► Block malicious URLs in proxy                                  │   │
+│  │  └─► If any clicks: isolate affected endpoints                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              │                                              │
+│                              ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  NOTIFICATION                                                        │   │
+│  │  ├─► Create ticket with all context                                 │   │
+│  │  ├─► Notify SOC Slack channel                                       │   │
+│  │  ├─► If clicks detected: escalate to IR team                        │   │
+│  │  └─► Send user awareness reminder to recipients                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Enrichment Playbook Example</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sentinel Logic App: IP Enrichment</div>
+                        <pre><code>// Pseudo-code for Logic App workflow
+TRIGGER: When Sentinel incident is created
+
+// Step 1: Extract IP addresses from incident
+PARSE: Get IP entities from incident
+
+FOR EACH ip IN incident.IPs:
+    
+    // Step 2: Check threat intelligence
+    CALL: VirusTotal API → get IP reputation
+    CALL: AbuseIPDB API → check abuse reports
+    CALL: Shodan API → get open ports/services
+    
+    // Step 3: Check internal context
+    QUERY: Asset inventory → is this a known asset?
+    QUERY: Recent alerts → other alerts with this IP?
+    QUERY: Firewall logs → connection history
+    
+    // Step 4: Add enrichment to incident
+    UPDATE: Add comments with enrichment data
+    UPDATE: Add tags based on reputation
+
+// Step 5: Adjust severity if needed
+IF any IP has reputation < threshold:
+    UPDATE: Increase incident severity
+    
+// Step 6: Notify
+POST: Send summary to Slack channel</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>High-Value Automations</h2>
+                    
+                    <h3>1. Alert Enrichment</h3>
+                    <p>Add context to every alert automatically:</p>
+                    <ul>
+                        <li><strong>User context:</strong> Department, manager, VIP status, recent activity</li>
+                        <li><strong>Asset context:</strong> Criticality, owner, OS, patch status</li>
+                        <li><strong>Threat intel:</strong> IP/domain/hash reputation</li>
+                        <li><strong>Historical context:</strong> Similar alerts, false positive history</li>
+                    </ul>
+
+                    <h3>2. Automated Triage</h3>
+                    <p>Close or deprioritize obvious cases:</p>
+                    <ul>
+                        <li>Known false positive patterns (same user + alert + action)</li>
+                        <li>Alerts from authorized security tools</li>
+                        <li>Scheduled task activity during maintenance windows</li>
+                        <li>Test/dev environment alerts (deprioritize)</li>
+                    </ul>
+
+                    <h3>3. Investigation Assistance</h3>
+                    <p>Gather data analysts would manually collect:</p>
+                    <ul>
+                        <li>Related events from SIEM (timeline queries)</li>
+                        <li>User's recent activity</li>
+                        <li>Network connections from the host</li>
+                        <li>Process execution history</li>
+                    </ul>
+
+                    <h3>4. Containment Actions</h3>
+                    <p>For high-confidence threats only:</p>
+                    <ul>
+                        <li><strong>Account:</strong> Disable, force password reset, revoke sessions</li>
+                        <li><strong>Network:</strong> Block IP in firewall, isolate host</li>
+                        <li><strong>Endpoint:</strong> Quarantine file, isolate from network</li>
+                        <li><strong>Email:</strong> Delete message from mailboxes</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automation Metrics</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Automation Rate</strong></td>
+                                    <td>% of alerts with automated enrichment</td>
+                                    <td>>90%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Auto-Close Rate</strong></td>
+                                    <td>% of alerts closed automatically</td>
+                                    <td>20-40%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time Saved</strong></td>
+                                    <td>Analyst hours saved per week</td>
+                                    <td>Track trend</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Playbook Success Rate</strong></td>
+                                    <td>% of playbook runs completing successfully</td>
+                                    <td>>95%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>False Auto-Close Rate</strong></td>
+                                    <td>Auto-closed alerts that were actually true positives</td>
+                                    <td><1%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automation Best Practices</h2>
+                    
+                    <h3>Design Principles</h3>
+                    <ul>
+                        <li><strong>Start simple:</strong> Enrich → Notify → Triage → Investigate → Contain</li>
+                        <li><strong>Human in the loop:</strong> Require approval for destructive actions initially</li>
+                        <li><strong>Fail safe:</strong> If automation fails, alert should go to analyst, not be dropped</li>
+                        <li><strong>Audit everything:</strong> Log all automated actions for review</li>
+                        <li><strong>Test thoroughly:</strong> Test playbooks with real and synthetic data</li>
+                    </ul>
+
+                    <h3>Avoid These Mistakes</h3>
+                    <ul>
+                        <li>❌ Automating containment without high confidence</li>
+                        <li>❌ Complex playbooks that are hard to debug</li>
+                        <li>❌ No error handling in playbooks</li>
+                        <li>❌ Automating before understanding the manual process</li>
+                        <li>❌ No monitoring of automation health</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you approach implementing SOAR in a SOC?"</strong></p>
+                        <p><strong>A:</strong> "I take a phased approach:</p>
+                        <ol>
+                            <li><strong>Phase 1 - Enrichment (Week 1-2):</strong> Start with automatic enrichment on all alerts. Add threat intel lookups, asset context, user info. Zero risk, immediate value—analysts save time on every alert.</li>
+                            <li><strong>Phase 2 - Notification (Week 3-4):</strong> Set up proper routing—Slack notifications for high severity, ticket creation, escalation paths. Ensures nothing gets missed.</li>
+                            <li><strong>Phase 3 - Triage (Week 5-8):</strong> Identify top false positive patterns. Create auto-close rules with human review of samples. Target 20-30% auto-close rate. Monitor for missed true positives.</li>
+                            <li><strong>Phase 4 - Investigation (Month 2-3):</strong> Build playbooks that gather investigation data—related alerts, timeline queries, network connections. Present as a summary for analysts.</li>
+                            <li><strong>Phase 5 - Containment (Month 3+):</strong> Only after everything else is stable. Start with human-approved containment. Gradually move to auto-containment for specific, high-confidence scenarios.</li>
+                        </ol>
+                        <p>Key metrics: Track automation rate, auto-close rate, time saved, and crucially—false auto-close rate. If you're auto-closing real threats, you've gone too far."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 SOAR Quick Reference</div>
+                        <h4>Automation Progression</h4>
+                        <ol>
+                            <li>Enrichment (Low risk)</li>
+                            <li>Notification (Low risk)</li>
+                            <li>Triage/Auto-close (Medium risk)</li>
+                            <li>Investigation (Medium risk)</li>
+                            <li>Containment (High risk)</li>
+                        </ol>
+                        <h4>High-Value Enrichments</h4>
+                        <ul>
+                            <li>IP/domain reputation</li>
+                            <li>User/asset context</li>
+                            <li>Related alerts</li>
+                            <li>Historical false positive rate</li>
+                        </ul>
+                        <h4>Success Metrics</h4>
+                        <ul>
+                            <li>Automation rate: >90%</li>
+                            <li>Auto-close rate: 20-40%</li>
+                            <li>False auto-close: <1%</li>
+                            <li>Playbook success: >95%</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-fundamentals.html" class="card-link">← Detection Fundamentals</a>
+                    <a href="powershell-security.html" class="card-link">PowerShell Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

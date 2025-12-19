@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration Methodology | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Migration Methodology</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Migration Methodology</h1>
+                    <p class="page-subtitle">Structured approach to SIEM platform migrations</p>
+                </header>
+                
+                
+                <h2>The Migration Framework</h2>
+                
+                <p>SIEM migrations are complex projects that touch every part of security operations. A structured methodology reduces risk and ensures nothing is missed.</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">SIEM Migration Phases</div>
+                    <pre><code>
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   DISCOVER   │ →  │    DESIGN    │ →  │    BUILD     │ →  │   MIGRATE    │ →  │  CUTOVER &   │
+│              │    │              │    │              │    │              │    │  OPTIMIZE    │
+├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤
+│ • Current    │    │ • Target     │    │ • Deploy     │    │ • Parallel   │    │ • Full       │
+│   state      │    │   architecture│   │   platform   │    │   running    │    │   cutover    │
+│ • Log sources│    │ • Data flow  │    │ • Configure  │    │ • Log source │    │ • Decomm     │
+│ • Content    │    │ • Content    │    │   collection │    │   migration  │    │   legacy     │
+│ • Gaps       │    │   mapping    │    │ • Translate  │    │ • Detection  │    │ • Continuous │
+│              │    │              │    │   rules      │    │   tuning     │    │   improvement│
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+   2-4 weeks          2-3 weeks          4-8 weeks          4-12 weeks          2-4 weeks
+                    </code></pre>
+                </div>
+                
+                <h2>Phase 1: Discovery</h2>
+                
+                <p>Understand what you're migrating from:</p>
+                
+                <ul>
+                    <li><strong>Log Source Inventory:</strong> What's sending data? Volume? Method?</li>
+                    <li><strong>Detection Content:</strong> How many rules? Which are active/useful?</li>
+                    <li><strong>Dashboards/Reports:</strong> What visualizations are required?</li>
+                    <li><strong>Integrations:</strong> Ticketing, SOAR, enrichment sources</li>
+                    <li><strong>Users/Workflows:</strong> Who uses the SIEM? How?</li>
+                </ul>
+                
+                <h2>Phase 2: Design</h2>
+                
+                <p>Plan the target state:</p>
+                
+                <ul>
+                    <li><strong>Architecture:</strong> Sizing, deployment model, data residency</li>
+                    <li><strong>Collection Strategy:</strong> Agent vs syslog vs API per source</li>
+                    <li><strong>Content Mapping:</strong> Which rules migrate? Which are replaced?</li>
+                    <li><strong>Gap Analysis:</strong> What's missing in source vs target?</li>
+                </ul>
+                
+                <h2>Phase 3: Build</h2>
+                
+                <p>Implement the new platform:</p>
+                
+                <ul>
+                    <li>Deploy infrastructure (or provision cloud)</li>
+                    <li>Configure initial log sources</li>
+                    <li>Translate/recreate detection rules</li>
+                    <li>Build dashboards and reports</li>
+                    <li>Test detection coverage</li>
+                </ul>
+                
+                <h2>Phase 4: Migrate</h2>
+                
+                <p>Transition operations:</p>
+                
+                <ul>
+                    <li><strong>Parallel running:</strong> Both SIEMs active (3-6 months typical)</li>
+                    <li><strong>Wave-based migration:</strong> Move sources in planned groups</li>
+                    <li><strong>Validation:</strong> Compare alerts between platforms</li>
+                    <li><strong>Tuning:</strong> Address false positives in new platform</li>
+                </ul>
+                
+                <h2>Phase 5: Cutover & Optimize</h2>
+                
+                <ul>
+                    <li>Full transition to new platform</li>
+                    <li>Decommission legacy SIEM</li>
+                    <li>Document lessons learned</li>
+                    <li>Continuous improvement roadmap</li>
+                </ul>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "How long does a SIEM migration take?"</p>
+                    <p><strong>Answer:</strong> "Typically 6-12 months for enterprise migrations. The timeline depends on complexity - number of log sources, detection rules to migrate, and team capacity. I break it into phases: Discovery (2-4 weeks), Design (2-3 weeks), Build (4-8 weeks), Parallel Running (3-6 months), and Cutover (2-4 weeks). Parallel running is the longest because you need time to validate detections, tune the new platform, and train the team. Rushing this phase leads to missed detections and operational issues."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="application-logs.html" class="card-link">← Application Logs</a>
+                    <a href="discovery-assessment.html" class="card-link">Discovery & Assessment →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

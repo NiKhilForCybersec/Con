@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Operations | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Context</div>
+                    <a href="soc-operations.html" class="nav-item active">SOC Operations</a>
+                    <a href="incident-response.html" class="nav-item">Incident Response</a>
+                    <a href="threat-hunting.html" class="nav-item">Threat Hunting</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SOC Operations</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SOC Operations</h1>
+                    <p class="page-subtitle">Understanding how Security Operations Centers function is essential for building effective SIEM solutions. The SIEM is the heart of the SOC—every decision about detection, alerting, and workflow directly impacts analyst effectiveness.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>SOC Structure</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Typical SOC Organization</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SECURITY OPERATIONS CENTER                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  TIER 1 - ALERT TRIAGE                                               │   │
+│  │  ├─ First responders to all alerts                                  │   │
+│  │  ├─ Initial investigation and classification                        │   │
+│  │  ├─ Follow runbooks and playbooks                                   │   │
+│  │  ├─ Escalate to Tier 2 when needed                                  │   │
+│  │  └─ Target: 15-30 min initial triage                                │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              │ Escalate                                     │
+│                              ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  TIER 2 - INVESTIGATION                                              │   │
+│  │  ├─ Deep-dive investigation                                         │   │
+│  │  ├─ Threat hunting                                                   │   │
+│  │  ├─ Detection tuning and development                                │   │
+│  │  ├─ Mentor Tier 1 analysts                                          │   │
+│  │  └─ Escalate complex incidents to Tier 3                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              │ Escalate                                     │
+│                              ▼                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  TIER 3 - EXPERT / INCIDENT RESPONSE                                 │   │
+│  │  ├─ Major incident handling                                         │   │
+│  │  ├─ Forensics and malware analysis                                  │   │
+│  │  ├─ Advanced threat hunting                                         │   │
+│  │  ├─ Tool development and automation                                 │   │
+│  │  └─ Strategic security improvements                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  SUPPORTING FUNCTIONS                                                       │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐         │
+│  │ SOC Manager      │  │ Detection Eng    │  │ Threat Intel     │         │
+│  │ ├─ Staffing      │  │ ├─ Rule dev      │  │ ├─ Feed mgmt     │         │
+│  │ ├─ Metrics       │  │ ├─ Tuning        │  │ ├─ IOC distrib   │         │
+│  │ └─ Reporting     │  │ └─ SIEM maint    │  │ └─ TTP analysis  │         │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>The Alert Lifecycle</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Alert Processing Workflow</div>
+                        <pre><code>
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│   DETECT    │ → │   TRIAGE    │ → │ INVESTIGATE │ → │   RESPOND   │
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+      │                 │                 │                 │
+      ▼                 ▼                 ▼                 ▼
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│ SIEM fires  │   │ Analyst     │   │ Deep dive   │   │ Contain     │
+│ alert based │   │ reviews:    │   │ analysis:   │   │ Eradicate   │
+│ on rule     │   │ • Context   │   │ • Scope     │   │ Recover     │
+│             │   │ • Priority  │   │ • Impact    │   │ Lessons     │
+│ Enriched    │   │ • Initial   │   │ • Root      │   │ learned     │
+│ with        │   │   verdict   │   │   cause     │   │             │
+│ context     │   │             │   │             │   │             │
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+                        │
+           ┌────────────┼────────────┐
+           ▼            ▼            ▼
+    ┌───────────┐ ┌───────────┐ ┌───────────┐
+    │   FALSE   │ │  BENIGN   │ │   TRUE    │
+    │ POSITIVE  │ │  TRUE POS │ │ POSITIVE  │
+    ├───────────┤ ├───────────┤ ├───────────┤
+    │ Detection │ │ Expected  │ │ Security  │
+    │ error     │ │ activity  │ │ incident  │
+    │ → Tune    │ │ → Close   │ │ → Respond │
+    └───────────┘ └───────────┘ └───────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SOC Metrics</h2>
+                    <p>Key performance indicators for SOC effectiveness:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Why It Matters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MTTD</strong></td>
+                                    <td>Mean Time to Detect</td>
+                                    <td>Minutes-hours</td>
+                                    <td>How quickly threats are identified</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTR</strong></td>
+                                    <td>Mean Time to Respond</td>
+                                    <td>Hours for critical</td>
+                                    <td>How quickly threats are contained</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTA</strong></td>
+                                    <td>Mean Time to Acknowledge</td>
+                                    <td>&lt;15 min critical</td>
+                                    <td>Queue management effectiveness</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>False Positive Rate</strong></td>
+                                    <td>FP / Total Alerts</td>
+                                    <td>&lt;30%</td>
+                                    <td>Detection quality</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Alert Volume</strong></td>
+                                    <td>Alerts per analyst per day</td>
+                                    <td>20-40 actionable</td>
+                                    <td>Workload management</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Escalation Rate</strong></td>
+                                    <td>% escalated to Tier 2+</td>
+                                    <td>15-25%</td>
+                                    <td>Tier 1 effectiveness</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dwell Time</strong></td>
+                                    <td>Time threat is undetected</td>
+                                    <td>Days (industry: months)</td>
+                                    <td>Overall security posture</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Calculate SOC Metrics</div>
+                        <pre><code>// Mean Time to Acknowledge
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status != "New"
+| extend MTTA = datetime_diff('minute', FirstModifiedTime, CreatedTime)
+| summarize 
+    AvgMTTA = avg(MTTA),
+    MedianMTTA = percentile(MTTA, 50),
+    P95MTTA = percentile(MTTA, 95)
+
+// False Positive Rate by Rule
+SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status == "Closed"
+| summarize 
+    Total = count(),
+    FalsePositive = countif(Classification == "FalsePositive"),
+    TruePositive = countif(Classification == "TruePositive"),
+    BenignPositive = countif(Classification == "BenignPositive")
+  by Title
+| extend FPRate = round(100.0 * FalsePositive / Total, 1)
+| order by Total desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Alert Prioritization</h2>
+                    <p>Not all alerts are equal. Effective triage requires structured prioritization:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Alert Priority Matrix</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PRIORITY MATRIX                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                           ASSET CRITICALITY                                 │
+│                    Low        Medium       High       Critical             │
+│              ┌─────────────────────────────────────────────────┐           │
+│    Critical  │   Medium  │    High   │  Critical │  Critical  │           │
+│  THREAT      ├───────────┼───────────┼───────────┼────────────┤           │
+│  SEVERITY    │    Low    │   Medium  │    High   │  Critical  │           │
+│    High      ├───────────┼───────────┼───────────┼────────────┤           │
+│              │    Low    │    Low    │   Medium  │    High    │           │
+│    Medium    ├───────────┼───────────┼───────────┼────────────┤           │
+│              │    Low    │    Low    │    Low    │   Medium   │           │
+│    Low       └───────────┴───────────┴───────────┴────────────┘           │
+│                                                                             │
+│  PRIORITY RESPONSE TIMES:                                                   │
+│  ├─ Critical: Immediate (<15 min acknowledge, <1hr contain)               │
+│  ├─ High:     <30 min acknowledge, <4hr investigate                        │
+│  ├─ Medium:   <2hr acknowledge, <24hr investigate                          │
+│  └─ Low:      <8hr acknowledge, <72hr investigate                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Enrichment for Triage</h3>
+                    <p>Effective triage requires context. Key enrichment sources:</p>
+                    <ul>
+                        <li><strong>Asset inventory:</strong> Is this a critical server? Executive workstation?</li>
+                        <li><strong>User context:</strong> VIP? Privileged? Service account?</li>
+                        <li><strong>Threat intel:</strong> Known malicious IP/hash? Related to active campaign?</li>
+                        <li><strong>Historical context:</strong> First time this user/host triggered this alert?</li>
+                        <li><strong>Related alerts:</strong> Part of a larger attack chain?</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Runbooks and Playbooks</h2>
+                    <p>Standardized procedures ensure consistent response:</p>
+                    
+                    <h3>Investigation Runbook Template</h3>
+                    <div class="diagram">
+                        <div class="diagram-title">Alert Investigation Runbook</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  RUNBOOK: Brute Force Authentication Alert                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ALERT CONTEXT                                                              │
+│  ├─ Description: Multiple failed logins from single source                │
+│  ├─ MITRE: T1110 - Brute Force                                            │
+│  ├─ Severity: Medium-High (depends on target)                              │
+│  └─ SLA: Acknowledge <30min, Investigate <4hr                              │
+│                                                                             │
+│  TRIAGE STEPS                                                               │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  □ 1. Identify source IP                                                   │
+│       └─ Internal or external? Known scanner? VPN gateway?                 │
+│                                                                             │
+│  □ 2. Identify targeted accounts                                           │
+│       └─ Service accounts? Admin accounts? Pattern in usernames?           │
+│                                                                             │
+│  □ 3. Check for successful login                                           │
+│       └─ Did any attempts succeed after failures?                          │
+│                                                                             │
+│  □ 4. Assess target system                                                 │
+│       └─ Criticality? Exposed to internet? Contains sensitive data?        │
+│                                                                             │
+│  □ 5. Check threat intel                                                   │
+│       └─ Is source IP known malicious? Tor exit node? Proxy?               │
+│                                                                             │
+│  DECISION TREE                                                              │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  IF source is known scanner/pen test → Close as Benign True Positive       │
+│  IF source is internal + single user → Possible password issue, not attack │
+│  IF external + multiple users + no success → Block IP, monitor, close      │
+│  IF any success after failures → ESCALATE immediately                      │
+│                                                                             │
+│  RESPONSE ACTIONS                                                           │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  • Block source IP at perimeter (if external)                              │
+│  • Reset passwords for any successfully compromised accounts               │
+│  • Enable MFA if not already enabled                                       │
+│  • Search for post-compromise activity if account was accessed             │
+│                                                                             │
+│  ESCALATION CRITERIA                                                        │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Escalate to Tier 2 if:                                                    │
+│  • Successful login after failures                                         │
+│  • Targeting privileged accounts                                           │
+│  • Evidence of lateral movement                                            │
+│  • Source is internal system (potential compromise)                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SOAR Integration</h2>
+                    <p>Security Orchestration, Automation and Response amplifies SOC effectiveness:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Automation Level</th>
+                                    <th>Description</th>
+                                    <th>Examples</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Enrichment</strong></td>
+                                    <td>Auto-gather context when alert fires</td>
+                                    <td>IP reputation, user info, asset details, related alerts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Triage</strong></td>
+                                    <td>Auto-classify obvious cases</td>
+                                    <td>Close known false positives, route by severity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Investigation</strong></td>
+                                    <td>Auto-run investigation queries</td>
+                                    <td>Timeline of user activity, similar alerts, IOC search</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Response</strong></td>
+                                    <td>Auto-execute containment</td>
+                                    <td>Block IP, disable account, isolate host</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Automation Caution</div>
+                        <p>Automated response actions require high confidence. Start with enrichment and triage automation. Only automate response for high-confidence, high-impact scenarios where delay is costly.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Shift Handoff</h2>
+                    <p>Effective handoff between shifts prevents dropped incidents:</p>
+                    
+                    <h3>Handoff Checklist</h3>
+                    <ul>
+                        <li>☐ <strong>Active incidents:</strong> Status, next steps, owner</li>
+                        <li>☐ <strong>Open alerts:</strong> What's in queue, any unusual volume</li>
+                        <li>☐ <strong>Recent activity:</strong> What happened this shift</li>
+                        <li>☐ <strong>Known issues:</strong> Any tools down, false positive spikes</li>
+                        <li>☐ <strong>Pending tasks:</strong> Follow-ups needed</li>
+                        <li>☐ <strong>Threat intel:</strong> New threats to watch for</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you improve SOC efficiency?"</strong></p>
+                        <p><strong>A:</strong> "I focus on three areas:</p>
+                        <ol>
+                            <li><strong>Reduce noise:</strong> False positives waste analyst time. I measure FP rate by rule, prioritize tuning the noisiest high-value detections, and implement proper exclusions with documentation.</li>
+                            <li><strong>Improve context:</strong> An alert without context requires investigation just to understand it. I ensure alerts include enrichment—asset criticality, user role, threat intel, related alerts—so analysts can triage faster.</li>
+                            <li><strong>Automate repetitive tasks:</strong> Using SOAR, I automate enrichment on every alert, auto-close known false positive patterns, and provide templated investigation queries. This lets analysts focus on decisions, not data gathering.</li>
+                        </ol>
+                        <p>I also track metrics—MTTA, MTTR, false positive rate—to measure improvement and identify bottlenecks. The goal is actionable alerts that analysts can confidently triage in under 15 minutes."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 SOC Operations Quick Reference</div>
+                        <h4>Tier Responsibilities</h4>
+                        <table>
+                            <tr><th>Tier</th><th>Focus</th><th>Escalate When</th></tr>
+                            <tr><td>Tier 1</td><td>Initial triage, runbooks</td><td>Confirmed incident, complex analysis</td></tr>
+                            <tr><td>Tier 2</td><td>Deep investigation, hunting</td><td>Major incident, forensics needed</td></tr>
+                            <tr><td>Tier 3</td><td>IR, forensics, advanced threats</td><td>Executive escalation</td></tr>
+                        </table>
+                        <h4>Key Metrics</h4>
+                        <ul>
+                            <li>MTTD: Time to detect (minutes-hours)</li>
+                            <li>MTTA: Time to acknowledge (&lt;15min critical)</li>
+                            <li>MTTR: Time to respond (&lt;1hr critical)</li>
+                            <li>FP Rate: Target &lt;30%</li>
+                        </ul>
+                        <h4>Alert Dispositions</h4>
+                        <ul>
+                            <li><strong>True Positive:</strong> Real attack → Incident</li>
+                            <li><strong>Benign True Positive:</strong> Real activity, not malicious</li>
+                            <li><strong>False Positive:</strong> Detection error → Tune</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-fundamentals.html" class="card-link">← Detection Fundamentals</a>
+                    <a href="incident-response.html" class="card-link">Incident Response →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

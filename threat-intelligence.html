@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Intelligence Integration | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="threat-intelligence.html" class="nav-item active">Threat Intel</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Threat Intelligence</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Threat Intelligence Integration</h1>
+                    <p class="page-subtitle">Threat intelligence transforms raw indicators into actionable detection. Effective integration requires understanding intel types, sources, and how to operationalize them in your SIEM.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Intelligence Types</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Threat Intelligence Pyramid</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THREAT INTELLIGENCE HIERARCHY                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                          ┌──────────────┐                                   │
+│                          │  STRATEGIC   │  Who, Why                         │
+│                          │ • Threat     │  Audience: Executives             │
+│                          │   actors     │  Lifespan: Months-Years           │
+│                          │ • Motivations│                                   │
+│                          │ • Industry   │                                   │
+│                         ┌┴──────────────┴┐                                  │
+│                         │   OPERATIONAL   │  How, Where                     │
+│                         │ • Campaigns     │  Audience: SOC Managers         │
+│                         │ • Attack chains │  Lifespan: Weeks-Months         │
+│                         │ • Malware       │                                 │
+│                        ┌┴────────────────┴┐                                 │
+│                        │     TACTICAL      │  What to Detect                │
+│                        │ • TTPs (MITRE)    │  Audience: Detection Eng       │
+│                        │ • Attack patterns │  Lifespan: Days-Weeks          │
+│                        │ • Procedures      │                                │
+│                       ┌┴──────────────────┴┐                                │
+│                       │     TECHNICAL       │  What to Block/Alert          │
+│                       │ • IOCs (IPs, hashes)│  Audience: SOC Analysts       │
+│                       │ • Domains, URLs     │  Lifespan: Hours-Days         │
+│                       │ • File signatures   │                               │
+│                       └────────────────────┘                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Intelligence Sources</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source Type</th>
+                                    <th>Examples</th>
+                                    <th>Typical Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Commercial Feeds</strong></td>
+                                    <td>Recorded Future, Mandiant, CrowdStrike</td>
+                                    <td>High-quality, curated indicators</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Open Source (OSINT)</strong></td>
+                                    <td>AlienVault OTX, Abuse.ch, EmergingThreats</td>
+                                    <td>Volume, community-driven</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Industry Sharing</strong></td>
+                                    <td>ISACs (FS-ISAC, H-ISAC), CISA</td>
+                                    <td>Sector-specific threats</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government</strong></td>
+                                    <td>CISA, FBI Flash, NSA advisories</td>
+                                    <td>APT, nation-state threats</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Internal</strong></td>
+                                    <td>Past incidents, threat hunting</td>
+                                    <td>Organization-specific threats</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>IOC Types & SIEM Matching</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>IOC Type</th>
+                                    <th>Match Against</th>
+                                    <th>False Positive Risk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>IP Address</strong></td>
+                                    <td>Firewall, proxy, DNS</td>
+                                    <td>Medium - shared hosting, CDNs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Domain</strong></td>
+                                    <td>Proxy, DNS, certificate logs</td>
+                                    <td>Low-Medium - more specific than IP</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>URL</strong></td>
+                                    <td>Proxy logs</td>
+                                    <td>Low - very specific</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>File Hash (MD5/SHA256)</strong></td>
+                                    <td>EDR, file events</td>
+                                    <td>Very Low - exact match</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email Address</strong></td>
+                                    <td>Email gateway, O365 logs</td>
+                                    <td>Low</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>JA3/JA3S</strong></td>
+                                    <td>TLS inspection, Zeek</td>
+                                    <td>Medium - shared fingerprints</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Threat Intel Matching</div>
+                        <pre><code>// Match network traffic against TI indicators
+let TI_IPs = ThreatIntelligenceIndicator
+| where ExpirationDateTime > now()
+| where isnotempty(NetworkIP)
+| project TI_IP = NetworkIP, ThreatType, ConfidenceScore, Description;
+
+CommonSecurityLog
+| where TimeGenerated > ago(24h)
+| join kind=inner TI_IPs on $left.DestinationIP == $right.TI_IP
+| project 
+    TimeGenerated,
+    SourceIP,
+    DestinationIP,
+    ThreatType,
+    ConfidenceScore,
+    DeviceAction,
+    Description
+| order by ConfidenceScore desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Threat Intel Lookup</div>
+                        <pre><code>index=firewall action=allowed
+| lookup threat_intel_ip ip as dest_ip OUTPUT threat_type, confidence, source
+| where isnotnull(threat_type)
+| stats count, values(threat_type) as threats, max(confidence) as max_confidence 
+  by src_ip, dest_ip
+| where max_confidence >= 80
+| sort -max_confidence</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Integration Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">TI Integration Flow</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THREAT INTEL INTEGRATION                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  FEEDS                    TIP                         SIEM                  │
+│  ┌──────────────┐        ┌──────────────┐           ┌──────────────┐       │
+│  │ Commercial   │───────►│              │           │              │       │
+│  │ OSINT        │───────►│   Threat     │  Push/    │  Lookup      │       │
+│  │ ISACs        │───────►│ Intelligence │─────────► │  Tables      │       │
+│  │ Government   │───────►│  Platform    │  Pull     │              │       │
+│  │ Internal     │───────►│              │           │              │       │
+│  └──────────────┘        └──────┬───────┘           └──────┬───────┘       │
+│                                 │                          │                │
+│                                 │                          │                │
+│                    ┌────────────▼────────────┐   ┌────────▼───────┐        │
+│                    │     NORMALIZATION       │   │   DETECTION    │        │
+│                    │ • Deduplicate           │   │ • Real-time    │        │
+│                    │ • Score/prioritize      │   │   matching     │        │
+│                    │ • Expire old            │   │ • Enrichment   │        │
+│                    │ • Format for SIEM       │   │ • Alerting     │        │
+│                    └─────────────────────────┘   └────────────────┘        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>TIP Platforms</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Platform</th>
+                                    <th>Type</th>
+                                    <th>Key Features</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MISP</strong></td>
+                                    <td>Open Source</td>
+                                    <td>Sharing, community, flexible</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>OpenCTI</strong></td>
+                                    <td>Open Source</td>
+                                    <td>STIX/TAXII, knowledge graph</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Anomali ThreatStream</strong></td>
+                                    <td>Commercial</td>
+                                    <td>Enterprise, integrations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Recorded Future</strong></td>
+                                    <td>Commercial</td>
+                                    <td>Context, risk scoring</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Microsoft Sentinel TI</strong></td>
+                                    <td>Native</td>
+                                    <td>Built-in Sentinel connector</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>STIX/TAXII Standards</h2>
+                    
+                    <p>STIX (Structured Threat Information Expression) and TAXII (Trusted Automated Exchange of Intelligence Information) are standards for sharing threat intel:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">STIX 2.1 Indicator Example</div>
+                        <pre><code>{
+  "type": "indicator",
+  "spec_version": "2.1",
+  "id": "indicator--745e1537-b4f3-4b53-a6b7-1234567890ab",
+  "created": "2024-03-15T12:00:00.000Z",
+  "modified": "2024-03-15T12:00:00.000Z",
+  "name": "Malicious C2 IP",
+  "description": "IP address associated with APT29 infrastructure",
+  "indicator_types": ["malicious-activity"],
+  "pattern": "[ipv4-addr:value = '192.168.1.100']",
+  "pattern_type": "stix",
+  "valid_from": "2024-03-15T12:00:00.000Z",
+  "valid_until": "2024-04-15T12:00:00.000Z",
+  "confidence": 85,
+  "labels": ["c2", "apt29"]
+}</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Best Practices</h2>
+                    
+                    <h3>Indicator Lifecycle Management</h3>
+                    <ul>
+                        <li><strong>Expiration:</strong> All IOCs should have expiration dates. IP indicators typically valid for days-weeks, domains for weeks-months.</li>
+                        <li><strong>Confidence Scoring:</strong> Not all indicators are equal. High-confidence indicators alert; low-confidence enrich.</li>
+                        <li><strong>Deduplication:</strong> Multiple feeds often share indicators. Dedupe to avoid false inflation.</li>
+                        <li><strong>Context:</strong> An IP alone is not useful. Include threat type, actor, campaign context.</li>
+                    </ul>
+
+                    <h3>Avoiding False Positives</h3>
+                    <ul>
+                        <li>Exclude CDN IPs, shared hosting ranges</li>
+                        <li>Validate indicators against known-good lists</li>
+                        <li>Use confidence thresholds (e.g., only alert on confidence > 70)</li>
+                        <li>Correlate with other indicators before alerting</li>
+                    </ul>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Confidence-Based Alerting</div>
+                        <pre><code>index=proxy
+| lookup threat_intel_domain domain as dest_domain 
+    OUTPUT threat_type, confidence, last_seen, source
+| where isnotnull(threat_type)
+| eval alert_level = case(
+    confidence >= 90, "critical",
+    confidence >= 70, "high",
+    confidence >= 50, "medium",
+    true(), "low"
+)
+| where alert_level IN ("critical", "high")
+| table _time, src_ip, user, dest_domain, threat_type, confidence, alert_level</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you operationalize threat intelligence in a SIEM?"</strong></p>
+                        <p><strong>A:</strong> "I approach threat intel integration in layers:</p>
+                        <ol>
+                            <li><strong>Technical indicators (IOCs):</strong> These go into lookup tables for real-time matching against network traffic, DNS queries, and file hashes. I set confidence thresholds—high-confidence indicators generate alerts, low-confidence just enrich events.</li>
+                            <li><strong>Tactical intelligence (TTPs):</strong> I translate these into detection rules. If intel reports an actor using a specific PowerShell technique, I build a rule detecting that pattern, tagged with the actor name.</li>
+                            <li><strong>Operational intelligence:</strong> Campaign information helps prioritize. If we know an actor is targeting our industry, I increase severity on related detections.</li>
+                            <li><strong>Lifecycle management:</strong> IOCs have short lifespans—attackers rotate infrastructure. I auto-expire indicators and track intel freshness to avoid stale data generating false positives.</li>
+                        </ol>
+                        <p>The key is not just matching indicators but adding context. 'Hit on known-bad IP' is less useful than 'Hit on APT29 C2 infrastructure active in financial sector campaign.'"</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Threat Intel Quick Reference</div>
+                        <h4>IOC Lifespan</h4>
+                        <ul>
+                            <li>IP Address: Hours to Days</li>
+                            <li>Domain: Days to Weeks</li>
+                            <li>File Hash: Weeks to Months</li>
+                            <li>TTP: Months to Years</li>
+                        </ul>
+                        <h4>Confidence Thresholds</h4>
+                        <ul>
+                            <li>90-100: Alert immediately</li>
+                            <li>70-89: High priority alert</li>
+                            <li>50-69: Medium, correlate first</li>
+                            <li>&lt;50: Enrich only</li>
+                        </ul>
+                        <h4>Key Standards</h4>
+                        <ul>
+                            <li>STIX: Indicator format</li>
+                            <li>TAXII: Transport protocol</li>
+                            <li>MITRE ATT&CK: TTP framework</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-fundamentals.html" class="card-link">← Detection Fundamentals</a>
+                    <a href="threat-hunting.html" class="card-link">Threat Hunting →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

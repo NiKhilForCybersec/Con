@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Management | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Operations</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="case-management.html" class="nav-item active">Case Management</a>
+                    <a href="incident-response.html" class="nav-item">Incident Response</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Case Management</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Case Management Integration</h1>
+                    <p class="page-subtitle">Effective case management links SIEM alerts to investigations, tracks evidence, and maintains audit trails. Integration between SIEM and case management is essential for mature SOC operations.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Case Management Workflow</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Alert to Case Lifecycle</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ALERT TO CASE WORKFLOW                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  SIEM ALERTS                              CASE MANAGEMENT                   │
+│  ┌─────────────────┐                     ┌─────────────────────────────┐   │
+│  │ Alert 1 ────────┼──┐                  │ CASE-2024-001               │   │
+│  │ Alert 2 ────────┼──┼─── Grouped ────► │ Title: Suspected BEC        │   │
+│  │ Alert 3 ────────┼──┘    by Entity     │ Status: In Progress         │   │
+│  └─────────────────┘                     │ Assignee: analyst@soc       │   │
+│                                          │ Severity: High               │   │
+│                                          │                             │   │
+│                                          │ TIMELINE:                   │   │
+│                                          │ 09:00 - Alert triggered     │   │
+│                                          │ 09:15 - Case created        │   │
+│                                          │ 09:30 - Investigation start │   │
+│                                          │ 10:00 - Evidence collected  │   │
+│                                          │                             │   │
+│                                          │ EVIDENCE:                   │   │
+│                                          │ • Email headers             │   │
+│                                          │ • Login logs                │   │
+│                                          │ • Query results             │   │
+│                                          │                             │   │
+│                                          │ NOTES:                      │   │
+│                                          │ • Analyst observations      │   │
+│                                          │ • Actions taken             │   │
+│                                          └─────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Sentinel Incidents</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Incident Analysis</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalIncidents = count(),
+    AvgTimeToClose = avg(datetime_diff('hour', ClosedTime, CreatedTime)),
+    TruePositives = countif(Classification == "TruePositive"),
+    FalsePositives = countif(Classification == "FalsePositive")
+  by ProviderName
+| extend TPRate = round(TruePositives * 100.0 / TotalIncidents, 1)
+| order by TotalIncidents desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Incident Aging</div>
+                        <pre><code>SecurityIncident
+| where Status == "Active" or Status == "InProgress"
+| extend AgeHours = datetime_diff('hour', now(), CreatedTime)
+| extend AgeCategory = case(
+    AgeHours < 4, "< 4 hours",
+    AgeHours < 24, "4-24 hours",
+    AgeHours < 72, "1-3 days",
+    "> 3 days"
+)
+| summarize IncidentCount = count() by AgeCategory, Severity
+| order by Severity, AgeCategory</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Splunk ITSI Integration</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Notable Event to Incident</div>
+                        <pre><code>// Query notable events
+index=notable
+| eval incident_age = round((now() - _time) / 3600, 1)
+| stats count as event_count,
+        values(rule_name) as rules,
+        values(src) as sources,
+        values(dest) as destinations
+  by owner, status, urgency
+| where status IN ("new", "in progress")
+| sort -urgency, -event_count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Case Timeline</div>
+                        <pre><code>// Build investigation timeline
+index=notable OR index=_audit action=*
+| eval event_type = case(
+    index="notable", "Alert",
+    action="edit_notable", "Status Update",
+    action="comment", "Note Added",
+    "Other"
+)
+| where case_id="CASE-2024-001"
+| table _time, event_type, user, action, comment
+| sort _time</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Third-Party Case Management</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Platform</th>
+                                    <th>Integration Method</th>
+                                    <th>Key Features</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>ServiceNow SecOps</strong></td>
+                                    <td>API, SOAR connector</td>
+                                    <td>CMDB integration, workflow automation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TheHive</strong></td>
+                                    <td>REST API, Cortex analyzers</td>
+                                    <td>Open source, flexible, MISP integration</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Jira Service Mgmt</strong></td>
+                                    <td>API, webhooks</td>
+                                    <td>Familiar interface, custom workflows</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>IBM Resilient</strong></td>
+                                    <td>Native SOAR</td>
+                                    <td>Playbooks, regulatory compliance</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Swimlane</strong></td>
+                                    <td>SOAR platform</td>
+                                    <td>Low-code automation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">TheHive API: Create Case</div>
+                        <pre><code># Create case from SIEM alert via API
+import requests
+
+thehive_url = "https://thehive.company.com/api/case"
+headers = {"Authorization": "Bearer API_KEY"}
+
+case_data = {
+    "title": "Suspicious PowerShell - HOST001",
+    "description": "Encoded PowerShell execution detected",
+    "severity": 2,  # Medium
+    "tlp": 2,       # Amber
+    "tags": ["powershell", "execution", "windows"],
+    "customFields": {
+        "alertId": {"string": "ALERT-12345"},
+        "sourceIP": {"string": "10.1.1.50"},
+        "affectedUser": {"string": "jsmith"}
+    }
+}
+
+response = requests.post(thehive_url, json=case_data, headers=headers)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Evidence Management</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Evidence Collection Checklist</div>
+                        <ul>
+                            <li><strong>Alert data:</strong> Original SIEM alert with all fields</li>
+                            <li><strong>Query results:</strong> Investigation searches with timestamps</li>
+                            <li><strong>Screenshots:</strong> Dashboard views, suspicious activity</li>
+                            <li><strong>Log exports:</strong> Raw logs for affected timeframe</li>
+                            <li><strong>Network captures:</strong> PCAPs if available</li>
+                            <li><strong>Memory dumps:</strong> For malware analysis</li>
+                            <li><strong>Timeline:</strong> Chronological event sequence</li>
+                            <li><strong>Chain of custody:</strong> Who accessed evidence, when</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Export Evidence Query</div>
+                        <pre><code>// Export all relevant logs for a case
+let StartTime = datetime(2024-01-15T09:00:00Z);
+let EndTime = datetime(2024-01-15T18:00:00Z);
+let TargetUser = "jsmith@company.com";
+let TargetHost = "WORKSTATION-42";
+union
+    (SigninLogs | where TimeGenerated between (StartTime .. EndTime) | where UserPrincipalName == TargetUser),
+    (SecurityEvent | where TimeGenerated between (StartTime .. EndTime) | where Computer == TargetHost),
+    (OfficeActivity | where TimeGenerated between (StartTime .. EndTime) | where UserId == TargetUser)
+| project-reorder TimeGenerated, Type
+| order by TimeGenerated asc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Metrics & Reporting</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Case Metrics Dashboard</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| summarize 
+    Created = countif(Status == "New"),
+    InProgress = countif(Status == "Active"),
+    Closed = countif(Status == "Closed"),
+    MTTR_Hours = avg(datetime_diff('hour', ClosedTime, CreatedTime))
+  by bin(TimeGenerated, 1d)
+| render timechart</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you integrate case management with SIEM?"</strong></p>
+                        <p><strong>A:</strong> "Integration creates a complete investigation workflow:</p>
+                        <ol>
+                            <li><strong>Automated case creation:</strong> High-severity alerts auto-create cases with enriched context. Analysts don't manually copy data between systems.</li>
+                            <li><strong>Alert grouping:</strong> Related alerts (same entity, similar technique) merge into single cases. This prevents duplicate investigations.</li>
+                            <li><strong>Bi-directional sync:</strong> Case status updates reflect in SIEM; SIEM findings push to case. Single source of truth.</li>
+                            <li><strong>Evidence preservation:</strong> Investigation queries, logs, and artifacts attach to cases with timestamps. Maintains chain of custody.</li>
+                            <li><strong>Metrics extraction:</strong> Case data feeds SLA tracking, MTTD/MTTR calculations, and analyst performance metrics.</li>
+                            <li><strong>Knowledge retention:</strong> Closed cases become searchable knowledge base. Similar future alerts reference past investigations.</li>
+                        </ol>
+                        <p>The goal is that from alert to closure, everything is tracked, searchable, and reportable."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Case Management Quick Reference</div>
+                        <h4>Case Statuses</h4>
+                        <ul>
+                            <li>New - Unassigned</li>
+                            <li>Assigned - Has owner</li>
+                            <li>In Progress - Active investigation</li>
+                            <li>Pending - Awaiting input</li>
+                            <li>Resolved - Action taken</li>
+                            <li>Closed - Complete</li>
+                        </ul>
+                        <h4>Required Case Fields</h4>
+                        <ul>
+                            <li>Unique case ID</li>
+                            <li>Title/Summary</li>
+                            <li>Severity/Priority</li>
+                            <li>Assignee</li>
+                            <li>Related alerts</li>
+                            <li>Affected entities</li>
+                            <li>Timeline</li>
+                        </ul>
+                        <h4>Case Metrics</h4>
+                        <ul>
+                            <li>Time to Assign</li>
+                            <li>Time to Resolve</li>
+                            <li>Cases per Analyst</li>
+                            <li>Reopen Rate</li>
+                            <li>Escalation Rate</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soc-operations.html" class="card-link">← SOC Operations</a>
+                    <a href="incident-response.html" class="card-link">Incident Response →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

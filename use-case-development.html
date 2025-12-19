@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Case Development | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="use-case-development.html" class="nav-item active">Use Case Development</a>
+                    <a href="tuning-methodology.html" class="nav-item">Tuning Methodology</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows</a>
+                    <a href="linux-logs.html" class="nav-item">Linux</a>
+                    <a href="network-logs.html" class="nav-item">Network</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="detection-fundamentals.html">Detection</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Use Case Development</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Use Case Development</h1>
+                    <p class="page-subtitle">Building detection use cases from threat requirements to production rules. This systematic approach ensures detections are effective, maintainable, and aligned with real threats.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>What is a Detection Use Case?</h2>
+                    <p>A detection use case is more than a query—it's a complete package that answers:</p>
+                    <ul>
+                        <li><strong>What threat?</strong> The attack technique being detected</li>
+                        <li><strong>What data?</strong> Log sources required</li>
+                        <li><strong>What logic?</strong> The detection pattern</li>
+                        <li><strong>What response?</strong> Actions when detected</li>
+                        <li><strong>What limitations?</strong> Known gaps and false positive sources</li>
+                    </ul>
+                    
+                    <p>A well-developed use case can be understood, tested, tuned, and maintained by anyone on the team—not just the original author.</p>
+                </section>
+
+                <section class="content-section">
+                    <h2>Use Case Development Lifecycle</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Detection Engineering Lifecycle</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+│  │ IDEATION │ → │  DESIGN  │ → │  BUILD   │ → │   TEST   │ → │  DEPLOY  │ │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
+│       │              │              │              │              │        │
+│       ▼              ▼              ▼              ▼              ▼        │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+│  │• Threat  │   │• Data    │   │• Write   │   │• Unit    │   │• Alert   │ │
+│  │  intel   │   │  sources │   │  query   │   │  test    │   │  only    │ │
+│  │• Gap     │   │• Logic   │   │• Config  │   │• Historic│   │• Monitor │ │
+│  │  analysis│   │  pattern │   │  alert   │   │• Atomic  │   │• Tune    │ │
+│  │• Request │   │• False   │   │• Document│   │• Purple  │   │• Enable  │ │
+│  │  from SOC│   │  pos     │   │          │   │  team    │   │  response│ │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
+│                                                                             │
+│                              ┌──────────────┐                               │
+│                              │   MAINTAIN   │ ← Continuous loop             │
+│                              ├──────────────┤                               │
+│                              │ • Review FPs │                               │
+│                              │ • Update     │                               │
+│                              │ • Retire     │                               │
+│                              └──────────────┘                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 1: Ideation</h2>
+                    <p>Where do use case ideas come from?</p>
+                    
+                    <h3>Sources of Detection Ideas</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Examples</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Threat Intelligence</strong></td>
+                                    <td>New TTPs used by actors targeting your industry</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Coverage Gaps</strong></td>
+                                    <td>MITRE ATT&CK techniques with no detection</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Incident Learnings</strong></td>
+                                    <td>Activity seen in past incidents that wasn't detected</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SOC Requests</strong></td>
+                                    <td>Analysts wanting alerts for patterns they see</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Purple Team</strong></td>
+                                    <td>Techniques that evaded detection in exercises</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Compliance</strong></td>
+                                    <td>Required monitoring (PCI, SOX, HIPAA)</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Community</strong></td>
+                                    <td>Sigma rules, vendor content, research papers</td>
+                                    <td>Medium</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Prioritization Framework</h3>
+                    <p>Not all use cases are equal. Prioritize based on:</p>
+                    <ul>
+                        <li><strong>Threat likelihood:</strong> Is this attack commonly used against organizations like ours?</li>
+                        <li><strong>Impact:</strong> What's the damage if this attack succeeds?</li>
+                        <li><strong>Feasibility:</strong> Do we have the data sources needed?</li>
+                        <li><strong>False positive risk:</strong> Can we tune this to be actionable?</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 2: Design</h2>
+                    <p>Before writing code, design the detection on paper:</p>
+                    
+                    <h3>Use Case Design Document</h3>
+                    <div class="diagram">
+                        <div class="diagram-title">Use Case Design Template</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  USE CASE: Kerberoasting Detection                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  THREAT DESCRIPTION                                                         │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Adversaries request Kerberos service tickets (TGS) for service accounts    │
+│  to extract the ticket and crack offline, obtaining service account         │
+│  credentials without triggering account lockout.                            │
+│                                                                             │
+│  MITRE ATT&CK: T1558.003 - Steal or Forge Kerberos Tickets: Kerberoasting  │
+│                                                                             │
+│  DATA REQUIREMENTS                                                          │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Primary: Windows Security Event Log (Event ID 4769)                        │
+│  - Must have: Service ticket requests                                       │
+│  - Key fields: ServiceName, TicketEncryptionType, IpAddress, AccountName    │
+│  Secondary: Service account inventory (for enrichment)                      │
+│                                                                             │
+│  DETECTION LOGIC                                                            │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Pattern: Event 4769 where:                                                 │
+│  - TicketEncryptionType = 0x17 (RC4, vulnerable to offline cracking)        │
+│  - ServiceName ends with $ (computer accounts) or is known service account  │
+│  - NOT from known scanning tools or service accounts themselves             │
+│                                                                             │
+│  Threshold: >3 service ticket requests with RC4 from single user in 1 hour  │
+│                                                                             │
+│  EXPECTED TRUE POSITIVES                                                    │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  - Attacker using Rubeus, Impacket, or similar tools                        │
+│  - Legitimate pen test / red team activity                                  │
+│                                                                             │
+│  EXPECTED FALSE POSITIVES                                                   │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  - Legacy applications requiring RC4                                        │
+│  - Vulnerability scanners (exclude by IP/service account)                   │
+│  - Kerberos misconfigurations                                               │
+│                                                                             │
+│  RESPONSE ACTIONS                                                           │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  1. Identify requesting account and source system                           │
+│  2. Check if account is compromised (other suspicious activity?)            │
+│  3. Identify targeted service accounts                                      │
+│  4. If malicious: disable requesting account, rotate service account PWs    │
+│                                                                             │
+│  LIMITATIONS                                                                 │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  - Only detects RC4-based Kerberoasting (not AES)                          │
+│  - Requires DC logging enabled                                              │
+│  - Low-and-slow attacks may evade threshold                                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Detection Logic Patterns</h3>
+                    <p>Choose the right pattern for your detection:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pattern</th>
+                                    <th>Description</th>
+                                    <th>Example Use Cases</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Threshold</strong></td>
+                                    <td>Count exceeds limit in time window</td>
+                                    <td>Brute force, scanning, DDoS</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Blacklist</strong></td>
+                                    <td>Match against known-bad indicators</td>
+                                    <td>Malware hashes, C2 domains, threat IPs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Whitelist Exception</strong></td>
+                                    <td>Alert unless in known-good list</td>
+                                    <td>Unusual admin tool, unsigned binary</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Behavioral</strong></td>
+                                    <td>Pattern matches attack technique</td>
+                                    <td>LSASS access, suspicious PowerShell</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sequence</strong></td>
+                                    <td>Events A → B → C in order</td>
+                                    <td>Successful login after failures, attack chain</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Anomaly</strong></td>
+                                    <td>Deviation from baseline</td>
+                                    <td>First time user runs tool, unusual volume</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Absence</strong></td>
+                                    <td>Expected event didn't occur</td>
+                                    <td>Heartbeat missing, backup didn't run</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 3: Build</h2>
+                    <p>Translate the design into a working detection:</p>
+                    
+                    <h3>Example: Kerberoasting Detection</h3>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Microsoft Sentinel Implementation</div>
+                        <pre><code>// Kerberoasting Detection
+// MITRE ATT&CK: T1558.003
+SecurityEvent
+| where TimeGenerated > ago(1h)
+| where EventID == 4769
+| where TicketEncryptionType == "0x17"  // RC4 encryption
+| where ServiceName !endswith "$"  // Exclude computer accounts
+| where ServiceName !in ("krbtgt")  // Exclude krbtgt
+// Exclude known service accounts that legitimately use RC4
+| where TargetUserName !in ("scanner_svc", "backup_svc")
+| summarize 
+    RequestCount = count(),
+    TargetedServices = make_set(ServiceName, 20),
+    SourceIPs = make_set(IpAddress, 5)
+  by TargetUserName, bin(TimeGenerated, 1h)
+| where RequestCount > 3
+| extend 
+    Severity = case(RequestCount > 20, "High", RequestCount > 10, "Medium", "Low"),
+    AlertTitle = strcat("Potential Kerberoasting: ", TargetUserName),
+    MitreAttack = "T1558.003"</code></pre>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk Implementation</div>
+                        <pre><code>`wineventlog` EventCode=4769 Ticket_Encryption_Type=0x17
+| search NOT Service_Name="krbtgt" NOT Service_Name="*$"
+| search NOT Account_Name IN ("scanner_svc", "backup_svc")
+| bucket _time span=1h
+| stats count as request_count,
+        values(Service_Name) as targeted_services,
+        values(Client_Address) as source_ips
+  by Account_Name, _time
+| where request_count > 3
+| eval severity=case(
+    request_count > 20, "high",
+    request_count > 10, "medium",
+    true(), "low")
+| eval mitre_attack="T1558.003"</code></pre>
+                    </div>
+
+                    <h3>Rule Configuration Checklist</h3>
+                    <ul>
+                        <li>☐ Query tested and returns expected results</li>
+                        <li>☐ Scheduling configured (frequency, lookback window)</li>
+                        <li>☐ Alert fields mapped (entities, severity)</li>
+                        <li>☐ Suppression/grouping configured to prevent alert storms</li>
+                        <li>☐ Response actions linked (ticketing, playbooks)</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 4: Test</h2>
+                    <p>Every detection must be validated before production deployment:</p>
+                    
+                    <h3>Testing Methods</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Description</th>
+                                    <th>When to Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Historical Replay</strong></td>
+                                    <td>Run query against past data</td>
+                                    <td>Always - baseline for expected volume</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Atomic Red Team</strong></td>
+                                    <td>Execute specific ATT&CK technique test</td>
+                                    <td>When safe test exists for technique</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Purple Team</strong></td>
+                                    <td>Coordinated red/blue exercise</td>
+                                    <td>Complex detections, multi-stage attacks</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Log Injection</strong></td>
+                                    <td>Send synthetic events to SIEM</td>
+                                    <td>When live test isn't safe/possible</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Atomic Test Example</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Testing Kerberoasting Detection</div>
+                        <pre><code># Atomic Red Team Test T1558.003
+# Run from Windows domain-joined workstation
+
+# Using Rubeus (if available)
+.\Rubeus.exe kerberoast
+
+# Using PowerShell (Empire)
+Import-Module .\Invoke-Kerberoast.ps1
+Invoke-Kerberoast -OutputFormat Hashcat
+
+# Expected: Detection should fire within 15 minutes
+# Verify: Alert contains correct user, targeted services</code></pre>
+                    </div>
+
+                    <h3>Test Documentation</h3>
+                    <pre><code>Test Record
+───────────────────────────────────────
+Detection: Kerberoasting Detection
+Test ID: TEST-2024-0315-001
+Date: 2024-03-15
+Tester: J. Smith
+
+Method: Atomic Red Team T1558.003
+Tool Used: Rubeus kerberoast
+Target: 5 service accounts
+
+Results:
+✓ Alert fired: Yes (8 minutes after execution)
+✓ Correct severity: High (15 requests detected)
+✓ Entity mapping: User correctly identified
+✓ Services listed: All 5 targeted services captured
+
+Notes: Threshold may need adjustment for environments
+with more service accounts. Consider adding service
+account criticality enrichment.</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 5: Deploy</h2>
+                    <p>Roll out carefully with monitoring:</p>
+                    
+                    <h3>Deployment Stages</h3>
+                    <ol>
+                        <li><strong>Alert-Only Mode (Week 1-2):</strong> Rule fires but no automated response. Monitor volume and investigate samples.</li>
+                        <li><strong>Tuning Period (Week 2-3):</strong> Adjust thresholds, add exclusions based on observed false positives.</li>
+                        <li><strong>Enable Response (Week 4+):</strong> Once false positive rate is acceptable, enable ticketing/automation.</li>
+                    </ol>
+                    
+                    <h3>Deployment Checklist</h3>
+                    <ul>
+                        <li>☐ Rule enabled in alert-only mode</li>
+                        <li>☐ Monitoring dashboard created</li>
+                        <li>☐ On-call team notified of new detection</li>
+                        <li>☐ Investigation runbook published</li>
+                        <li>☐ 1-week review scheduled</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Phase 6: Maintain</h2>
+                    <p>Detections require ongoing care:</p>
+                    
+                    <h3>Maintenance Activities</h3>
+                    <ul>
+                        <li><strong>Weekly:</strong> Review false positive rate, tune as needed</li>
+                        <li><strong>Monthly:</strong> Verify detection still works (mini purple team)</li>
+                        <li><strong>Quarterly:</strong> Review all detections for relevance, update for new TTPs</li>
+                        <li><strong>As needed:</strong> Update when data sources change or new exclusions needed</li>
+                    </ul>
+                    
+                    <h3>When to Retire a Detection</h3>
+                    <ul>
+                        <li>Data source no longer available</li>
+                        <li>Replaced by better detection method</li>
+                        <li>Threat no longer relevant</li>
+                        <li>False positive rate unmanageable despite tuning</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Use Case Examples</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Use Case</th>
+                                    <th>MITRE</th>
+                                    <th>Data Source</th>
+                                    <th>Pattern</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Brute Force</td>
+                                    <td>T1110</td>
+                                    <td>Auth logs (4625)</td>
+                                    <td>Threshold</td>
+                                </tr>
+                                <tr>
+                                    <td>Password Spray</td>
+                                    <td>T1110.003</td>
+                                    <td>Auth logs (4625)</td>
+                                    <td>Threshold + Pattern</td>
+                                </tr>
+                                <tr>
+                                    <td>Kerberoasting</td>
+                                    <td>T1558.003</td>
+                                    <td>DC logs (4769)</td>
+                                    <td>Behavioral</td>
+                                </tr>
+                                <tr>
+                                    <td>LSASS Access</td>
+                                    <td>T1003.001</td>
+                                    <td>Sysmon (Event 10)</td>
+                                    <td>Behavioral</td>
+                                </tr>
+                                <tr>
+                                    <td>Suspicious PowerShell</td>
+                                    <td>T1059.001</td>
+                                    <td>PowerShell logs</td>
+                                    <td>Blacklist + Pattern</td>
+                                </tr>
+                                <tr>
+                                    <td>Admin Group Change</td>
+                                    <td>T1098</td>
+                                    <td>Windows (4728, 4732)</td>
+                                    <td>Direct match</td>
+                                </tr>
+                                <tr>
+                                    <td>Unusual Outbound</td>
+                                    <td>TA0011</td>
+                                    <td>Firewall logs</td>
+                                    <td>Anomaly</td>
+                                </tr>
+                                <tr>
+                                    <td>Data Exfiltration</td>
+                                    <td>T1041</td>
+                                    <td>Proxy/DLP logs</td>
+                                    <td>Threshold + Anomaly</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "Walk me through how you develop a new detection use case."</strong></p>
+                        <p><strong>A:</strong> "I follow a six-phase lifecycle: Ideation, Design, Build, Test, Deploy, Maintain.</p>
+                        <p>In Ideation, I identify what to detect—typically from threat intelligence, coverage gaps, or incident learnings. I prioritize based on threat likelihood, impact, and whether we have the required data.</p>
+                        <p>In Design, I document the detection on paper first: the threat it addresses, MITRE mapping, required data sources, detection logic pattern, expected true and false positives, and response actions.</p>
+                        <p>In Build, I translate the design into a working query with proper scheduling and alerting configuration.</p>
+                        <p>Testing is critical—I run historical replay to baseline expected volume, then validate with atomic tests or purple team to confirm the detection actually catches the attack.</p>
+                        <p>Deployment happens in stages: alert-only mode first, then tuning, then enabling response actions once I'm confident in the false positive rate.</p>
+                        <p>Finally, ongoing maintenance ensures the detection stays effective as the environment changes."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Use Case Development Checklist</div>
+                        <h4>Design Phase</h4>
+                        <ul>
+                            <li>☐ Threat/technique clearly defined</li>
+                            <li>☐ MITRE ATT&CK mapping identified</li>
+                            <li>☐ Data sources confirmed available</li>
+                            <li>☐ Detection logic pattern selected</li>
+                            <li>☐ Expected true positives documented</li>
+                            <li>☐ Expected false positives identified</li>
+                            <li>☐ Response actions defined</li>
+                        </ul>
+                        <h4>Build Phase</h4>
+                        <ul>
+                            <li>☐ Query written and returns results</li>
+                            <li>☐ Scheduling configured</li>
+                            <li>☐ Alert severity/entities mapped</li>
+                            <li>☐ Investigation runbook created</li>
+                        </ul>
+                        <h4>Test Phase</h4>
+                        <ul>
+                            <li>☐ Historical replay completed</li>
+                            <li>☐ Atomic/purple team test passed</li>
+                            <li>☐ Test results documented</li>
+                        </ul>
+                        <h4>Deploy Phase</h4>
+                        <ul>
+                            <li>☐ Deployed in alert-only mode</li>
+                            <li>☐ 1-2 week monitoring period</li>
+                            <li>☐ Tuning completed</li>
+                            <li>☐ Response actions enabled</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="mitre-attack-intro.html" class="card-link">← MITRE ATT&CK</a>
+                    <a href="tuning-methodology.html" class="card-link">Tuning Methodology →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sysmon Configuration | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="sysmon-config.html" class="nav-item active">Sysmon Config</a>
+                    <a href="endpoint-logs.html" class="nav-item">Endpoint Logs</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="log-sources-overview.html">Log Sources</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Sysmon Configuration</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Sysmon Configuration</h1>
+                    <p class="page-subtitle">System Monitor (Sysmon) provides detailed telemetry about process creation, network connections, and file changes. Proper configuration is essential—too verbose creates noise, too restrictive misses threats.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Sysmon Event Types</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event ID</th>
+                                    <th>Description</th>
+                                    <th>Detection Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1</strong></td>
+                                    <td>Process Creation</td>
+                                    <td>⭐⭐⭐⭐⭐ Essential - command lines, parent process</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2</strong></td>
+                                    <td>File creation time changed</td>
+                                    <td>⭐⭐⭐ Timestomping detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3</strong></td>
+                                    <td>Network connection</td>
+                                    <td>⭐⭐⭐⭐ Process-to-network mapping</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5</strong></td>
+                                    <td>Process terminated</td>
+                                    <td>⭐⭐ Process lifecycle</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6</strong></td>
+                                    <td>Driver loaded</td>
+                                    <td>⭐⭐⭐ Rootkit detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>7</strong></td>
+                                    <td>Image loaded (DLL)</td>
+                                    <td>⭐⭐⭐⭐ DLL hijacking, injection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>8</strong></td>
+                                    <td>CreateRemoteThread</td>
+                                    <td>⭐⭐⭐⭐ Process injection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>9</strong></td>
+                                    <td>RawAccessRead</td>
+                                    <td>⭐⭐ Direct disk access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>10</strong></td>
+                                    <td>Process Access</td>
+                                    <td>⭐⭐⭐⭐⭐ LSASS access, injection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>11</strong></td>
+                                    <td>File created</td>
+                                    <td>⭐⭐⭐⭐ Malware drops, persistence</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>12/13/14</strong></td>
+                                    <td>Registry events</td>
+                                    <td>⭐⭐⭐⭐ Persistence, config changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>15</strong></td>
+                                    <td>FileCreateStreamHash</td>
+                                    <td>⭐⭐⭐ ADS (alternate data streams)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>17/18</strong></td>
+                                    <td>Pipe created/connected</td>
+                                    <td>⭐⭐⭐ C2 communication, lateral movement</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>19/20/21</strong></td>
+                                    <td>WMI events</td>
+                                    <td>⭐⭐⭐⭐ WMI persistence</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>22</strong></td>
+                                    <td>DNS query</td>
+                                    <td>⭐⭐⭐⭐ Process-to-DNS correlation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>23</strong></td>
+                                    <td>File delete archived</td>
+                                    <td>⭐⭐⭐ Evidence destruction</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>25</strong></td>
+                                    <td>Process tampering</td>
+                                    <td>⭐⭐⭐⭐ Hollow process, herpaderping</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>26</strong></td>
+                                    <td>File delete logged</td>
+                                    <td>⭐⭐ File deletion tracking</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Configuration Approach</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Sysmon Configuration Strategy</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     SYSMON CONFIGURATION PHILOSOPHY                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  APPROACH 1: Include Everything, Exclude Noise (Recommended)                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  &lt;RuleGroup groupRelation="or"&gt;                                     │   │
+│  │    &lt;ProcessCreate onmatch="exclude"&gt;                                │   │
+│  │      &lt;!-- Exclude known good --&gt;                                    │   │
+│  │      &lt;Image condition="is"&gt;C:\Windows\System32\svchost.exe&lt;/Image&gt;  │   │
+│  │    &lt;/ProcessCreate&gt;                                                 │   │
+│  │  &lt;/RuleGroup&gt;                                                       │   │
+│  │                                                                      │   │
+│  │  Pros: Catch unknown threats, comprehensive visibility              │   │
+│  │  Cons: Higher volume, more tuning required                          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  APPROACH 2: Exclude Everything, Include Suspicious                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  &lt;RuleGroup groupRelation="or"&gt;                                     │   │
+│  │    &lt;ProcessCreate onmatch="include"&gt;                                │   │
+│  │      &lt;!-- Include only suspicious --&gt;                               │   │
+│  │      &lt;Image condition="contains"&gt;powershell&lt;/Image&gt;                 │   │
+│  │    &lt;/ProcessCreate&gt;                                                 │   │
+│  │  &lt;/RuleGroup&gt;                                                       │   │
+│  │                                                                      │   │
+│  │  Pros: Lower volume, focused                                        │   │
+│  │  Cons: May miss novel attacks, requires constant updates            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sample Configuration</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Config: Process Creation (Event 1)</div>
+                        <pre><code>&lt;Sysmon schemaversion="4.90"&gt;
+  &lt;HashAlgorithms&gt;md5,sha256,IMPHASH&lt;/HashAlgorithms&gt;
+  &lt;EventFiltering&gt;
+    
+    &lt;!-- Process Creation: Exclude noisy, known-good processes --&gt;
+    &lt;RuleGroup name="ProcessCreate" groupRelation="or"&gt;
+      &lt;ProcessCreate onmatch="exclude"&gt;
+        &lt;!-- Windows noise --&gt;
+        &lt;Image condition="is"&gt;C:\Windows\System32\backgroundTaskHost.exe&lt;/Image&gt;
+        &lt;Image condition="is"&gt;C:\Windows\System32\RuntimeBroker.exe&lt;/Image&gt;
+        &lt;Image condition="is"&gt;C:\Windows\System32\SearchProtocolHost.exe&lt;/Image&gt;
+        &lt;Image condition="is"&gt;C:\Windows\System32\SearchFilterHost.exe&lt;/Image&gt;
+        
+        &lt;!-- Antivirus/EDR (adjust for your tools) --&gt;
+        &lt;Image condition="contains"&gt;Microsoft\Windows Defender&lt;/Image&gt;
+        &lt;Image condition="contains"&gt;CrowdStrike&lt;/Image&gt;
+        
+        &lt;!-- Chrome/browser noise --&gt;
+        &lt;ParentImage condition="end with"&gt;chrome.exe&lt;/ParentImage&gt;
+        &lt;Image condition="end with"&gt;chrome.exe&lt;/Image&gt;
+        
+        &lt;!-- Development tools (adjust for your environment) --&gt;
+        &lt;Image condition="contains"&gt;Visual Studio&lt;/Image&gt;
+      &lt;/ProcessCreate&gt;
+    &lt;/RuleGroup&gt;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Config: Network Connections (Event 3)</div>
+                        <pre><code>    &lt;!-- Network Connection: Focus on interesting connections --&gt;
+    &lt;RuleGroup name="NetworkConnect" groupRelation="or"&gt;
+      &lt;NetworkConnect onmatch="exclude"&gt;
+        &lt;!-- Exclude localhost --&gt;
+        &lt;DestinationIp condition="is"&gt;127.0.0.1&lt;/DestinationIp&gt;
+        &lt;DestinationIp condition="is"&gt;::1&lt;/DestinationIp&gt;
+        
+        &lt;!-- Exclude known browsers to common CDNs --&gt;
+        &lt;Image condition="end with"&gt;chrome.exe&lt;/Image&gt;
+        &lt;Image condition="end with"&gt;msedge.exe&lt;/Image&gt;
+        
+        &lt;!-- Exclude known good services --&gt;
+        &lt;Image condition="is"&gt;C:\Windows\System32\svchost.exe&lt;/Image&gt;
+        
+        &lt;!-- Exclude internal networks (adjust for your ranges) --&gt;
+        &lt;DestinationIp condition="begin with"&gt;10.&lt;/DestinationIp&gt;
+        &lt;DestinationIp condition="begin with"&gt;192.168.&lt;/DestinationIp&gt;
+      &lt;/NetworkConnect&gt;
+    &lt;/RuleGroup&gt;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Config: Process Access (Event 10)</div>
+                        <pre><code>    &lt;!-- Process Access: Critical for credential theft detection --&gt;
+    &lt;RuleGroup name="ProcessAccess" groupRelation="or"&gt;
+      &lt;ProcessAccess onmatch="include"&gt;
+        &lt;!-- LSASS access is always interesting --&gt;
+        &lt;TargetImage condition="end with"&gt;lsass.exe&lt;/TargetImage&gt;
+      &lt;/ProcessAccess&gt;
+      &lt;ProcessAccess onmatch="exclude"&gt;
+        &lt;!-- Exclude system processes accessing LSASS --&gt;
+        &lt;SourceImage condition="is"&gt;C:\Windows\System32\wbem\WmiPrvSE.exe&lt;/SourceImage&gt;
+        &lt;SourceImage condition="is"&gt;C:\Windows\System32\lsass.exe&lt;/SourceImage&gt;
+        &lt;SourceImage condition="contains"&gt;Windows Defender&lt;/SourceImage&gt;
+      &lt;/ProcessAccess&gt;
+    &lt;/RuleGroup&gt;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Config: Registry Events (Event 12/13/14)</div>
+                        <pre><code>    &lt;!-- Registry: Focus on persistence locations --&gt;
+    &lt;RuleGroup name="RegistryEvent" groupRelation="or"&gt;
+      &lt;RegistryEvent onmatch="include"&gt;
+        &lt;!-- Run keys --&gt;
+        &lt;TargetObject condition="contains"&gt;\CurrentVersion\Run&lt;/TargetObject&gt;
+        &lt;TargetObject condition="contains"&gt;\CurrentVersion\RunOnce&lt;/TargetObject&gt;
+        
+        &lt;!-- Services --&gt;
+        &lt;TargetObject condition="contains"&gt;\Services\&lt;/TargetObject&gt;
+        
+        &lt;!-- Image File Execution Options (debugger persistence) --&gt;
+        &lt;TargetObject condition="contains"&gt;\Image File Execution Options\&lt;/TargetObject&gt;
+        
+        &lt;!-- Windows Defender settings --&gt;
+        &lt;TargetObject condition="contains"&gt;\Windows Defender\&lt;/TargetObject&gt;
+        
+        &lt;!-- Security settings --&gt;
+        &lt;TargetObject condition="contains"&gt;\Policies\&lt;/TargetObject&gt;
+      &lt;/RegistryEvent&gt;
+    &lt;/RuleGroup&gt;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Config: DNS Queries (Event 22)</div>
+                        <pre><code>    &lt;!-- DNS Query: Exclude common noise --&gt;
+    &lt;RuleGroup name="DnsQuery" groupRelation="or"&gt;
+      &lt;DnsQuery onmatch="exclude"&gt;
+        &lt;!-- Microsoft telemetry --&gt;
+        &lt;QueryName condition="end with"&gt;.microsoft.com&lt;/QueryName&gt;
+        &lt;QueryName condition="end with"&gt;.windows.com&lt;/QueryName&gt;
+        &lt;QueryName condition="end with"&gt;.windowsupdate.com&lt;/QueryName&gt;
+        
+        &lt;!-- Google --&gt;
+        &lt;QueryName condition="end with"&gt;.google.com&lt;/QueryName&gt;
+        &lt;QueryName condition="end with"&gt;.googleapis.com&lt;/QueryName&gt;
+        
+        &lt;!-- CDNs --&gt;
+        &lt;QueryName condition="end with"&gt;.akamai.net&lt;/QueryName&gt;
+        &lt;QueryName condition="end with"&gt;.cloudfront.net&lt;/QueryName&gt;
+      &lt;/DnsQuery&gt;
+    &lt;/RuleGroup&gt;
+    
+  &lt;/EventFiltering&gt;
+&lt;/Sysmon&gt;</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Community Configurations</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Config</th>
+                                    <th>Approach</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SwiftOnSecurity</strong></td>
+                                    <td>Balanced, well-documented</td>
+                                    <td>Starting point, enterprise deployment</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Olaf Hartong</strong></td>
+                                    <td>Modular, ATT&CK mapped</td>
+                                    <td>Detection-focused environments</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ion-storm</strong></td>
+                                    <td>Comprehensive, verbose</td>
+                                    <td>Threat hunting, high-visibility needs</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Deployment Commands</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sysmon Installation & Management</div>
+                        <pre><code># Install Sysmon with config
+sysmon64.exe -accepteula -i sysmonconfig.xml
+
+# Update config on running Sysmon
+sysmon64.exe -c sysmonconfig.xml
+
+# Show current config
+sysmon64.exe -c
+
+# Uninstall
+sysmon64.exe -u
+
+# Check Sysmon service status
+sc query sysmon64
+
+# View Sysmon events in PowerShell
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" -MaxEvents 10</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Volume Management</h2>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Event Volume Considerations</div>
+                        <p>Sysmon can generate significant event volume. Monitor and tune:</p>
+                        <ul>
+                            <li><strong>Event 3 (Network):</strong> Can be extremely noisy—filter aggressively</li>
+                            <li><strong>Event 7 (Image Load):</strong> Very high volume, consider enabling only for specific processes</li>
+                            <li><strong>Event 11 (File Create):</strong> High volume, focus on specific paths</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Sysmon Volume Analysis</div>
+                        <pre><code>index=windows sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+| stats count by EventCode
+| sort -count
+| eval event_type = case(
+    EventCode=1, "Process Create",
+    EventCode=3, "Network Connect",
+    EventCode=7, "Image Load",
+    EventCode=10, "Process Access",
+    EventCode=11, "File Create",
+    EventCode=13, "Registry Value Set",
+    EventCode=22, "DNS Query",
+    true(), "Other"
+)
+| table EventCode, event_type, count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How would you approach Sysmon configuration for an enterprise?"</strong></p>
+                        <p><strong>A:</strong> "I follow a phased approach:</p>
+                        <ol>
+                            <li><strong>Start with community config:</strong> SwiftOnSecurity's config is an excellent baseline—well-documented, balanced between visibility and noise.</li>
+                            <li><strong>Prioritize high-value events:</strong> Event 1 (Process Create) with command lines is essential. Event 10 (Process Access) targeting LSASS catches credential theft. Event 22 (DNS) provides process-to-domain mapping.</li>
+                            <li><strong>Environment-specific tuning:</strong> Every environment has noisy applications. I analyze volume by event type, identify the top noise generators, and add targeted exclusions.</li>
+                            <li><strong>Iterate based on detection needs:</strong> As I develop detections, I may need events I initially filtered. The config evolves with detection requirements.</li>
+                            <li><strong>Monitor volume:</strong> I track Sysmon event volume in the SIEM. Sudden spikes indicate either attack activity or a new noisy application that needs filtering.</li>
+                        </ol>
+                        <p>The goal is maximum detection value per event—I want to log what's needed to detect attacks without drowning in noise that obscures real threats."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Sysmon Quick Reference</div>
+                        <h4>Essential Events</h4>
+                        <ul>
+                            <li>1 - Process Create (command lines)</li>
+                            <li>3 - Network Connection</li>
+                            <li>10 - Process Access (LSASS)</li>
+                            <li>11 - File Create</li>
+                            <li>13 - Registry Value Set</li>
+                            <li>22 - DNS Query</li>
+                        </ul>
+                        <h4>High Volume Events</h4>
+                        <ul>
+                            <li>7 - Image Load (DLL)</li>
+                            <li>3 - Network Connection</li>
+                            <li>11 - File Create</li>
+                        </ul>
+                        <h4>Condition Operators</h4>
+                        <ul>
+                            <li><code>is</code> - Exact match</li>
+                            <li><code>contains</code> - Substring</li>
+                            <li><code>begin with</code> - Prefix</li>
+                            <li><code>end with</code> - Suffix</li>
+                            <li><code>image</code> - Image path only</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="windows-logs.html" class="card-link">← Windows Logs</a>
+                    <a href="endpoint-logs.html" class="card-link">Endpoint Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Directory Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Windows Security</div>
+                    <a href="active-directory.html" class="nav-item active">Active Directory</a>
+                    <a href="windows-attack-techniques.html" class="nav-item">Attack Techniques</a>
+                    <a href="windows-hardening.html" class="nav-item">Hardening</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="windows-logs.html">Windows Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Active Directory</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Active Directory Security</h1>
+                    <p class="page-subtitle">Active Directory is the crown jewel of enterprise environments. Attackers who compromise AD own the network. Understanding AD security is essential for any security professional working in Windows environments.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>AD Security Fundamentals</h2>
+                    <p>Active Directory is a hierarchical database that stores information about network resources. From a security perspective, the critical components are:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Active Directory Security Model</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          ACTIVE DIRECTORY FOREST                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         DOMAIN CONTROLLERS                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │   │
+│  │  │    DC01     │  │    DC02     │  │    DC03     │  (FSMO Roles)    │   │
+│  │  │  (Primary)  │  │  (Backup)   │  │  (Read-Only)│                  │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │   │
+│  │         │              │              │                              │   │
+│  │         └──────────────┴──────────────┘                              │   │
+│  │                        │                                             │   │
+│  │              ┌─────────┴─────────┐                                   │   │
+│  │              │   NTDS.dit        │  ← All credentials stored here   │   │
+│  │              │   (AD Database)   │                                   │   │
+│  │              └───────────────────┘                                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────┐  ┌─────────────────────────┐                  │
+│  │  PRIVILEGED GROUPS      │  │  AUTHENTICATION         │                  │
+│  │  ├─ Domain Admins       │  │  ├─ Kerberos (default)  │                  │
+│  │  ├─ Enterprise Admins   │  │  ├─ NTLM (legacy)       │                  │
+│  │  ├─ Schema Admins       │  │  └─ LDAP (queries)      │                  │
+│  │  ├─ Administrators      │  │                         │                  │
+│  │  └─ Account Operators   │  │  PROTOCOLS              │                  │
+│  └─────────────────────────┘  │  ├─ SMB (file shares)   │                  │
+│                               │  ├─ RPC (remote mgmt)   │                  │
+│  ┌─────────────────────────┐  │  └─ WinRM (PowerShell)  │                  │
+│  │  GROUP POLICY           │  └─────────────────────────┘                  │
+│  │  ├─ Security settings   │                                               │
+│  │  ├─ Software deployment │                                               │
+│  │  └─ Login scripts       │                                               │
+│  └─────────────────────────┘                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Critical AD Objects to Monitor</h2>
+                    
+                    <h3>High-Value Groups</h3>
+                    <p>Changes to these groups should always generate alerts:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Group</th>
+                                    <th>Scope</th>
+                                    <th>Risk Level</th>
+                                    <th>Detection Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Enterprise Admins</strong></td>
+                                    <td>Forest-wide</td>
+                                    <td>Critical</td>
+                                    <td>Any modification = immediate alert</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Domain Admins</strong></td>
+                                    <td>Domain-wide</td>
+                                    <td>Critical</td>
+                                    <td>Any modification = immediate alert</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Schema Admins</strong></td>
+                                    <td>Forest-wide</td>
+                                    <td>Critical</td>
+                                    <td>Should rarely/never change</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Administrators</strong></td>
+                                    <td>Domain-wide</td>
+                                    <td>High</td>
+                                    <td>Monitor all changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Account Operators</strong></td>
+                                    <td>Domain-wide</td>
+                                    <td>High</td>
+                                    <td>Can create/modify accounts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Backup Operators</strong></td>
+                                    <td>Domain-wide</td>
+                                    <td>High</td>
+                                    <td>Can backup NTDS.dit</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Server Operators</strong></td>
+                                    <td>DC local</td>
+                                    <td>High</td>
+                                    <td>Access to DC services</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DnsAdmins</strong></td>
+                                    <td>Domain-wide</td>
+                                    <td>High</td>
+                                    <td>Can load DLLs on DCs</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Monitor Privileged Group Changes</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID in (4728, 4729, 4732, 4733, 4756, 4757)
+| where TargetUserName in (
+    "Domain Admins", "Enterprise Admins", "Schema Admins",
+    "Administrators", "Account Operators", "Backup Operators",
+    "DnsAdmins", "Server Operators")
+| extend Action = case(
+    EventID in (4728, 4732, 4756), "Member Added",
+    EventID in (4729, 4733, 4757), "Member Removed",
+    "Unknown")
+| project TimeGenerated, Computer, SubjectUserName, 
+          MemberName, TargetUserName, Action
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Kerberos Authentication</h2>
+                    <p>Understanding Kerberos is essential for detecting AD attacks:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Kerberos Authentication Flow</div>
+                        <pre><code>
+┌──────────────┐                    ┌──────────────┐                    ┌──────────────┐
+│    CLIENT    │                    │      KDC     │                    │   SERVICE    │
+│   (User)     │                    │     (DC)     │                    │   (Server)   │
+└──────┬───────┘                    └──────┬───────┘                    └──────┬───────┘
+       │                                   │                                   │
+       │  1. AS-REQ (username + timestamp) │                                   │
+       │   encrypted with user's hash      │                                   │
+       │──────────────────────────────────►│                                   │
+       │                                   │                                   │
+       │  2. AS-REP (TGT)                  │                                   │
+       │   TGT encrypted with krbtgt hash  │                                   │
+       │◄──────────────────────────────────│                                   │
+       │                                   │                                   │
+       │  3. TGS-REQ (TGT + service name)  │                                   │
+       │──────────────────────────────────►│                                   │
+       │                                   │                                   │
+       │  4. TGS-REP (Service Ticket)      │                                   │
+       │   encrypted with service's hash   │                                   │
+       │◄──────────────────────────────────│                                   │
+       │                                   │                                   │
+       │  5. AP-REQ (Service Ticket)       │                                   │
+       │───────────────────────────────────────────────────────────────────────►│
+       │                                   │                                   │
+       │  6. AP-REP (optional confirmation)│                                   │
+       │◄───────────────────────────────────────────────────────────────────────│
+       │                                   │                                   │
+
+ATTACK VECTORS:
+├─ AS-REP Roasting: Request AS-REP for accounts without pre-auth
+├─ Kerberoasting: Request TGS for service accounts, crack offline  
+├─ Golden Ticket: Forge TGT with stolen krbtgt hash
+├─ Silver Ticket: Forge service ticket with stolen service hash
+└─ Pass-the-Ticket: Reuse stolen TGT/TGS
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Critical Events for AD Monitoring</h2>
+                    
+                    <h3>Authentication Events</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event ID</th>
+                                    <th>Description</th>
+                                    <th>Detection Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>4624</strong></td>
+                                    <td>Successful logon</td>
+                                    <td>Baseline normal auth, detect anomalies</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4625</strong></td>
+                                    <td>Failed logon</td>
+                                    <td>Brute force, password spray</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4648</strong></td>
+                                    <td>Explicit credential logon</td>
+                                    <td>Credential use from unexpected source</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4768</strong></td>
+                                    <td>TGT requested (AS-REQ)</td>
+                                    <td>AS-REP Roasting detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4769</strong></td>
+                                    <td>Service ticket requested (TGS-REQ)</td>
+                                    <td>Kerberoasting detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4771</strong></td>
+                                    <td>Kerberos pre-auth failed</td>
+                                    <td>Password spray detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4776</strong></td>
+                                    <td>NTLM authentication</td>
+                                    <td>Legacy auth, pass-the-hash</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Account & Group Management</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event ID</th>
+                                    <th>Description</th>
+                                    <th>Detection Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>4720</strong></td>
+                                    <td>User account created</td>
+                                    <td>Rogue account creation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4722</strong></td>
+                                    <td>User account enabled</td>
+                                    <td>Dormant account activation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4724</strong></td>
+                                    <td>Password reset attempt</td>
+                                    <td>Unauthorized password resets</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4728/4732/4756</strong></td>
+                                    <td>Member added to group</td>
+                                    <td>Privilege escalation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4729/4733/4757</strong></td>
+                                    <td>Member removed from group</td>
+                                    <td>Cover tracks, policy violation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4738</strong></td>
+                                    <td>User account changed</td>
+                                    <td>Attribute modification</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4740</strong></td>
+                                    <td>Account locked out</td>
+                                    <td>Brute force indicator</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Directory Service Events</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event ID</th>
+                                    <th>Description</th>
+                                    <th>Detection Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>4662</strong></td>
+                                    <td>Operation on directory object</td>
+                                    <td>DCSync, replication abuse</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4670</strong></td>
+                                    <td>Permissions changed</td>
+                                    <td>ACL manipulation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5136</strong></td>
+                                    <td>Directory object modified</td>
+                                    <td>AD object changes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5137</strong></td>
+                                    <td>Directory object created</td>
+                                    <td>New AD objects</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5141</strong></td>
+                                    <td>Directory object deleted</td>
+                                    <td>Deletion of AD objects</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common AD Attack Detections</h2>
+                    
+                    <h3>Kerberoasting</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Kerberoasting Detection</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(1h)
+| where EventID == 4769
+| where TicketEncryptionType == "0x17"  // RC4
+| where ServiceName !endswith "$"  // Not computer account
+| where ServiceName != "krbtgt"
+| summarize 
+    RequestCount = count(),
+    Services = make_set(ServiceName, 20)
+  by TargetUserName, IpAddress, bin(TimeGenerated, 1h)
+| where RequestCount > 3
+| extend AlertSeverity = iif(RequestCount > 10, "High", "Medium")</code></pre>
+                    </div>
+
+                    <h3>DCSync Attack</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: DCSync Detection</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 4662
+| where OperationType == "Object Access"
+| where ObjectType contains "domainDNS"
+| where Properties has_any (
+    "Replicating Directory Changes",
+    "Replicating Directory Changes All",
+    "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2",  // DS-Replication-Get-Changes
+    "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2"   // DS-Replication-Get-Changes-All
+)
+| where SubjectUserName !endswith "$"  // Not a DC computer account
+| project TimeGenerated, Computer, SubjectUserName, ObjectName, Properties</code></pre>
+                    </div>
+
+                    <h3>Golden Ticket Indicators</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Golden Ticket Anomalies</div>
+                        <pre><code>// Look for TGS requests without prior TGT request
+let TGTRequests = SecurityEvent
+| where EventID == 4768
+| where TimeGenerated > ago(24h)
+| project TGTTime = TimeGenerated, TGTUser = TargetUserName, TGTClient = IpAddress;
+
+SecurityEvent
+| where EventID == 4769
+| where TimeGenerated > ago(24h)
+| join kind=leftanti TGTRequests on $left.TargetUserName == $right.TGTUser
+| where ServiceName != "krbtgt"
+| project TimeGenerated, TargetUserName, ServiceName, IpAddress, TicketEncryptionType
+| extend Alert = "TGS request without prior TGT - possible Golden Ticket"</code></pre>
+                    </div>
+
+                    <h3>Password Spray</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Password Spray Detection</div>
+                        <pre><code>// Many users, few attempts per user, from single source
+SecurityEvent
+| where TimeGenerated > ago(1h)
+| where EventID == 4771 or (EventID == 4625 and LogonType == 3)
+| summarize 
+    FailureCount = count(),
+    UniqueUsers = dcount(TargetUserName),
+    Users = make_set(TargetUserName, 50)
+  by IpAddress, bin(TimeGenerated, 30m)
+| where UniqueUsers > 10 and FailureCount > 20
+| extend Ratio = round(toreal(FailureCount) / UniqueUsers, 2)
+| where Ratio < 3  // Few attempts per user = spray pattern
+| extend Alert = "Possible password spray attack"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>AD Security Best Practices</h2>
+                    
+                    <h3>Tiered Administration Model</h3>
+                    <div class="diagram">
+                        <div class="diagram-title">Microsoft Tiered Administration</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  TIER 0 - CONTROL PLANE (Highest Security)                                 │
+│  ├─ Domain Controllers                                                      │
+│  ├─ Enterprise/Domain/Schema Admins                                        │
+│  ├─ PKI infrastructure                                                      │
+│  └─ Only Tier 0 admins can access Tier 0 systems                           │
+│                                                                             │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  TIER 1 - SERVER PLANE                                                      │
+│  ├─ Member servers                                                          │
+│  ├─ Server administrators                                                   │
+│  ├─ Applications and databases                                              │
+│  └─ Tier 0/1 admins can access; Tier 2 cannot                              │
+│                                                                             │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  TIER 2 - WORKSTATION PLANE                                                 │
+│  ├─ User workstations                                                       │
+│  ├─ Helpdesk / local admins                                                │
+│  └─ Standard users                                                          │
+│                                                                             │
+│  KEY PRINCIPLE: Higher tiers never authenticate to lower tiers             │
+│  (No Domain Admin creds on workstations!)                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Detection Recommendations</h3>
+                    <ul>
+                        <li><strong>Enable Advanced Audit Policy:</strong> Ensure DS Access and Logon/Logoff auditing is enabled</li>
+                        <li><strong>Monitor all DC logs:</strong> Forward all security events from DCs to SIEM</li>
+                        <li><strong>Baseline privileged groups:</strong> Know who should be in admin groups</li>
+                        <li><strong>Alert on any admin change:</strong> Zero tolerance for unexpected modifications</li>
+                        <li><strong>Track NTLM usage:</strong> NTLM is legacy and attack-prone</li>
+                        <li><strong>Monitor service account behavior:</strong> Service accounts shouldn't interactively log on</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What Active Directory attacks would you prioritize detecting?"</strong></p>
+                        <p><strong>A:</strong> "I prioritize based on attack prevalence and impact:</p>
+                        <ol>
+                            <li><strong>Kerberoasting (T1558.003):</strong> Very common, easy to execute. I detect via Event 4769 looking for RC4 service ticket requests from non-service accounts.</li>
+                            <li><strong>DCSync (T1003.006):</strong> Catastrophic if successful - attackers get all password hashes. I monitor Event 4662 for replication rights being exercised by non-DC accounts.</li>
+                            <li><strong>Admin group modifications:</strong> Events 4728/4732/4756 for any change to Domain Admins, Enterprise Admins, etc. This is always high priority.</li>
+                            <li><strong>Password spray:</strong> Many users failing with few attempts each. I look for patterns in 4771/4625 - high user count, low attempts per user.</li>
+                            <li><strong>Pass-the-Hash/Ticket:</strong> Harder to detect, but I look for NTLM usage (4776) from unexpected sources and logons without corresponding TGT requests.</li>
+                        </ol>
+                        <p>The key is layered detection - no single alert catches everything, but together they make AD compromise very hard to achieve undetected."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 AD Security Quick Reference</div>
+                        <h4>Critical Event IDs</h4>
+                        <table>
+                            <tr><th>Event</th><th>Description</th></tr>
+                            <tr><td>4624/4625</td><td>Logon success/failure</td></tr>
+                            <tr><td>4768/4769</td><td>TGT/TGS requests</td></tr>
+                            <tr><td>4728/4732/4756</td><td>Member added to group</td></tr>
+                            <tr><td>4662</td><td>Directory object access (DCSync)</td></tr>
+                            <tr><td>4771</td><td>Kerberos pre-auth failed</td></tr>
+                        </table>
+                        <h4>High-Value Groups</h4>
+                        <p>Enterprise Admins, Domain Admins, Schema Admins, Administrators, Backup Operators, DnsAdmins</p>
+                        <h4>Attack Detection Priorities</h4>
+                        <ol>
+                            <li>Admin group changes</li>
+                            <li>Kerberoasting (4769 + RC4)</li>
+                            <li>DCSync (4662 + replication)</li>
+                            <li>Password spray patterns</li>
+                            <li>Golden/Silver ticket anomalies</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="windows-logs.html" class="card-link">← Windows Logs</a>
+                    <a href="windows-attack-techniques.html" class="card-link">Attack Techniques →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

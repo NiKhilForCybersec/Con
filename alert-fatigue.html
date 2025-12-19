@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Fatigue Management | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-engineering.html" class="nav-item">Detection Engineering</a>
+                    <a href="tuning-methodology.html" class="nav-item">Tuning</a>
+                    <a href="alert-fatigue.html" class="nav-item active">Alert Fatigue</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Alert Fatigue Management</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Alert Fatigue Management</h1>
+                    <p class="page-subtitle">Alert fatigue is the SOC's silent killer. When analysts are overwhelmed with low-value alerts, real threats get missed. Managing alert volume and quality is essential for effective security operations.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Alert Fatigue Impact</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Alert Fatigue Cycle</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ALERT FATIGUE CYCLE                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐     Too Many      ┌─────────────────────┐             │
+│  │ High Alert      │ ───────────────►  │ Analyst             │             │
+│  │ Volume          │      Alerts       │ Overwhelm           │             │
+│  └─────────────────┘                   └──────────┬──────────┘             │
+│          ▲                                        │                         │
+│          │                                        ▼                         │
+│  ┌───────┴─────────┐                   ┌─────────────────────┐             │
+│  │ No Time for     │                   │ Analysts Start      │             │
+│  │ Tuning          │                   │ Ignoring Alerts     │             │
+│  └─────────────────┘                   └──────────┬──────────┘             │
+│          ▲                                        │                         │
+│          │                                        ▼                         │
+│  ┌───────┴─────────┐                   ┌─────────────────────┐             │
+│  │ Burnout &       │ ◄──────────────── │ Real Threats        │             │
+│  │ Turnover        │    Consequences   │ Get Missed          │             │
+│  └─────────────────┘                   └─────────────────────┘             │
+│                                                                             │
+│  BREAKING THE CYCLE:                                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ 1. Measure alert quality (TP rate)                                   │   │
+│  │ 2. Tune or disable low-value rules                                   │   │
+│  │ 3. Automate triage of known patterns                                 │   │
+│  │ 4. Prioritize by risk context                                        │   │
+│  │ 5. Set sustainable alert volume targets                              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Alert Quality Measurement</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Alert True Positive Rate</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalAlerts = count(),
+    TruePositives = countif(Status == "Resolved" and 
+                            AlertType != "FalsePositive"),
+    FalsePositives = countif(AlertType == "FalsePositive"),
+    Unreviewed = countif(Status == "New")
+  by AlertName = ProductName
+| extend TPRate = round(TruePositives * 100.0 / TotalAlerts, 1)
+| extend FPRate = round(FalsePositives * 100.0 / TotalAlerts, 1)
+| where TotalAlerts > 10  // Enough data to evaluate
+| extend Health = case(
+    TPRate >= 80, "🟢 Healthy",
+    TPRate >= 50, "🟡 Needs Tuning",
+    "🔴 Review/Disable"
+)
+| order by TotalAlerts desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Alert Volume by Rule</div>
+                        <pre><code>index=alerts
+| stats count as alert_count, 
+        dc(dest_host) as affected_hosts,
+        values(disposition) as dispositions
+  by rule_name
+| eval alerts_per_day = round(alert_count / 30, 1)
+| eval disposition_summary = mvjoin(dispositions, ", ")
+| sort -alert_count
+| head 20</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Reduction Strategies</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Identify Tuning Candidates</div>
+                        <pre><code>index=alerts status=closed
+| eval is_fp = if(disposition="false_positive", 1, 0)
+| stats count as total, 
+        sum(is_fp) as false_positives,
+        avg(time_to_close) as avg_ttc
+  by rule_name
+| eval fp_rate = round(false_positives / total * 100, 1)
+| eval tuning_priority = case(
+    fp_rate > 80 AND total > 100, "Critical - Disable",
+    fp_rate > 60, "High - Major Tuning",
+    fp_rate > 40, "Medium - Minor Tuning",
+    "Low - Monitor"
+)
+| where fp_rate > 40
+| sort -fp_rate</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Noisy Entity Exclusions</div>
+                        <pre><code>// Find entities causing most false positives
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where AlertType == "FalsePositive"
+| extend Entities = parse_json(Entities)
+| mv-expand Entity = Entities
+| extend EntityType = tostring(Entity.Type)
+| extend EntityName = tostring(Entity.Name)
+| summarize FPCount = count() by AlertName = ProductName, EntityType, EntityName
+| where FPCount > 10
+| order by FPCount desc
+// Use results to build exclusion lists</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Alert Aggregation</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Group Related Alerts</div>
+                        <pre><code>index=alerts
+| bucket _time span=1h
+| stats count as alert_count,
+        values(rule_name) as rules,
+        dc(rule_name) as unique_rules
+  by dest_host, _time
+| where alert_count > 5  // Multiple alerts same host same hour
+| eval incident_summary = dest_host . " - " . alert_count . " alerts from " . 
+                          unique_rules . " rules"
+| table _time, dest_host, alert_count, rules, incident_summary</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Incident Grouping</div>
+                        <pre><code>// Group alerts into incidents by entity
+SecurityAlert
+| where TimeGenerated > ago(24h)
+| extend Entities = parse_json(Entities)
+| mv-expand Entity = Entities
+| where Entity.Type == "Host" or Entity.Type == "Account"
+| extend EntityKey = strcat(Entity.Type, ":", Entity.Name)
+| summarize 
+    AlertCount = count(),
+    AlertTypes = make_set(AlertName),
+    Severities = make_set(Severity),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated)
+  by EntityKey
+| where AlertCount > 1
+| order by AlertCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Sustainable Volume Targets</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SOC Size</th>
+                                    <th>Target Alerts/Day</th>
+                                    <th>Per Analyst</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Small (2-5 analysts)</strong></td>
+                                    <td>20-50</td>
+                                    <td>10-15</td>
+                                    <td>Focus on high-fidelity only</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Medium (6-15 analysts)</strong></td>
+                                    <td>50-150</td>
+                                    <td>10-20</td>
+                                    <td>Tiered by severity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Large (15+ analysts)</strong></td>
+                                    <td>150-500</td>
+                                    <td>15-25</td>
+                                    <td>With automation support</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Volume Management Levers</div>
+                        <ul>
+                            <li><strong>Disable:</strong> Rules with >80% false positive rate</li>
+                            <li><strong>Tune:</strong> Add exclusions for known-good patterns</li>
+                            <li><strong>Aggregate:</strong> Group related alerts into incidents</li>
+                            <li><strong>Automate:</strong> Auto-close known false positive patterns</li>
+                            <li><strong>Prioritize:</strong> Only alert on high-confidence detections</li>
+                            <li><strong>Threshold:</strong> Raise thresholds on volume-based rules</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automation for Triage</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SOAR: Auto-Close Known FPs</div>
+                        <pre><code># Playbook: Auto-close known false positive patterns
+trigger:
+  alert_type: "Suspicious PowerShell"
+  
+steps:
+  - name: Check exclusion list
+    action: lookup
+    parameters:
+      table: "fp_exclusions"
+      key: "{{ alert.host }}"
+    
+  - name: Auto-close if excluded
+    condition: "lookup_result.excluded == true"
+    action: close_alert
+    parameters:
+      disposition: "Known Good"
+      comment: "Auto-closed: {{ lookup_result.reason }}"
+      
+  - name: Send to analyst if not excluded
+    condition: "lookup_result.excluded != true"
+    action: assign_to_queue
+    parameters:
+      queue: "tier1"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you manage alert fatigue?"</strong></p>
+                        <p><strong>A:</strong> "Alert fatigue is an existential threat to SOC effectiveness. My approach:</p>
+                        <ol>
+                            <li><strong>Measure baseline:</strong> First, I understand current volume—alerts per analyst per day, true positive rates by rule, average investigation time.</li>
+                            <li><strong>Set targets:</strong> I establish sustainable volume targets. A general rule: 10-20 meaningful alerts per analyst per day is manageable. More leads to shortcuts.</li>
+                            <li><strong>Ruthless tuning:</strong> Rules with >50% false positive rates get immediate attention. >80% FP means disable or completely rewrite. No sacred cows.</li>
+                            <li><strong>Aggregation:</strong> 10 alerts on the same host in 1 hour should be 1 incident, not 10 tickets. I implement alert grouping logic.</li>
+                            <li><strong>Automation:</strong> Known false positive patterns get auto-closed by SOAR. Analysts shouldn't waste time on predictable noise.</li>
+                            <li><strong>Feedback loops:</strong> Analyst feedback on false positives feeds back into tuning. Make it easy to report FPs and actually act on them.</li>
+                        </ol>
+                        <p>Quality over quantity. 50 high-confidence alerts catch more threats than 500 noisy ones."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Alert Fatigue Quick Reference</div>
+                        <h4>Warning Signs</h4>
+                        <ul>
+                            <li>> 50 alerts/analyst/day</li>
+                            <li>> 40% false positive rate</li>
+                            <li>Alerts closed without notes</li>
+                            <li>Long investigation backlogs</li>
+                            <li>Analyst burnout/turnover</li>
+                        </ul>
+                        <h4>Reduction Actions</h4>
+                        <ul>
+                            <li>Disable >80% FP rules</li>
+                            <li>Add entity exclusions</li>
+                            <li>Raise detection thresholds</li>
+                            <li>Implement aggregation</li>
+                            <li>Auto-close known FPs</li>
+                        </ul>
+                        <h4>Health Metrics</h4>
+                        <ul>
+                            <li>True positive rate > 60%</li>
+                            <li>Time to triage < 15 min</li>
+                            <li>Backlog < 1 day</li>
+                            <li>Analyst satisfaction</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="tuning-methodology.html" class="card-link">← Tuning Methodology</a>
+                    <a href="detection-engineering.html" class="card-link">Detection Engineering →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

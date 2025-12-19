@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Cloud Security</div>
+                    <a href="cloud-security-monitoring.html" class="nav-item">Cloud Monitoring</a>
+                    <a href="azure-security.html" class="nav-item">Azure Security</a>
+                    <a href="aws-security.html" class="nav-item active">AWS Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="cloud-security-monitoring.html">Cloud Security</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">AWS Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">AWS Security Monitoring</h1>
+                    <p class="page-subtitle">Amazon Web Services provides comprehensive security logging through CloudTrail, GuardDuty, and other services. Understanding AWS security primitives is essential for effective cloud security monitoring.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>AWS Security Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">AWS Security Services</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AWS SECURITY ECOSYSTEM                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        SIEM / SECURITY LAKE                          │   │
+│  │           (Splunk, Sentinel, or AWS Security Lake)                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│           ▲              ▲              ▲              ▲                   │
+│           │              │              │              │                   │
+│  ┌────────┴────┐ ┌───────┴──────┐ ┌─────┴─────┐ ┌──────┴─────┐            │
+│  │ CLOUDTRAIL  │ │ GUARDDUTY    │ │ VPC FLOW  │ │ CONFIG     │            │
+│  │ (API Audit) │ │ (Detection)  │ │ LOGS      │ │ (Posture)  │            │
+│  ├─────────────┤ ├──────────────┤ ├───────────┤ ├────────────┤            │
+│  │ All API     │ │ ML-based     │ │ Network   │ │ Resource   │            │
+│  │ calls       │ │ threat       │ │ traffic   │ │ config     │            │
+│  │ Management  │ │ detection    │ │ metadata  │ │ changes    │            │
+│  │ + Data      │ │ DNS logs     │ │           │ │ Compliance │            │
+│  │ events      │ │ integrated   │ │           │ │            │            │
+│  └─────────────┘ └──────────────┘ └───────────┘ └────────────┘            │
+│                                                                             │
+│  ┌────────────┐ ┌──────────────┐ ┌───────────┐ ┌────────────┐             │
+│  │ IAM        │ │ S3 ACCESS    │ │ WAF       │ │ SECURITY   │             │
+│  │ ACCESS     │ │ LOGS         │ │ LOGS      │ │ HUB        │             │
+│  │ ANALYZER   │ │              │ │           │ │            │             │
+│  └────────────┘ └──────────────┘ └───────────┘ └────────────┘             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>CloudTrail Monitoring</h2>
+                    <p>CloudTrail logs all API activity in AWS. Key events to monitor:</p>
+                    
+                    <h3>Critical IAM Events</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event Name</th>
+                                    <th>Description</th>
+                                    <th>Security Significance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>CreateUser</code></td>
+                                    <td>New IAM user created</td>
+                                    <td>Backdoor account creation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>CreateAccessKey</code></td>
+                                    <td>New access key pair</td>
+                                    <td>Persistence mechanism</td>
+                                </tr>
+                                <tr>
+                                    <td><code>AttachUserPolicy</code></td>
+                                    <td>Policy attached to user</td>
+                                    <td>Privilege escalation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>PutUserPolicy</code></td>
+                                    <td>Inline policy added</td>
+                                    <td>Privilege escalation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>AssumeRole</code></td>
+                                    <td>Role assumption</td>
+                                    <td>Cross-account access, lateral movement</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ConsoleLogin</code></td>
+                                    <td>AWS console login</td>
+                                    <td>Interactive access</td>
+                                </tr>
+                                <tr>
+                                    <td><code>GetSecretValue</code></td>
+                                    <td>Secret retrieved</td>
+                                    <td>Credential access</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: IAM Privilege Escalation</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName IN ("AttachUserPolicy", "AttachRolePolicy", "PutUserPolicy", 
+              "PutRolePolicy", "CreatePolicyVersion", "SetDefaultPolicyVersion")
+| stats count by eventName, userIdentity.arn, requestParameters.policyArn
+| where requestParameters.policyArn="*AdministratorAccess*" 
+     OR requestParameters.policyArn="*PowerUserAccess*"</code></pre>
+                    </div>
+
+                    <h3>Suspicious API Patterns</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Reconnaissance Activity</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName IN ("DescribeInstances", "DescribeSecurityGroups", "DescribeSubnets",
+              "ListBuckets", "GetBucketAcl", "ListUsers", "ListRoles",
+              "DescribeDBInstances", "ListSecrets")
+| stats dc(eventName) as unique_api_calls, count as total_calls, 
+        values(eventName) as apis by userIdentity.arn, sourceIPAddress
+| where unique_api_calls > 5 AND total_calls > 20
+| sort -total_calls</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Root Account Usage</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+userIdentity.type="Root"
+| stats count by eventName, sourceIPAddress, userAgent
+| sort -count
+
+// Root account usage should be extremely rare!
+// Alert on ANY root account activity</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GuardDuty Integration</h2>
+                    <p>GuardDuty provides ML-based threat detection. Key finding types:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Finding Type</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>UnauthorizedAccess:IAMUser/ConsoleLogin</code></td>
+                                    <td>IAM</td>
+                                    <td>Suspicious console login</td>
+                                </tr>
+                                <tr>
+                                    <td><code>UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration</code></td>
+                                    <td>IAM</td>
+                                    <td>Instance creds used externally</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Recon:EC2/PortProbeUnprotectedPort</code></td>
+                                    <td>Network</td>
+                                    <td>Port scanning detected</td>
+                                </tr>
+                                <tr>
+                                    <td><code>CryptoCurrency:EC2/BitcoinTool.B</code></td>
+                                    <td>Malware</td>
+                                    <td>Crypto mining activity</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Exfiltration:S3/MaliciousIPCaller</code></td>
+                                    <td>Data</td>
+                                    <td>S3 access from malicious IP</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Impact:EC2/PortSweep</code></td>
+                                    <td>Attack</td>
+                                    <td>Instance performing port sweep</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: GuardDuty High-Severity Findings</div>
+                        <pre><code>index=aws sourcetype="aws:guardduty"
+| where severity >= 7
+| stats count by type, resource.instanceDetails.instanceId, 
+        service.action.networkConnectionAction.remoteIpDetails.ipAddressV4
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>S3 Security Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: S3 Bucket Policy Changes</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName IN ("PutBucketPolicy", "PutBucketAcl", "PutBucketPublicAccessBlock",
+              "DeleteBucketPolicy", "PutObjectAcl")
+| spath output=bucket path=requestParameters.bucketName
+| stats count by eventName, bucket, userIdentity.arn, sourceIPAddress
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Detect Public Bucket Creation</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName="PutBucketAcl"
+| spath output=grants path=requestParameters.AccessControlPolicy.AccessControlList.Grant{}
+| mvexpand grants
+| search grants="*AllUsers*" OR grants="*AuthenticatedUsers*"
+| table _time, userIdentity.arn, requestParameters.bucketName, grants</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Large S3 Data Access</div>
+                        <pre><code>index=aws sourcetype=aws:s3accesslogs
+| stats sum(bytes_sent) as total_bytes, count as request_count 
+        by bucket, remote_ip, requester
+| eval total_gb = round(total_bytes/1024/1024/1024, 2)
+| where total_gb > 10
+| sort -total_gb</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>EC2 & Network Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Security Group Opens</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName IN ("AuthorizeSecurityGroupIngress", "AuthorizeSecurityGroupEgress")
+| spath output=fromPort path=requestParameters.ipPermissions.items{}.fromPort
+| spath output=toPort path=requestParameters.ipPermissions.items{}.toPort
+| spath output=cidr path=requestParameters.ipPermissions.items{}.ipRanges.items{}.cidrIp
+| where cidr="0.0.0.0/0"
+| table _time, userIdentity.arn, requestParameters.groupId, fromPort, toPort, cidr</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: VPC Flow Log Analysis</div>
+                        <pre><code>index=aws sourcetype=aws:cloudwatchlogs:vpcflow
+action=REJECT
+| stats count by src_ip, dest_ip, dest_port
+| sort -count
+| head 20</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: EC2 Instance Metadata Access</div>
+                        <pre><code>// Detect potential SSRF attempts via metadata service
+index=aws sourcetype=aws:cloudtrail
+eventSource="ec2.amazonaws.com"
+| search userAgent="*169.254.169.254*" OR requestParameters="*169.254.169.254*"
+| table _time, eventName, userIdentity.arn, sourceIPAddress, userAgent</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cross-Account Activity</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Cross-Account Role Assumptions</div>
+                        <pre><code>index=aws sourcetype=aws:cloudtrail
+eventName="AssumeRole"
+| spath output=assumed_role path=requestParameters.roleArn
+| spath output=source_account path=userIdentity.accountId
+| rex field=assumed_role "arn:aws:iam::(?<target_account>\d+):role"
+| where source_account != target_account
+| stats count by source_account, target_account, assumed_role, 
+        userIdentity.arn, sourceIPAddress
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>AWS Attack Techniques</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Common AWS Attack Patterns</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       AWS ATTACK TECHNIQUES                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  INITIAL ACCESS                          PERSISTENCE                        │
+│  ┌─────────────────────────┐            ┌─────────────────────────┐        │
+│  │ • Exposed credentials   │            │ • Create IAM user       │        │
+│  │   (GitHub, S3, etc)     │            │ • Create access key     │        │
+│  │ • Stolen access keys    │            │ • Lambda backdoor       │        │
+│  │ • SSO/federated abuse   │            │ • EC2 instance profile  │        │
+│  │ • Phished console creds │            │ • Cross-account role    │        │
+│  └─────────────────────────┘            └─────────────────────────┘        │
+│                                                                             │
+│  PRIVILEGE ESCALATION                    DEFENSE EVASION                    │
+│  ┌─────────────────────────┐            ┌─────────────────────────┐        │
+│  │ • Attach admin policy   │            │ • Disable CloudTrail    │        │
+│  │ • Modify role trust     │            │ • Delete logs           │        │
+│  │ • PassRole abuse        │            │ • Use different region  │        │
+│  │ • Lambda escalation     │            │ • Modify GuardDuty      │        │
+│  └─────────────────────────┘            └─────────────────────────┘        │
+│                                                                             │
+│  DATA EXFILTRATION                       IMPACT                             │
+│  ┌─────────────────────────┐            ┌─────────────────────────┐        │
+│  │ • S3 bucket copy        │            │ • Crypto mining         │        │
+│  │ • RDS snapshot share    │            │ • Data destruction      │        │
+│  │ • AMI sharing           │            │ • Ransomware            │        │
+│  │ • EBS snapshot export   │            │ • Service disruption    │        │
+│  └─────────────────────────┘            └─────────────────────────┘        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What CloudTrail events would you prioritize for detection?"</strong></p>
+                        <p><strong>A:</strong> "I organize CloudTrail detections by attack phase:</p>
+                        <ol>
+                            <li><strong>Credential Compromise:</strong> ConsoleLogin from unusual locations, CreateAccessKey for users who don't normally have keys, GetSecretValue spikes.</li>
+                            <li><strong>Privilege Escalation:</strong> AttachUserPolicy/AttachRolePolicy with admin policies, PutRolePolicy adding permissions, CreatePolicyVersion with elevated access.</li>
+                            <li><strong>Persistence:</strong> CreateUser outside normal provisioning, CreateLoginProfile for existing users, CreateAccessKey for service accounts.</li>
+                            <li><strong>Defense Evasion:</strong> StopLogging, DeleteTrail, UpdateTrail to different bucket, PutEventSelectors reducing logging.</li>
+                            <li><strong>Data Exfiltration:</strong> Unusual GetObject patterns from S3, ModifySnapshotAttribute making snapshots public, CreateSnapshot followed by cross-account share.</li>
+                        </ol>
+                        <p>I also heavily leverage GuardDuty for ML-based detection of anomalies that rule-based detection might miss."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 AWS Security Quick Reference</div>
+                        <h4>Critical CloudTrail Events</h4>
+                        <table>
+                            <tr><th>Category</th><th>Events</th></tr>
+                            <tr><td>IAM</td><td>CreateUser, CreateAccessKey, Attach*Policy</td></tr>
+                            <tr><td>Auth</td><td>ConsoleLogin, AssumeRole</td></tr>
+                            <tr><td>S3</td><td>PutBucketPolicy, PutBucketAcl</td></tr>
+                            <tr><td>Evasion</td><td>StopLogging, DeleteTrail</td></tr>
+                        </table>
+                        <h4>GuardDuty Severity</h4>
+                        <ul>
+                            <li>Low: 1-3 (informational)</li>
+                            <li>Medium: 4-6 (investigate)</li>
+                            <li>High: 7-9 (urgent response)</li>
+                        </ul>
+                        <h4>Root Account Rules</h4>
+                        <ul>
+                            <li>Alert on ANY root activity</li>
+                            <li>Root should have MFA</li>
+                            <li>No access keys for root</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="azure-security.html" class="card-link">← Azure Security</a>
+                    <a href="cloud-security-monitoring.html" class="card-link">Cloud Monitoring →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

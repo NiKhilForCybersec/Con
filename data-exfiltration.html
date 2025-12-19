@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Exfiltration Detection | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Data Protection</div>
+                    <a href="dlp-monitoring.html" class="nav-item">DLP Monitoring</a>
+                    <a href="data-exfiltration.html" class="nav-item active">Exfiltration Detection</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Data Exfiltration Detection</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Data Exfiltration Detection</h1>
+                    <p class="page-subtitle">Data exfiltration is often the ultimate goal of attacks. Detecting unusual data movement patterns—whether via network, cloud, or physical means—is critical for preventing data breaches.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Exfiltration Channels</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Data Exfiltration Vectors</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    EXFILTRATION CHANNELS                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  NETWORK-BASED                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Web uploads (HTTP/HTTPS POST)     • Cloud storage (Dropbox, GDrive)│   │
+│  │ • Email attachments                 • FTP/SFTP transfers            │   │
+│  │ • DNS tunneling                     • Encrypted tunnels (SSH, VPN)  │   │
+│  │ • C2 channels                       • Steganography                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ENDPOINT-BASED                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • USB/removable media               • Printing sensitive data       │   │
+│  │ • Bluetooth transfer                • Screen capture/recording      │   │
+│  │ • Local backup to external          • Clipboard to personal device  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  CLOUD-BASED                                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • SaaS app downloads                • API data extraction           │   │
+│  │ • Shared links to external          • Cloud-to-cloud sync           │   │
+│  │ • Personal account sync             • Shadow IT applications        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Network Exfiltration Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Large Outbound Transfers</div>
+                        <pre><code>// Detect unusually large outbound data transfers
+CommonSecurityLog
+| where TimeGenerated > ago(24h)
+| where DeviceAction == "allow"
+| where DestinationIP !startswith "10." 
+    and DestinationIP !startswith "192.168."
+    and DestinationIP !startswith "172."
+| summarize 
+    TotalBytesSent = sum(SentBytes),
+    SessionCount = count(),
+    UniqueDestinations = dcount(DestinationIP)
+  by SourceIP, bin(TimeGenerated, 1h)
+| where TotalBytesSent > 500000000  // > 500 MB
+| order by TotalBytesSent desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: DNS Tunneling Detection</div>
+                        <pre><code>index=dns query_type=TXT OR query_type=NULL
+| eval query_length = len(query)
+| eval subdomain_count = mvcount(split(query, "."))
+| stats avg(query_length) as avg_len,
+        max(query_length) as max_len,
+        count as query_count,
+        dc(query) as unique_queries
+  by src_ip, query_domain
+| where avg_len > 50 OR max_len > 100  // Long queries = possible tunneling
+| where query_count > 100
+| sort -avg_len</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Beaconing Detection</div>
+                        <pre><code>// Detect regular beaconing patterns (C2 communication)
+CommonSecurityLog
+| where TimeGenerated > ago(24h)
+| where DeviceAction == "allow"
+| summarize 
+    ConnectionTimes = make_list(TimeGenerated),
+    ConnectionCount = count()
+  by SourceIP, DestinationIP
+| where ConnectionCount > 50
+| extend Intervals = array_sort_asc(ConnectionTimes)
+| mv-apply Intervals to typeof(datetime) on (
+    extend NextTime = next(Intervals)
+    | where isnotnull(NextTime)
+    | extend IntervalSeconds = datetime_diff('second', NextTime, Intervals)
+    | summarize 
+        AvgInterval = avg(IntervalSeconds),
+        StdDevInterval = stdev(IntervalSeconds)
+)
+| where StdDevInterval < 10  // Very regular intervals = beaconing
+| project SourceIP, DestinationIP, ConnectionCount, AvgInterval, StdDevInterval</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud Exfiltration Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Bulk SharePoint Downloads</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(24h)
+| where Operation == "FileDownloaded"
+| where OfficeWorkload == "SharePoint" or OfficeWorkload == "OneDrive"
+| summarize 
+    DownloadCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    TotalSize = sum(tolong(ItemSize))
+  by UserId, ClientIP, bin(TimeGenerated, 1h)
+| where DownloadCount > 100 OR TotalSize > 100000000
+| order by DownloadCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: External Sharing Anomaly</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("SharingSet", "AnonymousLinkCreated", "SecureLinkCreated")
+| where TargetUserOrGroupType == "Guest" or Operation == "AnonymousLinkCreated"
+| summarize 
+    ShareCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    ExternalRecipients = make_set(TargetUserOrGroupName)
+  by UserId
+| join kind=leftouter (
+    OfficeActivity
+    | where TimeGenerated between (ago(37d) .. ago(7d))
+    | where Operation in ("SharingSet", "AnonymousLinkCreated")
+    | summarize BaselineShares = count() by UserId
+) on UserId
+| extend Anomaly = iff(ShareCount > coalesce(BaselineShares, 0) * 3, true, false)
+| where Anomaly == true</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Cloud Storage Upload Detection</div>
+                        <pre><code>index=proxy 
+| where url_domain IN ("dropbox.com", "drive.google.com", "onedrive.live.com", 
+                       "box.com", "wetransfer.com", "mega.nz")
+| where http_method=POST
+| stats sum(bytes_out) as total_uploaded,
+        count as upload_count,
+        values(url_domain) as destinations
+  by user, src_ip
+| where total_uploaded > 50000000  // > 50 MB
+| sort -total_uploaded</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Endpoint Exfiltration</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: USB Large File Transfers</div>
+                        <pre><code>DeviceFileEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "FileCreated" or ActionType == "FileModified"
+| where FolderPath matches regex @"^[D-Z]:\\"  // Removable drives
+| where FolderPath !startswith "C:\\"
+| summarize 
+    FileCount = count(),
+    TotalSize = sum(FileSize),
+    FileTypes = make_set(tostring(split(FileName, ".")[-1]))
+  by DeviceName, AccountName, bin(TimeGenerated, 1h)
+| where FileCount > 50 OR TotalSize > 100000000
+| order by TotalSize desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Sensitive File Access Before Departure</div>
+                        <pre><code>// Correlate file access with HR departure data
+index=file_access action=read
+| lookup hr_terminations user OUTPUT termination_date, last_work_day
+| where isnotnull(termination_date)
+| where _time > relative_time(termination_date, "-14d")
+| where file_path LIKE "%confidential%" OR file_path LIKE "%restricted%"
+| stats count as access_count,
+        dc(file_path) as unique_files,
+        values(file_path) as accessed_files
+  by user, termination_date
+| where access_count > 20
+| sort -access_count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Email Exfiltration</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Large Email Attachments to External</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where EmailDirection == "Outbound"
+| where RecipientEmailAddress !endswith "@company.com"
+| join kind=inner (
+    EmailAttachmentInfo
+    | where TimeGenerated > ago(24h)
+    | project NetworkMessageId, FileName, FileSize = FileSize
+) on NetworkMessageId
+| summarize 
+    TotalAttachmentSize = sum(FileSize),
+    AttachmentCount = count(),
+    Recipients = make_set(RecipientEmailAddress)
+  by SenderFromAddress, bin(TimeGenerated, 1h)
+| where TotalAttachmentSize > 25000000  // > 25 MB
+| order by TotalAttachmentSize desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Auto-Forward to External</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation in ("Set-Mailbox", "New-InboxRule", "Set-InboxRule")
+| where Parameters has "ForwardTo" or Parameters has "RedirectTo"
+| extend RuleDetails = parse_json(Parameters)
+| extend ForwardAddress = tostring(RuleDetails.ForwardTo)
+| where ForwardAddress !endswith "@company.com"
+| project TimeGenerated, UserId, Operation, ForwardAddress, ClientIP</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Exfiltration Indicators</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Indicator</th>
+                                    <th>Detection Method</th>
+                                    <th>MITRE Technique</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Large outbound transfers</strong></td>
+                                    <td>Bytes sent > baseline</td>
+                                    <td>T1048 - Exfiltration Over Alternative Protocol</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DNS tunneling</strong></td>
+                                    <td>Long/encoded DNS queries</td>
+                                    <td>T1048.003 - Exfiltration Over DNS</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cloud upload spike</strong></td>
+                                    <td>Upload volume anomaly</td>
+                                    <td>T1567 - Exfiltration to Cloud Storage</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>USB data copy</strong></td>
+                                    <td>File writes to removable</td>
+                                    <td>T1052 - Exfiltration Over Physical Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>After-hours transfers</strong></td>
+                                    <td>Data movement outside business hours</td>
+                                    <td>T1029 - Scheduled Transfer</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Compression before transfer</strong></td>
+                                    <td>Archive creation + network activity</td>
+                                    <td>T1560 - Archive Collected Data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect data exfiltration?"</strong></p>
+                        <p><strong>A:</strong> "Exfiltration detection requires monitoring multiple channels:</p>
+                        <ol>
+                            <li><strong>Baseline normal:</strong> First, I establish what's normal. How much data does each user/system typically transfer externally? Anomalies are only meaningful against baselines.</li>
+                            <li><strong>Volume thresholds:</strong> Large outbound transfers trigger alerts. But attackers know this—so I also watch for many small transfers (low-and-slow exfil).</li>
+                            <li><strong>Channel monitoring:</strong> I monitor all egress paths: web uploads, email attachments, cloud storage, DNS, removable media. Blocking one channel pushes attackers to another.</li>
+                            <li><strong>Context correlation:</strong> Data transfer alone isn't suspicious. But data transfer + new external IP + after hours + recent sensitive file access = high confidence.</li>
+                            <li><strong>User risk integration:</strong> Employees with resignation dates, under investigation, or with elevated access warrant extra monitoring.</li>
+                            <li><strong>Protocol anomalies:</strong> DNS tunneling, ICMP exfil, steganography—these bypass volume-based detection. I look for protocol misuse patterns.</li>
+                        </ol>
+                        <p>The key is layering: no single detection catches everything, but multiple overlapping controls create coverage."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Exfiltration Detection Quick Reference</div>
+                        <h4>High-Risk Indicators</h4>
+                        <ul>
+                            <li>> 100MB outbound in 1 hour</li>
+                            <li>Transfers to new external IPs</li>
+                            <li>After-hours data movement</li>
+                            <li>Archive creation + transfer</li>
+                            <li>Cloud storage uploads</li>
+                            <li>USB activity on sensitive systems</li>
+                        </ul>
+                        <h4>Key Log Sources</h4>
+                        <ul>
+                            <li>Firewall/proxy (bytes out)</li>
+                            <li>DLP (sensitive data movement)</li>
+                            <li>EDR (file operations)</li>
+                            <li>Cloud audit (SharePoint, O365)</li>
+                            <li>Email gateway (attachments)</li>
+                        </ul>
+                        <h4>MITRE Exfiltration Techniques</h4>
+                        <ul>
+                            <li>T1041 - Exfil Over C2 Channel</li>
+                            <li>T1048 - Exfil Over Alt Protocol</li>
+                            <li>T1567 - Exfil to Cloud Storage</li>
+                            <li>T1052 - Exfil Over Physical</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="dlp-monitoring.html" class="card-link">← DLP Monitoring</a>
+                    <a href="insider-threats.html" class="card-link">Insider Threats →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

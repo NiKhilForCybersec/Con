@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splunk Overview | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Understand Splunk architecture, components, and deployment options. Learn when to choose Splunk for your SIEM needs.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <!-- Sidebar (abbreviated for space) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item active">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+                    <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Query Languages</div>
+                    <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+                    <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Splunk Overview</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Splunk Overview</h1>
+                    <p class="page-subtitle">Understanding Splunk's architecture, components, and when to use it</p>
+                </header>
+                
+                <!-- What is Splunk -->
+                <h2>What is Splunk?</h2>
+                
+                <p>Splunk is a data platform that can ingest, index, and search any machine-generated data. While it started as a log management tool, it has evolved into a comprehensive security platform.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 The Splunk Family</div>
+                    <p><strong>Splunk Enterprise:</strong> The core platform (on-premises)</p>
+                    <p><strong>Splunk Cloud:</strong> Managed SaaS version</p>
+                    <p><strong>Splunk Enterprise Security (ES):</strong> SIEM application that runs on top</p>
+                    <p><strong>Splunk SOAR:</strong> Security orchestration and automated response</p>
+                </div>
+                
+                <!-- Splunk Architecture -->
+                <h2>Splunk Architecture</h2>
+                
+                <p>Splunk has a distributed architecture with specialized components:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Splunk Component Architecture</div>
+                    <pre><code>
+┌─────────────────────────────────────────────────────────────────────┐
+│                        DATA SOURCES                                  │
+│   Windows │ Linux │ Firewalls │ Cloud │ Applications │ Network     │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    FORWARDERS (Collection)                          │
+│  ┌─────────────────────┐    ┌─────────────────────────────────┐    │
+│  │  Universal Forwarder │    │  Heavy Forwarder                │    │
+│  │  (Lightweight agent) │    │  (Can parse/filter before send) │    │
+│  │  - Just forwards     │    │  - Local parsing                │    │
+│  │  - Minimal resources │    │  - Data filtering               │    │
+│  └─────────────────────┘    │  - Routing decisions             │    │
+│                              └─────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    INDEXERS (Storage & Search)                      │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐                       │
+│  │ Indexer 1 │  │ Indexer 2 │  │ Indexer 3 │  (Indexer Cluster)    │
+│  ├───────────┤  ├───────────┤  ├───────────┤                       │
+│  │ - Receives│  │ - Stores  │  │ - Responds│                       │
+│  │   data    │  │   in      │  │   to      │                       │
+│  │ - Parses  │  │   buckets │  │   search  │                       │
+│  │ - Indexes │  │   (hot/   │  │   queries │                       │
+│  │           │  │   warm/   │  │           │                       │
+│  │           │  │   cold)   │  │           │                       │
+│  └───────────┘  └───────────┘  └───────────┘                       │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SEARCH HEADS (User Interface)                    │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Search Head Cluster (for high availability)                   │ │
+│  │  - Distributes searches to indexers                           │ │
+│  │  - Aggregates results                                         │ │
+│  │  - Hosts dashboards and apps                                  │ │
+│  │  - Enterprise Security runs here                              │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    MANAGEMENT COMPONENTS                            │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌────────────────┐  │
+│  │ Deployment Server │  │  Cluster Manager  │  │ License Server │  │
+│  │ (Push configs to  │  │ (Manages indexer  │  │ (Tracks usage) │  │
+│  │  forwarders)      │  │  cluster)         │  │                │  │
+│  └───────────────────┘  └───────────────────┘  └────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <!-- Key Components Explained -->
+                <h2>Key Components Explained</h2>
+                
+                <h3>Universal Forwarder (UF)</h3>
+                
+                <p>The most common way to get data into Splunk. Think of it as a lightweight agent:</p>
+                
+                <ul>
+                    <li><strong>What it does:</strong> Monitors files/logs and sends them to indexers</li>
+                    <li><strong>Resources:</strong> Very lightweight (~50MB RAM)</li>
+                    <li><strong>Limitation:</strong> Cannot parse or transform data - just forwards</li>
+                    <li><strong>Use case:</strong> Installed on every server you want to monitor</li>
+                </ul>
+                
+                <h3>Heavy Forwarder (HF)</h3>
+                
+                <p>A full Splunk instance that can process data before forwarding:</p>
+                
+                <ul>
+                    <li><strong>What it does:</strong> Receives data, parses it, filters it, routes it</li>
+                    <li><strong>Resources:</strong> Heavier (~1GB+ RAM)</li>
+                    <li><strong>Use case:</strong> Aggregation point for syslog, parsing at the edge, routing to multiple destinations</li>
+                </ul>
+                
+                <h3>Indexer</h3>
+                
+                <p>The workhorse of Splunk - stores and searches data:</p>
+                
+                <ul>
+                    <li><strong>What it does:</strong> Receives data, parses into events, creates index, responds to searches</li>
+                    <li><strong>Storage:</strong> Organizes data into "buckets" (hot → warm → cold → frozen)</li>
+                    <li><strong>Clustering:</strong> Multiple indexers share load and provide redundancy</li>
+                </ul>
+                
+                <h3>Search Head</h3>
+                
+                <p>Where users interact with Splunk:</p>
+                
+                <ul>
+                    <li><strong>What it does:</strong> Provides web UI, runs searches, hosts dashboards and apps</li>
+                    <li><strong>Search process:</strong> Sends search to indexers, aggregates results, presents to user</li>
+                    <li><strong>Apps:</strong> Enterprise Security, SOAR, and custom apps run here</li>
+                </ul>
+                
+                <!-- Data Flow -->
+                <h2>How Data Flows Through Splunk</h2>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Splunk Data Pipeline</div>
+                    <pre><code>
+   INPUT              PARSING            INDEXING           SEARCH
+┌─────────┐        ┌─────────────┐     ┌───────────┐     ┌─────────────┐
+│ Raw Log │   →    │ Break into  │  →  │ Write to  │  →  │ Query with  │
+│ Data    │        │ events,     │     │ disk,     │     │ SPL,        │
+│         │        │ extract     │     │ create    │     │ return      │
+│         │        │ fields,     │     │ index     │     │ results     │
+│         │        │ timestamp   │     │           │     │             │
+└─────────┘        └─────────────┘     └───────────┘     └─────────────┘
+     │                   │                  │                  │
+     │                   │                  │                  │
+inputs.conf        props.conf          indexes.conf      Search Head
+                   transforms.conf
+                    </code></pre>
+                </div>
+                
+                <!-- Key Configuration Files -->
+                <h2>Key Configuration Files</h2>
+                
+                <p>Splunk is configured through .conf files. Here are the essential ones:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Purpose</th>
+                                <th>Example Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>inputs.conf</code></td>
+                                <td>Define data inputs</td>
+                                <td>Monitor a log file, listen on a port</td>
+                            </tr>
+                            <tr>
+                                <td><code>props.conf</code></td>
+                                <td>Define how to parse data</td>
+                                <td>Timestamp extraction, line breaking</td>
+                            </tr>
+                            <tr>
+                                <td><code>transforms.conf</code></td>
+                                <td>Advanced data transformation</td>
+                                <td>Field extraction, routing, masking</td>
+                            </tr>
+                            <tr>
+                                <td><code>indexes.conf</code></td>
+                                <td>Define indexes</td>
+                                <td>Create index, set retention</td>
+                            </tr>
+                            <tr>
+                                <td><code>outputs.conf</code></td>
+                                <td>Define where to send data</td>
+                                <td>Point forwarder to indexers</td>
+                            </tr>
+                            <tr>
+                                <td><code>server.conf</code></td>
+                                <td>Server settings</td>
+                                <td>Clustering, SSL, general config</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Splunk Enterprise Security -->
+                <h2>Splunk Enterprise Security (ES)</h2>
+                
+                <p>ES is what transforms Splunk from a log platform into a SIEM:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🚨</div>
+                        <h3 class="card-title">Notable Events</h3>
+                        <p class="card-description">ES's alert mechanism. When a correlation search matches, it creates a notable event for analyst investigation.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🔗</div>
+                        <h3 class="card-title">Correlation Searches</h3>
+                        <p class="card-description">Scheduled searches that look for security threats. Run continuously against incoming data.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">⚠️</div>
+                        <h3 class="card-title">Risk-Based Alerting</h3>
+                        <p class="card-description">Instead of alerting on every event, assign risk scores. Alert when risk for a user/asset exceeds threshold.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📋</div>
+                        <h3 class="card-title">Asset & Identity</h3>
+                        <p class="card-description">Enrichment frameworks that add context about who and what is involved in security events.</p>
+                    </div>
+                </div>
+                
+                <!-- When to Choose Splunk -->
+                <h2>When to Choose Splunk</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Splunk Strengths</th>
+                                <th>Splunk Challenges</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>✅ Extremely flexible - can ingest anything</td>
+                                <td>⚠️ Complex to manage (especially on-prem)</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Powerful query language (SPL)</td>
+                                <td>⚠️ Expensive at scale (license by GB)</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Mature ecosystem (apps, add-ons)</td>
+                                <td>⚠️ Requires dedicated Splunk expertise</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Deployment options (on-prem, cloud, hybrid)</td>
+                                <td>⚠️ ES requires additional license</td>
+                            </tr>
+                            <tr>
+                                <td>✅ Strong community and documentation</td>
+                                <td>⚠️ Can become "shelfware" without investment</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 When Splunk is the Right Choice</div>
+                    <ul>
+                        <li>Large enterprise with diverse log sources</li>
+                        <li>Need for flexibility and customization</li>
+                        <li>Existing Splunk expertise in-house</li>
+                        <li>Requirements beyond security (IT ops, business analytics)</li>
+                        <li>On-premises or hybrid requirements</li>
+                    </ul>
+                </div>
+                
+                <!-- Deployment Options -->
+                <h2>Deployment Options</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Description</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Splunk Enterprise (On-Prem)</strong></td>
+                                <td>Full control, your infrastructure</td>
+                                <td>Data residency requirements, full control needs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk Cloud</strong></td>
+                                <td>Managed SaaS, Splunk handles infrastructure</td>
+                                <td>Cloud-first orgs, reduce operational burden</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hybrid</strong></td>
+                                <td>Cloud + on-prem components</td>
+                                <td>Transition period, specific data requirements</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p>See <a href="splunk-cloud.html">Splunk Cloud</a> and <a href="splunk-hybrid.html">Splunk Hybrid</a> for detailed coverage of these deployment models.</p>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "Explain Splunk architecture."</p>
+                    <p><strong>Good Answer:</strong> "Splunk has a distributed architecture with three main tiers. First, Forwarders - lightweight agents on sources that collect and send data. Universal Forwarders just forward; Heavy Forwarders can parse and filter. Second, Indexers - receive data, parse it into events, store in indexed buckets, and respond to search queries. They're typically clustered for scale and redundancy. Third, Search Heads - the user interface layer where analysts run searches, view dashboards, and where apps like Enterprise Security run. Management components include Deployment Server for pushing configs to forwarders, and Cluster Manager for the indexer cluster."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "What's the difference between Universal and Heavy Forwarder?"</p>
+                    <p><strong>Good Answer:</strong> "Universal Forwarder is lightweight - about 50MB RAM - and just forwards raw data to indexers. It can't parse or transform. Heavy Forwarder is a full Splunk instance that can parse data, extract fields, filter events, and route to multiple destinations. Use UF for most endpoints; use HF as an aggregation point for syslog or when you need to parse at the edge before sending to cloud."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Splunk Quick Reference</div>
+                    
+                    <h4>Core Components</h4>
+                    <ul>
+                        <li><strong>Universal Forwarder (UF)</strong> - Lightweight agent, just forwards</li>
+                        <li><strong>Heavy Forwarder (HF)</strong> - Full Splunk, can parse/route</li>
+                        <li><strong>Indexer</strong> - Stores and searches data</li>
+                        <li><strong>Search Head</strong> - User interface, runs apps</li>
+                    </ul>
+                    
+                    <h4>Key Ports</h4>
+                    <ul>
+                        <li><code>8000</code> - Web UI (Search Head)</li>
+                        <li><code>8089</code> - Management/REST API</li>
+                        <li><code>9997</code> - Forwarder to Indexer</li>
+                        <li><code>8088</code> - HTTP Event Collector (HEC)</li>
+                    </ul>
+                    
+                    <h4>Key Config Files</h4>
+                    <ul>
+                        <li><code>inputs.conf</code> - What to collect</li>
+                        <li><code>props.conf</code> - How to parse</li>
+                        <li><code>outputs.conf</code> - Where to send</li>
+                        <li><code>indexes.conf</code> - Storage settings</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-architecture.html" class="card-link">← SIEM Architecture</a>
+                    <a href="splunk-cloud.html" class="card-link">Splunk Cloud →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

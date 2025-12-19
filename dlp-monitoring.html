@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DLP Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Data Protection</div>
+                    <a href="dlp-monitoring.html" class="nav-item active">DLP Monitoring</a>
+                    <a href="compliance-governance.html" class="nav-item">Compliance</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">DLP Monitoring</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">DLP Monitoring</h1>
+                    <p class="page-subtitle">Data Loss Prevention logs are critical for detecting data exfiltration, policy violations, and insider threats. Integrating DLP with SIEM enables correlation with other security events for comprehensive threat detection.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>DLP Architecture</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">DLP Coverage Points</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DLP COVERAGE ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ENDPOINT DLP                  NETWORK DLP                 CLOUD DLP        │
+│  ┌─────────────────┐          ┌─────────────────┐        ┌──────────────┐  │
+│  │ • USB/Removable │          │ • Web upload    │        │ • SaaS apps  │  │
+│  │ • Print         │          │ • Email gateway │        │ • Cloud      │  │
+│  │ • Clipboard     │          │ • FTP/SFTP      │        │   storage    │  │
+│  │ • File copy     │          │ • SMB shares    │        │ • Sharing    │  │
+│  │ • Screen capture│          │ • HTTPS inspect │        │   links      │  │
+│  └─────────────────┘          └─────────────────┘        └──────────────┘  │
+│                                                                             │
+│  DATA CLASSIFICATION                                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • PII (SSN, Credit Cards, Passport)                                  │   │
+│  │ • PHI (Medical records, Patient data)                                │   │
+│  │ • PCI (Cardholder data, PANs)                                       │   │
+│  │ • IP (Source code, Trade secrets, Engineering docs)                  │   │
+│  │ • Financial (M&A, Earnings, Internal reports)                        │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  POLICY ACTIONS                                                             │
+│  ┌─────────────────┐          ┌─────────────────┐        ┌──────────────┐  │
+│  │ MONITOR         │          │ WARN            │        │ BLOCK        │  │
+│  │ Log only        │          │ User notified   │        │ Prevent      │  │
+│  │ No disruption   │          │ Justify action  │        │ activity     │  │
+│  └─────────────────┘          └─────────────────┘        └──────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Purview DLP</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: DLP Policy Matches</div>
+                        <pre><code>DLPAll
+| where TimeGenerated > ago(24h)
+| where ActionType in ("Block", "Override", "Audit")
+| summarize 
+    MatchCount = count(),
+    UniqueUsers = dcount(UserId),
+    Locations = make_set(Workload)
+  by PolicyName, SensitiveInfoTypeName
+| order by MatchCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: High-Risk DLP Events</div>
+                        <pre><code>// Focus on blocked or overridden events
+DLPAll
+| where TimeGenerated > ago(24h)
+| where ActionType in ("Block", "Override")
+| project TimeGenerated, UserId, Workload, PolicyName,
+          SensitiveInfoTypeName, SourceFileName,
+          SharePointUrl, ActionType, Justification
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: DLP User Risk Score</div>
+                        <pre><code>DLPAll
+| where TimeGenerated > ago(7d)
+| extend Severity = case(
+    ActionType == "Block", 3,
+    ActionType == "Override", 2,
+    ActionType == "Audit", 1,
+    0
+)
+| extend DataSeverity = case(
+    SensitiveInfoTypeName has_any ("Credit", "SSN", "Passport"), 3,
+    SensitiveInfoTypeName has_any ("Patient", "Medical"), 3,
+    SensitiveInfoTypeName has "Source Code", 2,
+    1
+)
+| extend RiskScore = Severity * DataSeverity
+| summarize 
+    TotalRiskScore = sum(RiskScore),
+    EventCount = count(),
+    BlockedCount = countif(ActionType == "Block"),
+    DataTypes = make_set(SensitiveInfoTypeName, 5)
+  by UserId
+| where TotalRiskScore > 10
+| order by TotalRiskScore desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Endpoint DLP Events</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: USB Data Transfer</div>
+                        <pre><code>DeviceEvents
+| where TimeGenerated > ago(24h)
+| where ActionType == "RemovableMediaWrite"
+| join kind=inner (
+    DeviceFileEvents
+    | where ActionType == "FileCreated"
+    | where FolderPath startswith "F:\\" or FolderPath startswith "E:\\"
+) on DeviceId, InitiatingProcessAccountName
+| summarize 
+    FileCount = count(),
+    TotalSize = sum(FileSize),
+    FileTypes = make_set(FileType)
+  by DeviceName, InitiatingProcessAccountName
+| where TotalSize > 100000000  // Over 100MB
+| order by TotalSize desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Sensitive File Printing</div>
+                        <pre><code>index=dlp sourcetype=endpoint_dlp action_type=print
+| where sensitivity_label IN ("Confidential", "Highly Restricted", "Secret")
+| stats count, sum(page_count) as total_pages, 
+        values(filename) as files 
+  by user, printer_name, sensitivity_label
+| where count > 5
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cloud DLP Events</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: External Sharing Detection</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(24h)
+| where Operation in ("SharingSet", "AnonymousLinkCreated", 
+                      "SecureLinkCreated", "AddedToSecureLink")
+| where TargetUserOrGroupType == "Guest" or 
+        Operation == "AnonymousLinkCreated"
+| project TimeGenerated, UserId, Operation, 
+          SourceFileName, Site_Url, TargetUserOrGroupName
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Bulk Download Detection</div>
+                        <pre><code>OfficeActivity
+| where TimeGenerated > ago(24h)
+| where Operation == "FileDownloaded"
+| summarize 
+    DownloadCount = count(),
+    UniqueFiles = dcount(SourceFileName),
+    Sites = make_set(Site_Url, 5)
+  by UserId, ClientIP, bin(TimeGenerated, 1h)
+| where DownloadCount > 50
+| order by DownloadCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Email DLP</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Sensitive Email to External</div>
+                        <pre><code>EmailEvents
+| where TimeGenerated > ago(24h)
+| where EmailDirection == "Outbound"
+| where ThreatTypes has "DLP"
+| join kind=inner (
+    DLPAll
+    | where Workload == "Exchange"
+    | project NetworkMessageId, SensitiveInfoTypeName, PolicyName, ActionType
+) on NetworkMessageId
+| project TimeGenerated, SenderFromAddress, 
+          RecipientEmailAddress, Subject,
+          SensitiveInfoTypeName, PolicyName, ActionType
+| where ActionType != "Allow"</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Email Attachment Analysis</div>
+                        <pre><code>index=email_gateway action=blocked reason=dlp
+| stats count, values(attachment_name) as attachments,
+        values(recipient_domain) as dest_domains
+  by sender, dlp_rule
+| where count > 3
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Insider Threat Indicators</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Pre-Resignation Data Access</div>
+                        <pre><code>// Correlate DLP with HR data
+let TerminatingUsers = datatable(UserId:string, TermDate:datetime) [
+    "user1@company.com", datetime(2024-03-30),
+    "user2@company.com", datetime(2024-04-15)
+];
+DLPAll
+| where TimeGenerated > ago(30d)
+| join kind=inner TerminatingUsers on UserId
+| where TimeGenerated between (TermDate - 30d .. TermDate)
+| summarize 
+    DLPEvents = count(),
+    BlockedCount = countif(ActionType == "Block"),
+    DataTypes = make_set(SensitiveInfoTypeName)
+  by UserId, TermDate
+| where DLPEvents > 10</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: After-Hours Sensitive Access</div>
+                        <pre><code>DLPAll
+| where TimeGenerated > ago(7d)
+| extend HourOfDay = hourofday(TimeGenerated)
+| extend DayOfWeek = dayofweek(TimeGenerated)
+| where HourOfDay < 6 or HourOfDay > 22  // Outside business hours
+    or DayOfWeek in (0d, 6d)  // Weekend
+| where ActionType in ("Block", "Override", "Audit")
+| summarize 
+    AfterHoursEvents = count(),
+    EventTimes = make_set(TimeGenerated, 10)
+  by UserId, SensitiveInfoTypeName
+| where AfterHoursEvents > 5
+| order by AfterHoursEvents desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>DLP Metrics Dashboard</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: DLP Executive Summary</div>
+                        <pre><code>DLPAll
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalEvents = count(),
+    BlockedEvents = countif(ActionType == "Block"),
+    OverriddenEvents = countif(ActionType == "Override"),
+    UniqueUsers = dcount(UserId),
+    TopDataType = arg_max(count(), SensitiveInfoTypeName)
+  by bin(TimeGenerated, 1d)
+| extend BlockRate = round(BlockedEvents * 100.0 / TotalEvents, 1)
+| order by TimeGenerated desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you integrate DLP with SIEM for threat detection?"</strong></p>
+                        <p><strong>A:</strong> "DLP logs are valuable but need context from other sources:</p>
+                        <ol>
+                            <li><strong>Correlation with identity:</strong> A single DLP event isn't always significant. But DLP events correlated with failed logins, impossible travel, or new device access suggest account compromise or insider threat.</li>
+                            <li><strong>User risk scoring:</strong> I build risk scores combining DLP events, access patterns, and behavior. Multiple blocked uploads + after-hours access + bulk downloads = investigate.</li>
+                            <li><strong>HR data integration:</strong> DLP events in the weeks before resignation or during PIP are high priority. This requires correlation with HR systems.</li>
+                            <li><strong>Endpoint context:</strong> USB copy detected by DLP + files from sensitive SharePoint site + email to personal account = potential exfiltration chain.</li>
+                            <li><strong>False positive reduction:</strong> Some users legitimately handle sensitive data. I baseline normal behavior and alert on deviations, not raw volume.</li>
+                        </ol>
+                        <p>The key is that DLP alone tells you what data moved. Combined with SIEM context, you understand if it's malicious. A finance user downloading financial reports is normal; an engineering intern doing it isn't."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 DLP Monitoring Quick Reference</div>
+                        <h4>High-Risk Patterns</h4>
+                        <ul>
+                            <li>Bulk downloads before termination</li>
+                            <li>USB transfers of classified data</li>
+                            <li>External sharing of confidential files</li>
+                            <li>Policy overrides with weak justification</li>
+                            <li>After-hours sensitive data access</li>
+                        </ul>
+                        <h4>Policy Actions</h4>
+                        <ul>
+                            <li>Audit - Log only, no user impact</li>
+                            <li>Warn - User notification, allow proceed</li>
+                            <li>Override - User must justify</li>
+                            <li>Block - Prevent action</li>
+                        </ul>
+                        <h4>Data Types to Monitor</h4>
+                        <ul>
+                            <li>PII (SSN, Credit Cards)</li>
+                            <li>PHI (Medical Records)</li>
+                            <li>PCI (Cardholder Data)</li>
+                            <li>Source Code</li>
+                            <li>Financial Reports</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="compliance-governance.html" class="card-link">← Compliance</a>
+                    <a href="email-security.html" class="card-link">Email Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

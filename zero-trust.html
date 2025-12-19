@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Trust Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Architecture</div>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="zero-trust.html" class="nav-item active">Zero Trust</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Zero Trust Monitoring</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Zero Trust Security Monitoring</h1>
+                    <p class="page-subtitle">Zero Trust assumes breach and verifies explicitly. SIEM plays a critical role in monitoring Zero Trust controls, detecting policy violations, and validating continuous authentication and authorization.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Zero Trust Principles</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Zero Trust Monitoring Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ZERO TRUST MONITORING                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CORE PRINCIPLES                  SIEM MONITORING ROLE                      │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ Never Trust,        │         │ • Verify all access events  │           │
+│  │ Always Verify       │ ──────► │ • Detect bypass attempts    │           │
+│  │                     │         │ • Monitor policy enforcement│           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ Least Privilege     │         │ • Track permission changes  │           │
+│  │ Access              │ ──────► │ • Detect privilege escalation│          │
+│  │                     │         │ • Monitor access patterns   │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ Assume Breach       │         │ • Lateral movement detection│           │
+│  │                     │ ──────► │ • Anomaly detection         │           │
+│  │                     │         │ • Continuous risk scoring   │           │
+│  └─────────────────────┘         └─────────────────────────────┘           │
+│                                                                             │
+│  ZERO TRUST PILLARS:                                                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐         │
+│  │ Identity │ │ Devices  │ │ Network  │ │ Apps     │ │ Data     │         │
+│  │          │ │          │ │          │ │          │ │          │         │
+│  │ MFA, SSO │ │ MDM,     │ │ Micro-   │ │ CASB,    │ │ DLP,     │         │
+│  │ Risk-    │ │ Health   │ │ segment  │ │ ZTNA     │ │ Classif- │         │
+│  │ based CA │ │ Checks   │ │ SASE     │ │ Proxy    │ │ ication  │         │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Conditional Access Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Conditional Access Policy Evaluation</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| mv-expand ConditionalAccessPolicies
+| extend PolicyName = tostring(ConditionalAccessPolicies.displayName)
+| extend PolicyResult = tostring(ConditionalAccessPolicies.result)
+| summarize 
+    TotalEvaluations = count(),
+    Successes = countif(PolicyResult == "success"),
+    Failures = countif(PolicyResult == "failure"),
+    NotApplied = countif(PolicyResult == "notApplied")
+  by PolicyName
+| extend FailureRate = round(Failures * 100.0 / TotalEvaluations, 2)
+| order by Failures desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: CA Policy Bypass Detection</div>
+                        <pre><code>// Detect sign-ins that bypassed expected policies
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0  // Successful sign-in
+| mv-expand ConditionalAccessPolicies
+| where ConditionalAccessPolicies.result == "notApplied"
+| extend PolicyName = tostring(ConditionalAccessPolicies.displayName)
+| where PolicyName has_any ("MFA", "Compliant", "Block")
+| project TimeGenerated, UserPrincipalName, AppDisplayName, 
+          IPAddress, PolicyName
+| summarize BypassedPolicies = make_set(PolicyName) by UserPrincipalName
+| where array_length(BypassedPolicies) > 0</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Device Compliance Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Non-Compliant Device Access</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| extend DeviceCompliance = tostring(DeviceDetail.isCompliant)
+| extend DeviceManaged = tostring(DeviceDetail.isManaged)
+| where DeviceCompliance != "true" or DeviceManaged != "true"
+| summarize 
+    AccessCount = count(),
+    Apps = make_set(AppDisplayName)
+  by UserPrincipalName, DeviceCompliance, DeviceManaged
+| order by AccessCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Device Health Posture</div>
+                        <pre><code>index=endpoint_mgmt 
+| eval compliance_status = case(
+    antivirus_enabled="true" AND os_patched="true" AND encrypted="true", "Compliant",
+    antivirus_enabled="false", "Non-Compliant: No AV",
+    os_patched="false", "Non-Compliant: Unpatched",
+    encrypted="false", "Non-Compliant: Unencrypted",
+    "Unknown"
+)
+| stats count by compliance_status, device_type
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Network Micro-Segmentation</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Segment Violation Detection</div>
+                        <pre><code>index=firewall action=blocked
+| lookup network_segments src_ip OUTPUT src_segment
+| lookup network_segments dest_ip OUTPUT dest_segment
+| where src_segment != dest_segment
+| stats count as violations,
+        values(dest_port) as ports_attempted
+  by src_segment, dest_segment, src_ip
+| where violations > 10
+| sort -violations</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: East-West Traffic Anomalies</div>
+                        <pre><code>CommonSecurityLog
+| where TimeGenerated > ago(24h)
+| where SourceIP startswith "10." and DestinationIP startswith "10."
+| where DeviceAction == "allow"
+| summarize 
+    Connections = count(),
+    Destinations = dcount(DestinationIP),
+    Ports = make_set(DestinationPort)
+  by SourceIP
+| where Destinations > 20  // Talking to many internal hosts
+| order by Destinations desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>ZTNA/SASE Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: ZTNA Access Patterns</div>
+                        <pre><code>index=ztna_proxy
+| stats count as access_count,
+        dc(application) as unique_apps,
+        values(application) as apps_accessed,
+        dc(src_ip) as locations
+  by user
+| where locations > 3  // Accessing from many locations
+| sort -locations</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Application Access Without ZTNA</div>
+                        <pre><code>// Detect direct application access bypassing ZTNA
+index=app_access NOT [search index=ztna_proxy | fields user, application]
+| eval bypass_indicator = "Direct access detected"
+| stats count by user, application, src_ip
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Continuous Risk Assessment</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Real-Time User Risk</div>
+                        <pre><code>// Combine multiple risk signals
+let RiskySignIns = SigninLogs
+| where TimeGenerated > ago(1h)
+| where RiskLevelDuringSignIn != "none"
+| summarize SignInRisk = countif(RiskLevelDuringSignIn in ("medium", "high")) 
+  by UserPrincipalName;
+let PolicyViolations = SigninLogs
+| where TimeGenerated > ago(1h)
+| mv-expand ConditionalAccessPolicies
+| where ConditionalAccessPolicies.result == "failure"
+| summarize PolicyFailures = count() by UserPrincipalName;
+let AnomalousAccess = SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 0
+| summarize UniqueLocations = dcount(Location) by UserPrincipalName
+| where UniqueLocations > 2;
+RiskySignIns
+| join kind=leftouter PolicyViolations on UserPrincipalName
+| join kind=leftouter AnomalousAccess on UserPrincipalName
+| extend CompositeRisk = SignInRisk + coalesce(PolicyFailures, 0) * 2 + 
+                          iff(isnotnull(UniqueLocations), 5, 0)
+| where CompositeRisk > 5
+| order by CompositeRisk desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Zero Trust Metrics</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MFA Coverage</strong></td>
+                                    <td>% of authentications with MFA</td>
+                                    <td>> 99%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Device Compliance</strong></td>
+                                    <td>% of access from compliant devices</td>
+                                    <td>> 95%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CA Policy Enforcement</strong></td>
+                                    <td>% of sign-ins evaluated by CA</td>
+                                    <td>100%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Segment Violations</strong></td>
+                                    <td>Cross-segment blocked connections</td>
+                                    <td>Trending down</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ZTNA Adoption</strong></td>
+                                    <td>% of app access via ZTNA</td>
+                                    <td>> 90%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How does SIEM support Zero Trust architecture?"</strong></p>
+                        <p><strong>A:</strong> "SIEM is the verification and visibility layer for Zero Trust:</p>
+                        <ol>
+                            <li><strong>Policy enforcement validation:</strong> I monitor Conditional Access logs to ensure policies are applied. Bypasses or exceptions are immediately visible.</li>
+                            <li><strong>Continuous risk assessment:</strong> Zero Trust means continuous verification. I aggregate risk signals—risky sign-ins, device posture, behavior anomalies—into real-time risk scores.</li>
+                            <li><strong>Micro-segmentation monitoring:</strong> Network segmentation is only effective if enforced. I monitor firewall logs for segment violations and unauthorized lateral movement.</li>
+                            <li><strong>Device compliance tracking:</strong> Access from non-compliant or unmanaged devices is a Zero Trust violation. I correlate device state with access events.</li>
+                            <li><strong>Least privilege validation:</strong> I track permission changes and access patterns. Users accessing resources outside their normal pattern trigger investigation.</li>
+                            <li><strong>Assume breach detection:</strong> Zero Trust assumes breach. SIEM detects post-compromise activity—lateral movement, privilege escalation, data exfiltration.</li>
+                        </ol>
+                        <p>Zero Trust without visibility is just policy. SIEM proves the policies are working."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Zero Trust Monitoring Quick Reference</div>
+                        <h4>Key Log Sources</h4>
+                        <ul>
+                            <li>Entra ID Sign-in Logs</li>
+                            <li>Conditional Access Logs</li>
+                            <li>Intune Compliance</li>
+                            <li>Firewall/Segment Logs</li>
+                            <li>ZTNA/SASE Proxy Logs</li>
+                        </ul>
+                        <h4>Critical Alerts</h4>
+                        <ul>
+                            <li>CA policy bypass</li>
+                            <li>Non-compliant device access</li>
+                            <li>MFA not enforced</li>
+                            <li>Segment violation</li>
+                            <li>Direct app access (no ZTNA)</li>
+                        </ul>
+                        <h4>Risk Signals</h4>
+                        <ul>
+                            <li>Impossible travel</li>
+                            <li>Anonymous IP usage</li>
+                            <li>Unfamiliar sign-in properties</li>
+                            <li>Risky user state</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-architecture.html" class="card-link">← SIEM Architecture</a>
+                    <a href="identity-security.html" class="card-link">Identity Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

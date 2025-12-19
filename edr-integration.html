@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDR Integration | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Integrations</div>
+                    <a href="edr-integration.html" class="nav-item active">EDR Integration</a>
+                    <a href="ueba-analytics.html" class="nav-item">UEBA</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">EDR Integration</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">EDR/XDR Integration</h1>
+                    <p class="page-subtitle">Endpoint Detection and Response platforms provide rich telemetry that enhances SIEM detection. Integrating EDR with SIEM enables correlation across endpoints, network, and identity for comprehensive threat visibility.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>EDR vs SIEM: Complementary Roles</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">EDR + SIEM Integration Value</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    EDR vs SIEM CAPABILITIES                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EDR STRENGTHS                         SIEM STRENGTHS                       │
+│  ┌─────────────────────────┐          ┌─────────────────────────┐          │
+│  │ • Deep endpoint         │          │ • Cross-source          │          │
+│  │   telemetry             │          │   correlation           │          │
+│  │ • Process trees         │          │ • Network + Identity    │          │
+│  │ • Memory analysis       │          │   + Cloud logs          │          │
+│  │ • Real-time response    │          │ • Long-term retention   │          │
+│  │ • Automated containment │          │ • Compliance reporting  │          │
+│  │ • Behavioral detection  │          │ • Custom detection      │          │
+│  └─────────────────────────┘          └─────────────────────────┘          │
+│                                                                             │
+│  INTEGRATED VALUE:                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ EDR Alert → SIEM Correlation → Context (who logged in from where,   │   │
+│  │ what else happened on network, did they access sensitive data?)     │   │
+│  │                                                                      │   │
+│  │ SIEM Detection → EDR Action (auto-isolate host, collect forensics)  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Defender for Endpoint</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: MDE Alert Correlation</div>
+                        <pre><code>// Correlate MDE alerts with sign-in events
+AlertInfo
+| where TimeGenerated > ago(24h)
+| where ServiceSource == "Microsoft Defender for Endpoint"
+| join kind=inner (
+    AlertEvidence
+    | where EntityType == "User"
+    | project AlertId, AccountName, AccountDomain
+) on AlertId
+| join kind=leftouter (
+    SigninLogs
+    | where TimeGenerated > ago(24h)
+    | project UserPrincipalName, IPAddress, Location, 
+              AppDisplayName, ResultType
+) on $left.AccountName == $right.UserPrincipalName
+| project TimeGenerated, Title, Severity, AccountName,
+          IPAddress, Location, AppDisplayName</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Process Chain Analysis</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where InitiatingProcessFileName in~ ("cmd.exe", "powershell.exe", "wscript.exe")
+| where FileName in~ ("whoami.exe", "net.exe", "nltest.exe", "dsquery.exe")
+| extend ProcessChain = strcat(
+    InitiatingProcessParentFileName, " → ",
+    InitiatingProcessFileName, " → ",
+    FileName
+)
+| summarize 
+    CommandCount = count(),
+    Commands = make_set(ProcessCommandLine, 5)
+  by DeviceName, AccountName, ProcessChain
+| where CommandCount >= 3
+| order by CommandCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>CrowdStrike Falcon</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: CrowdStrike Detection Analysis</div>
+                        <pre><code>index=crowdstrike sourcetype=crowdstrike:events:sensor
+| where event_simpleName IN ("ProcessRollup2", "DnsRequest", "NetworkConnectIP4")
+| stats count by ComputerName, event_simpleName, UserName
+| where count > 100
+| sort -count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Falcon Alerts to Incident</div>
+                        <pre><code>index=crowdstrike sourcetype=crowdstrike:events:detect
+| eval severity_num = case(
+    Severity="Critical", 4,
+    Severity="High", 3,
+    Severity="Medium", 2,
+    Severity="Low", 1,
+    0
+)
+| stats max(severity_num) as max_severity,
+        values(Technique) as techniques,
+        values(Tactic) as tactics,
+        dc(ComputerName) as affected_hosts
+  by DetectName
+| where max_severity >= 3
+| sort -max_severity</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cortex XDR</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Cortex XDR Incident Enrichment</div>
+                        <pre><code>index=cortex_xdr sourcetype=pan:xdr:incident
+| lookup asset_inventory hostname as host OUTPUT criticality, owner, department
+| lookup user_risk user OUTPUT risk_score
+| eval priority = case(
+    severity="high" AND criticality="Critical", "P1",
+    severity="high" OR criticality="Critical", "P2",
+    severity="medium", "P3",
+    "P4"
+)
+| table _time, incident_id, host, user, severity, 
+        criticality, risk_score, priority, description</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: XDR + Network Correlation</div>
+                        <pre><code>index=cortex_xdr sourcetype=pan:xdr:alert alert_source="XDR Agent"
+| join type=left host [
+    search index=pan_firewall action=allowed
+    | stats sum(bytes_sent) as bytes_out, 
+            dc(dest_ip) as unique_dests 
+      by src_ip
+    | rename src_ip as host_ip
+]
+| where bytes_out > 100000000 OR unique_dests > 50
+| table _time, host, alert_name, bytes_out, unique_dests</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Carbon Black</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Carbon Black Alert Analysis</div>
+                        <pre><code>index=carbonblack sourcetype=carbonblack:defense:json
+| where type="ALERT"
+| spath output=threat_indicators path=threat_indicators{}
+| mvexpand threat_indicators
+| stats count by reason, threat_indicators, device_name
+| where count > 0
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Cross-EDR Normalization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Unified EDR Alert View</div>
+                        <pre><code>// Normalize alerts from multiple EDR platforms
+(index=crowdstrike sourcetype=crowdstrike:events:detect)
+OR (index=cortex_xdr sourcetype=pan:xdr:alert)
+OR (index=carbonblack sourcetype=carbonblack:defense:json type="ALERT")
+| eval normalized_severity = case(
+    // CrowdStrike
+    Severity="Critical", "Critical",
+    Severity="High", "High",
+    // Cortex XDR
+    severity="high", "High",
+    severity="critical", "Critical",
+    // Carbon Black
+    threat_score >= 8, "Critical",
+    threat_score >= 6, "High",
+    "Medium"
+)
+| eval normalized_host = coalesce(ComputerName, host, device_name)
+| eval normalized_user = coalesce(UserName, user, device_username)
+| eval source_edr = case(
+    isnotnull(ComputerName), "CrowdStrike",
+    isnotnull(host), "Cortex XDR",
+    isnotnull(device_name), "Carbon Black",
+    "Unknown"
+)
+| table _time, source_edr, normalized_host, normalized_user, 
+        normalized_severity, description</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>EDR-Driven Response</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SIEM-EDR Response Workflow</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AUTOMATED RESPONSE WORKFLOW                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. DETECTION                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ SIEM: Correlates EDR alert + failed VPN + data access anomaly       │   │
+│  │ Result: High-confidence compromise indicator                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  2. ENRICHMENT                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Query EDR for full process tree                                    │   │
+│  │ • Get file hashes for IOC matching                                   │   │
+│  │ • Pull network connections from endpoint                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  3. RESPONSE (via EDR API)                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Isolate endpoint from network                                      │   │
+│  │ • Kill malicious processes                                           │   │
+│  │ • Collect memory dump for forensics                                  │   │
+│  │ • Block file hash across all endpoints                               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  4. TRACKING                                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ SIEM creates incident, tracks containment status, notifies SOC      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you integrate EDR with SIEM?"</strong></p>
+                        <p><strong>A:</strong> "EDR and SIEM integration is about combining deep endpoint visibility with broad correlation:</p>
+                        <ol>
+                            <li><strong>Data flow:</strong> EDR alerts and telemetry flow to SIEM via API or syslog. I typically send alerts plus high-value telemetry (process creation, network connections) while leaving verbose data in EDR to manage volume.</li>
+                            <li><strong>Correlation value:</strong> An EDR alert alone might be low-confidence. But when SIEM correlates it with suspicious authentication, unusual data access, or network anomalies—it becomes high-confidence. This cross-source correlation is SIEM's strength.</li>
+                            <li><strong>Response automation:</strong> SOAR can trigger EDR actions based on SIEM detections. Isolate endpoints, collect forensics, block hashes—all automated based on correlation results.</li>
+                            <li><strong>Normalization:</strong> With multiple EDR platforms, I normalize to common fields (host, user, severity) enabling unified dashboards and detections that work across vendors.</li>
+                            <li><strong>Investigation workflow:</strong> SIEM alerts link to EDR console for deep-dive. Analysts pivot from correlation alert to full process tree and timeline in EDR.</li>
+                        </ol>
+                        <p>The key is avoiding duplication—don't recreate EDR detections in SIEM. Use SIEM for what EDR can't do: correlating endpoint activity with network, identity, and cloud."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 EDR Integration Quick Reference</div>
+                        <h4>Key EDR Data to Ingest</h4>
+                        <ul>
+                            <li>Alerts/Detections (always)</li>
+                            <li>Process creation events</li>
+                            <li>Network connections</li>
+                            <li>File operations (selective)</li>
+                            <li>Registry changes (selective)</li>
+                        </ul>
+                        <h4>Common EDR Platforms</h4>
+                        <ul>
+                            <li>Microsoft Defender for Endpoint</li>
+                            <li>CrowdStrike Falcon</li>
+                            <li>Palo Alto Cortex XDR</li>
+                            <li>VMware Carbon Black</li>
+                            <li>SentinelOne</li>
+                        </ul>
+                        <h4>EDR Response Actions</h4>
+                        <ul>
+                            <li>Network isolation</li>
+                            <li>Process termination</li>
+                            <li>File quarantine</li>
+                            <li>Memory collection</li>
+                            <li>Hash blocking</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="endpoint-logs.html" class="card-link">← Endpoint Logs</a>
+                    <a href="ueba-analytics.html" class="card-link">UEBA →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

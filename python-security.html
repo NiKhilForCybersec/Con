@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python for Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Automation</div>
+                    <a href="soar-automation.html" class="nav-item">SOAR & Automation</a>
+                    <a href="powershell-security.html" class="nav-item">PowerShell</a>
+                    <a href="python-security.html" class="nav-item active">Python</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="soar-automation.html">Automation</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Python for Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Python for Security</h1>
+                    <p class="page-subtitle">Python is the go-to language for security automation, log parsing, API integration, and data analysis. This guide covers Python techniques for SIEM engineering and security operations.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Essential Security Libraries</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Library</th>
+                                    <th>Purpose</th>
+                                    <th>Install</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>requests</strong></td>
+                                    <td>HTTP requests, API calls</td>
+                                    <td><code>pip install requests</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>pandas</strong></td>
+                                    <td>Data analysis, log parsing</td>
+                                    <td><code>pip install pandas</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>splunk-sdk</strong></td>
+                                    <td>Splunk API integration</td>
+                                    <td><code>pip install splunk-sdk</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>azure-identity</strong></td>
+                                    <td>Azure authentication</td>
+                                    <td><code>pip install azure-identity</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>boto3</strong></td>
+                                    <td>AWS SDK</td>
+                                    <td><code>pip install boto3</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>python-evtx</strong></td>
+                                    <td>Windows Event Log parsing</td>
+                                    <td><code>pip install python-evtx</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>yara-python</strong></td>
+                                    <td>YARA rule matching</td>
+                                    <td><code>pip install yara-python</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SIEM API Integration</h2>
+                    
+                    <h3>Splunk REST API</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Query Splunk</div>
+                        <pre><code>import splunklib.client as client
+import splunklib.results as results
+
+# Connect to Splunk
+service = client.connect(
+    host="splunk.company.com",
+    port=8089,
+    username="api_user",
+    password="api_password"
+)
+
+# Run a search
+search_query = """
+search index=security sourcetype=WinEventLog:Security EventCode=4625
+| stats count by src_ip, user
+| where count > 10
+"""
+
+job = service.jobs.create(search_query, **{"earliest_time": "-1h"})
+
+# Wait for search to complete
+while not job.is_done():
+    time.sleep(1)
+
+# Get results
+reader = results.ResultsReader(job.results())
+for result in reader:
+    if isinstance(result, dict):
+        print(f"IP: {result['src_ip']}, User: {result['user']}, Count: {result['count']}")</code></pre>
+                    </div>
+
+                    <h3>Microsoft Sentinel / Log Analytics</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Query Log Analytics</div>
+                        <pre><code>from azure.identity import DefaultAzureCredential
+from azure.monitor.query import LogsQueryClient
+from datetime import timedelta
+
+# Authenticate
+credential = DefaultAzureCredential()
+client = LogsQueryClient(credential)
+
+# Query
+workspace_id = "your-workspace-id"
+query = """
+SecurityEvent
+| where TimeGenerated > ago(1h)
+| where EventID == 4625
+| summarize FailCount = count() by TargetUserName, IpAddress
+| where FailCount > 5
+"""
+
+response = client.query_workspace(
+    workspace_id=workspace_id,
+    query=query,
+    timespan=timedelta(hours=1)
+)
+
+# Process results
+for table in response.tables:
+    for row in table.rows:
+        print(f"User: {row[0]}, IP: {row[1]}, Failures: {row[2]}")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Threat Intelligence Integration</h2>
+                    
+                    <h3>VirusTotal API</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Check IP Reputation</div>
+                        <pre><code>import requests
+
+VT_API_KEY = "your-api-key"
+
+def check_ip_reputation(ip_address):
+    """Check IP reputation in VirusTotal"""
+    url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip_address}"
+    headers = {"x-apikey": VT_API_KEY}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        stats = data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+        
+        return {
+            "ip": ip_address,
+            "malicious": stats.get("malicious", 0),
+            "suspicious": stats.get("suspicious", 0),
+            "harmless": stats.get("harmless", 0),
+            "reputation": data.get("data", {}).get("attributes", {}).get("reputation", 0)
+        }
+    return None
+
+# Check multiple IPs
+suspicious_ips = ["1.2.3.4", "5.6.7.8"]
+for ip in suspicious_ips:
+    result = check_ip_reputation(ip)
+    if result and result["malicious"] > 0:
+        print(f"⚠️ Malicious IP: {ip} - {result['malicious']} detections")</code></pre>
+                    </div>
+
+                    <h3>AbuseIPDB Integration</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Check AbuseIPDB</div>
+                        <pre><code>import requests
+
+ABUSEIPDB_KEY = "your-api-key"
+
+def check_abuseipdb(ip_address):
+    """Check IP in AbuseIPDB"""
+    url = "https://api.abuseipdb.com/api/v2/check"
+    headers = {
+        "Key": ABUSEIPDB_KEY,
+        "Accept": "application/json"
+    }
+    params = {
+        "ipAddress": ip_address,
+        "maxAgeInDays": 90
+    }
+    
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        data = response.json().get("data", {})
+        return {
+            "ip": ip_address,
+            "abuse_confidence": data.get("abuseConfidenceScore", 0),
+            "total_reports": data.get("totalReports", 0),
+            "country": data.get("countryCode", ""),
+            "isp": data.get("isp", "")
+        }
+    return None
+
+# Enrich alert with abuse data
+alert_ip = "192.0.2.1"
+abuse_data = check_abuseipdb(alert_ip)
+if abuse_data and abuse_data["abuse_confidence"] > 50:
+    print(f"High-risk IP: {alert_ip} (Confidence: {abuse_data['abuse_confidence']}%)")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Log Parsing and Analysis</h2>
+                    
+                    <h3>Parse Windows Event Logs</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Parse EVTX Files</div>
+                        <pre><code>from Evtx.Evtx import Evtx
+from Evtx.Views import evtx_file_xml_view
+import xml.etree.ElementTree as ET
+import pandas as pd
+
+def parse_security_evtx(evtx_path):
+    """Parse Windows Security EVTX file"""
+    events = []
+    
+    with Evtx(evtx_path) as evtx:
+        for record in evtx.records():
+            try:
+                xml_content = record.xml()
+                root = ET.fromstring(xml_content)
+                
+                # Extract key fields
+                ns = {'ns': 'http://schemas.microsoft.com/win/2004/08/events/event'}
+                system = root.find('ns:System', ns)
+                
+                event = {
+                    'EventID': system.find('ns:EventID', ns).text,
+                    'TimeCreated': system.find('ns:TimeCreated', ns).get('SystemTime'),
+                    'Computer': system.find('ns:Computer', ns).text,
+                }
+                
+                # Extract EventData
+                event_data = root.find('ns:EventData', ns)
+                if event_data is not None:
+                    for data in event_data.findall('ns:Data', ns):
+                        name = data.get('Name')
+                        if name:
+                            event[name] = data.text
+                
+                events.append(event)
+            except Exception as e:
+                continue
+    
+    return pd.DataFrame(events)
+
+# Analyze failed logins
+df = parse_security_evtx("Security.evtx")
+failed_logins = df[df['EventID'] == '4625']
+print(failed_logins.groupby('TargetUserName').size().sort_values(ascending=False).head(10))</code></pre>
+                    </div>
+
+                    <h3>Parse Syslog</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Parse Syslog with Regex</div>
+                        <pre><code>import re
+import pandas as pd
+from datetime import datetime
+
+def parse_syslog(log_file):
+    """Parse syslog format logs"""
+    # Standard syslog pattern
+    pattern = r'^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+(\S+?)(?:\[\d+\])?:\s+(.*)$'
+    
+    events = []
+    with open(log_file, 'r') as f:
+        for line in f:
+            match = re.match(pattern, line.strip())
+            if match:
+                events.append({
+                    'timestamp': match.group(1),
+                    'host': match.group(2),
+                    'program': match.group(3),
+                    'message': match.group(4)
+                })
+    
+    return pd.DataFrame(events)
+
+# Analyze SSH authentication
+df = parse_syslog("/var/log/auth.log")
+ssh_events = df[df['program'] == 'sshd']
+
+# Find failed SSH logins
+failed_ssh = ssh_events[ssh_events['message'].str.contains('Failed password', na=False)]
+print(f"Failed SSH attempts: {len(failed_ssh)}")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Automation Scripts</h2>
+                    
+                    <h3>Alert Enrichment Service</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Enrichment Pipeline</div>
+                        <pre><code>import requests
+from dataclasses import dataclass
+from typing import Optional, Dict, Any
+
+@dataclass
+class EnrichedAlert:
+    original_alert: Dict[str, Any]
+    ip_reputation: Optional[Dict] = None
+    user_context: Optional[Dict] = None
+    asset_info: Optional[Dict] = None
+    related_alerts: Optional[list] = None
+
+class AlertEnricher:
+    def __init__(self, vt_key: str, cmdb_url: str):
+        self.vt_key = vt_key
+        self.cmdb_url = cmdb_url
+    
+    def enrich_ip(self, ip: str) -> Dict:
+        """Get IP reputation from multiple sources"""
+        # VirusTotal
+        vt_result = self._check_virustotal(ip)
+        # Could add more sources here
+        return {
+            "ip": ip,
+            "virustotal": vt_result,
+            "risk_score": self._calculate_risk_score(vt_result)
+        }
+    
+    def enrich_user(self, username: str) -> Dict:
+        """Get user context from directory"""
+        # Query AD or identity provider
+        return {
+            "username": username,
+            "department": "IT",  # From directory lookup
+            "is_privileged": True,  # Check group membership
+            "last_login": "2024-03-15T10:00:00Z"
+        }
+    
+    def enrich_asset(self, hostname: str) -> Dict:
+        """Get asset info from CMDB"""
+        # Query CMDB
+        return {
+            "hostname": hostname,
+            "criticality": "high",
+            "owner": "security-team",
+            "os": "Windows Server 2022"
+        }
+    
+    def enrich_alert(self, alert: Dict) -> EnrichedAlert:
+        """Full enrichment pipeline"""
+        enriched = EnrichedAlert(original_alert=alert)
+        
+        # Enrich IP if present
+        if "src_ip" in alert:
+            enriched.ip_reputation = self.enrich_ip(alert["src_ip"])
+        
+        # Enrich user if present
+        if "user" in alert:
+            enriched.user_context = self.enrich_user(alert["user"])
+        
+        # Enrich asset if present
+        if "host" in alert:
+            enriched.asset_info = self.enrich_asset(alert["host"])
+        
+        return enriched
+
+# Usage
+enricher = AlertEnricher(vt_key="xxx", cmdb_url="https://cmdb.internal")
+alert = {"src_ip": "1.2.3.4", "user": "admin", "host": "SERVER01"}
+enriched = enricher.enrich_alert(alert)</code></pre>
+                    </div>
+
+                    <h3>Detection Rule Testing</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Python: Test Detection Rules</div>
+                        <pre><code>import json
+from typing import List, Dict
+
+class DetectionTester:
+    def __init__(self, rules_path: str):
+        with open(rules_path) as f:
+            self.rules = json.load(f)
+    
+    def test_rule(self, rule: Dict, test_events: List[Dict]) -> Dict:
+        """Test a detection rule against sample events"""
+        results = {
+            "rule_name": rule["name"],
+            "true_positives": [],
+            "false_negatives": [],
+            "total_tested": len(test_events)
+        }
+        
+        for event in test_events:
+            should_match = event.get("expected_match", False)
+            did_match = self._evaluate_rule(rule, event)
+            
+            if should_match and did_match:
+                results["true_positives"].append(event)
+            elif should_match and not did_match:
+                results["false_negatives"].append(event)
+        
+        results["detection_rate"] = (
+            len(results["true_positives"]) / 
+            (len(results["true_positives"]) + len(results["false_negatives"]))
+            if results["true_positives"] or results["false_negatives"]
+            else 0
+        )
+        
+        return results
+    
+    def _evaluate_rule(self, rule: Dict, event: Dict) -> bool:
+        """Evaluate if an event matches a rule"""
+        conditions = rule.get("conditions", {})
+        
+        for field, expected in conditions.items():
+            actual = event.get(field)
+            if isinstance(expected, list):
+                if actual not in expected:
+                    return False
+            elif actual != expected:
+                return False
+        
+        return True
+
+# Run tests
+tester = DetectionTester("detection_rules.json")
+test_events = [
+    {"EventID": 4625, "TargetUserName": "admin", "expected_match": True},
+    {"EventID": 4624, "TargetUserName": "admin", "expected_match": False},
+]
+results = tester.test_rule({"name": "Brute Force", "conditions": {"EventID": 4625}}, test_events)
+print(f"Detection rate: {results['detection_rate']:.0%}")</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "Give an example of how you've used Python for security automation."</strong></p>
+                        <p><strong>A:</strong> "One impactful project was building an alert enrichment pipeline. When an alert fired in our SIEM, a Python service would automatically:</p>
+                        <ol>
+                            <li><strong>Extract IOCs:</strong> Parse the alert for IPs, domains, hashes using regex patterns.</li>
+                            <li><strong>Query threat intel:</strong> Check each IOC against VirusTotal, AbuseIPDB, and our internal blocklists using their APIs.</li>
+                            <li><strong>Add user context:</strong> Query Active Directory for the user's department, manager, and whether they're in privileged groups.</li>
+                            <li><strong>Asset lookup:</strong> Pull asset criticality and owner from our CMDB.</li>
+                            <li><strong>Correlate:</strong> Query the SIEM for related alerts on the same host/user in the past 24 hours.</li>
+                        </ol>
+                        <p>The enriched data was added to the alert as comments, reducing analyst triage time from 10 minutes to under 2 minutes per alert. I used the requests library for APIs, pandas for data manipulation, and structured everything with dataclasses for clean code."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Python Security Quick Reference</div>
+                        <h4>Essential Imports</h4>
+                        <pre><code>import requests              # API calls
+import pandas as pd          # Data analysis
+from datetime import datetime # Time handling
+import re                    # Regex parsing
+import json                  # JSON handling</code></pre>
+                        <h4>API Pattern</h4>
+                        <pre><code>response = requests.get(url, headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    # Process data</code></pre>
+                        <h4>Log Parsing Pattern</h4>
+                        <pre><code>pattern = r'^(\S+)\s+(\S+)\s+(.*)$'
+match = re.match(pattern, line)
+if match:
+    field1, field2, field3 = match.groups()</code></pre>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="powershell-security.html" class="card-link">← PowerShell Security</a>
+                    <a href="soar-automation.html" class="card-link">SOAR Automation →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

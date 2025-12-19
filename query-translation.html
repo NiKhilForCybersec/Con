@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Translation | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Methodology</a>
+                    <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+                    <a href="log-migration.html" class="nav-item">Log Migration</a>
+                    <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+                    <a href="query-translation.html" class="nav-item active">Query Translation</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Query Languages</div>
+                    <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+                    <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="migration-methodology.html">Migrations</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Query Translation</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Query Translation</h1>
+                    <p class="page-subtitle">A comprehensive guide to translating between SPL (Splunk) and KQL (Microsoft Sentinel). This reference covers syntax mapping, common patterns, and the nuances that make translation tricky.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Philosophy: SPL vs KQL</h2>
+                    <p>Understanding the philosophical differences helps translate more effectively:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Aspect</th>
+                                    <th>SPL (Splunk)</th>
+                                    <th>KQL (Sentinel/Azure)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Paradigm</strong></td>
+                                    <td>Unix pipe-based (command | command)</td>
+                                    <td>SQL-like tabular expressions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Model</strong></td>
+                                    <td>Events with extracted fields</td>
+                                    <td>Strongly-typed tables with columns</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Search Start</strong></td>
+                                    <td>index=X sourcetype=Y</td>
+                                    <td>TableName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time Filter</strong></td>
+                                    <td>earliest=-24h OR time picker</td>
+                                    <td>where TimeGenerated > ago(24h)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Case Sensitivity</strong></td>
+                                    <td>Case-insensitive by default</td>
+                                    <td>Case-sensitive (use =~ for insensitive)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Wildcards</strong></td>
+                                    <td>* in search terms</td>
+                                    <td>has, contains, startswith, endswith</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Core Command Translation</h2>
+                    
+                    <h3>Filtering Data</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Basic filter</strong></td>
+                                    <td><code>index=security EventCode=4625</code></td>
+                                    <td><code>SecurityEvent | where EventID == 4625</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Multiple conditions</strong></td>
+                                    <td><code>EventCode=4625 user=admin</code></td>
+                                    <td><code>| where EventID == 4625 and Account has "admin"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>OR condition</strong></td>
+                                    <td><code>EventCode=4624 OR EventCode=4625</code></td>
+                                    <td><code>| where EventID in (4624, 4625)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>NOT condition</strong></td>
+                                    <td><code>NOT user=service*</code></td>
+                                    <td><code>| where Account !startswith "service"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Wildcard search</strong></td>
+                                    <td><code>user=admin*</code></td>
+                                    <td><code>| where Account startswith "admin"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contains</strong></td>
+                                    <td><code>CommandLine="*mimikatz*"</code></td>
+                                    <td><code>| where CommandLine has "mimikatz"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Regex match</strong></td>
+                                    <td><code>| regex user="^admin\d+"</code></td>
+                                    <td><code>| where Account matches regex "^admin\\d+"</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Aggregation</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Count</strong></td>
+                                    <td><code>| stats count</code></td>
+                                    <td><code>| summarize count()</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Count by field</strong></td>
+                                    <td><code>| stats count by src_ip</code></td>
+                                    <td><code>| summarize count() by SourceIP</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Named count</strong></td>
+                                    <td><code>| stats count as event_count by user</code></td>
+                                    <td><code>| summarize EventCount = count() by User</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Distinct count</strong></td>
+                                    <td><code>| stats dc(user) as unique_users</code></td>
+                                    <td><code>| summarize UniqueUsers = dcount(User)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Multiple aggregations</strong></td>
+                                    <td><code>| stats count, dc(user), values(host) by src_ip</code></td>
+                                    <td><code>| summarize count(), dcount(User), make_set(Computer) by SourceIP</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sum</strong></td>
+                                    <td><code>| stats sum(bytes) as total_bytes</code></td>
+                                    <td><code>| summarize TotalBytes = sum(BytesSent)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Average</strong></td>
+                                    <td><code>| stats avg(duration)</code></td>
+                                    <td><code>| summarize avg(Duration)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Min/Max</strong></td>
+                                    <td><code>| stats min(_time), max(_time)</code></td>
+                                    <td><code>| summarize min(TimeGenerated), max(TimeGenerated)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>First/Last value</strong></td>
+                                    <td><code>| stats first(status), last(status)</code></td>
+                                    <td><code>| summarize take_any(Status), arg_max(TimeGenerated, Status)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>List values</strong></td>
+                                    <td><code>| stats values(user)</code></td>
+                                    <td><code>| summarize make_set(User)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>List with limit</strong></td>
+                                    <td><code>| stats values(user) as users | eval users=mvindex(users,0,9)</code></td>
+                                    <td><code>| summarize make_set(User, 10)</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Time Operations</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Last 24 hours</strong></td>
+                                    <td><code>earliest=-24h latest=now</code></td>
+                                    <td><code>| where TimeGenerated > ago(24h)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Last 7 days</strong></td>
+                                    <td><code>earliest=-7d</code></td>
+                                    <td><code>| where TimeGenerated > ago(7d)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time range</strong></td>
+                                    <td><code>earliest="01/01/2024:00:00:00" latest="01/31/2024:23:59:59"</code></td>
+                                    <td><code>| where TimeGenerated between (datetime(2024-01-01) .. datetime(2024-01-31))</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Bucket by hour</strong></td>
+                                    <td><code>| bin _time span=1h</code></td>
+                                    <td><code>| summarize count() by bin(TimeGenerated, 1h)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Bucket by day</strong></td>
+                                    <td><code>| bin _time span=1d</code></td>
+                                    <td><code>| summarize count() by bin(TimeGenerated, 1d)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time chart</strong></td>
+                                    <td><code>| timechart count by user</code></td>
+                                    <td><code>| summarize count() by User, bin(TimeGenerated, 1h) | render timechart</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Relative time calc</strong></td>
+                                    <td><code>| eval age=now()-_time</code></td>
+                                    <td><code>| extend Age = now() - TimeGenerated</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Field Operations</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Create field</strong></td>
+                                    <td><code>| eval severity="high"</code></td>
+                                    <td><code>| extend Severity = "high"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rename field</strong></td>
+                                    <td><code>| rename src_ip as SourceIP</code></td>
+                                    <td><code>| project-rename SourceIP = src_ip</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Select fields</strong></td>
+                                    <td><code>| table _time, user, src_ip</code></td>
+                                    <td><code>| project TimeGenerated, User, SourceIP</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Remove fields</strong></td>
+                                    <td><code>| fields - _raw, _time</code></td>
+                                    <td><code>| project-away Column1, Column2</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Conditional field</strong></td>
+                                    <td><code>| eval status=if(code=200, "ok", "error")</code></td>
+                                    <td><code>| extend Status = iif(Code == 200, "ok", "error")</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Case statement</strong></td>
+                                    <td><code>| eval sev=case(score>90,"crit", score>50,"high", true(),"low")</code></td>
+                                    <td><code>| extend Sev = case(Score>90,"crit", Score>50,"high", true,"low")</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Concatenate</strong></td>
+                                    <td><code>| eval full_name=first." ".last</code></td>
+                                    <td><code>| extend FullName = strcat(First, " ", Last)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Substring</strong></td>
+                                    <td><code>| eval domain=substr(email, indexOf(email,"@")+1)</code></td>
+                                    <td><code>| extend Domain = substring(Email, indexof(Email, "@")+1)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lower/Upper case</strong></td>
+                                    <td><code>| eval user=lower(user)</code></td>
+                                    <td><code>| extend User = tolower(User)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Split string</strong></td>
+                                    <td><code>| eval parts=split(path, "/")</code></td>
+                                    <td><code>| extend Parts = split(Path, "/")</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Coalesce</strong></td>
+                                    <td><code>| eval ip=coalesce(src_ip, client_ip, "unknown")</code></td>
+                                    <td><code>| extend IP = coalesce(SrcIP, ClientIP, "unknown")</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Sorting and Limiting</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Sort descending</strong></td>
+                                    <td><code>| sort -count</code></td>
+                                    <td><code>| order by Count desc</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sort ascending</strong></td>
+                                    <td><code>| sort +count</code></td>
+                                    <td><code>| order by Count asc</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Multi-column sort</strong></td>
+                                    <td><code>| sort -count, +user</code></td>
+                                    <td><code>| order by Count desc, User asc</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Limit rows</strong></td>
+                                    <td><code>| head 10</code></td>
+                                    <td><code>| take 10</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Top N</strong></td>
+                                    <td><code>| top 10 user</code></td>
+                                    <td><code>| top 10 by User</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rare values</strong></td>
+                                    <td><code>| rare user</code></td>
+                                    <td><code>| summarize Count=count() by User | order by Count asc | take 10</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Deduplicate</strong></td>
+                                    <td><code>| dedup user</code></td>
+                                    <td><code>| distinct User</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dedup with fields</strong></td>
+                                    <td><code>| dedup user, src_ip</code></td>
+                                    <td><code>| distinct User, SourceIP</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Advanced Patterns</h2>
+                    
+                    <h3>Joins</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>index=auth user=* 
+| join user [
+    search index=hr 
+    | table user, department
+]</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>SigninLogs
+| join kind=inner (
+    HRData | project User, Department
+) on $left.UserPrincipalName == $right.User</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Join Performance</div>
+                        <p>Joins in both SPL and KQL are expensive. In KQL, prefer <code>lookup</code> for reference data and <code>union</code> for combining similar tables. In Splunk, use data models or summary indexes for frequently joined data.</p>
+                    </div>
+
+                    <h3>Lookups / Enrichment</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>| lookup threat_intel.csv ip as src_ip 
+  OUTPUT threat_type, confidence</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>| lookup kind=leftouter ThreatIntel on 
+  $left.SourceIP == $right.IP
+// Or use externaldata for CSV:
+| join kind=leftouter (
+    externaldata (IP:string, ThreatType:string)
+    [@"https://storage/threat_intel.csv"]
+) on $left.SourceIP == $right.IP</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Subqueries</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>index=auth 
+[search index=threat 
+ | fields src_ip 
+ | format]</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>let ThreatIPs = ThreatLogs | distinct SourceIP;
+SigninLogs
+| where IpAddress in (ThreatIPs)</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Regex Field Extraction</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>| rex field=_raw "user=(?&lt;username&gt;\w+)"
+| rex field=msg "from (?&lt;src_ip&gt;\d+\.\d+\.\d+\.\d+)"</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>| extend Username = extract("user=(\\w+)", 1, RawData)
+| extend SrcIP = extract("from (\\d+\\.\\d+\\.\\d+\\.\\d+)", 1, Message)</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Transaction / Session Grouping</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL</th>
+                                    <th>KQL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>| transaction src_ip maxspan=5m 
+  startswith="login" 
+  endswith="logout"</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>// KQL doesn't have direct transaction equivalent
+// Approach: Use summarize with session window
+| summarize 
+    Events = make_list(EventType),
+    StartTime = min(TimeGenerated),
+    EndTime = max(TimeGenerated)
+  by SourceIP, bin(TimeGenerated, 5m)</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Security Detection Examples</h2>
+                    
+                    <h3>Brute Force Detection</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL (Splunk)</th>
+                                    <th>KQL (Sentinel)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>index=wineventlog EventCode=4625
+| bin _time span=10m
+| stats count as failures,
+        dc(TargetUserName) as users_targeted,
+        values(TargetUserName) as targeted_users
+  by src_ip, _time
+| where failures > 10
+| eval severity=case(
+    failures>50, "critical",
+    failures>25, "high",
+    true(), "medium")</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>SecurityEvent
+| where EventID == 4625
+| summarize 
+    Failures = count(),
+    UsersTargeted = dcount(TargetUserName),
+    TargetedUsers = make_set(TargetUserName, 10)
+  by SourceIP = IpAddress, bin(TimeGenerated, 10m)
+| where Failures > 10
+| extend Severity = case(
+    Failures > 50, "critical",
+    Failures > 25, "high",
+    "medium")</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Suspicious Process Execution</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL (Splunk)</th>
+                                    <th>KQL (Sentinel)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>index=wineventlog EventCode=4688
+| search (NewProcessName="*\\powershell.exe" 
+         OR NewProcessName="*\\cmd.exe")
+| search CommandLine="*-enc*" 
+         OR CommandLine="*downloadstring*"
+         OR CommandLine="*bypass*"
+| eval risk_score=case(
+    like(CommandLine,"%encodedcommand%"), 90,
+    like(CommandLine,"%downloadstring%"), 85,
+    like(CommandLine,"%bypass%"), 70,
+    true(), 50)
+| where risk_score >= 70
+| table _time, host, SubjectUserName, 
+        NewProcessName, CommandLine, risk_score</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>SecurityEvent
+| where EventID == 4688
+| where NewProcessName endswith "\\powershell.exe" 
+     or NewProcessName endswith "\\cmd.exe"
+| where CommandLine has_any 
+    ("-enc", "downloadstring", "bypass", 
+     "IEX", "WebClient")
+| extend RiskScore = case(
+    CommandLine has "encodedcommand", 90,
+    CommandLine has "downloadstring", 85,
+    CommandLine has "bypass", 70,
+    50)
+| where RiskScore >= 70
+| project TimeGenerated, Computer, 
+          SubjectUserName, NewProcessName, 
+          CommandLine, RiskScore</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Lateral Movement via RDP</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPL (Splunk)</th>
+                                    <th>KQL (Sentinel)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <pre><code>index=wineventlog EventCode=4624 LogonType=10
+| eval src_type=if(cidrmatch("10.0.0.0/8",src_ip) 
+                  OR cidrmatch("172.16.0.0/12",src_ip) 
+                  OR cidrmatch("192.168.0.0/16",src_ip),
+                  "internal","external")
+| where src_type="internal"
+| stats count, dc(dest) as unique_targets, 
+        values(dest) as targets by src_ip, user
+| where unique_targets > 3
+| eval alert="Potential lateral movement via RDP"</code></pre>
+                                    </td>
+                                    <td>
+                                        <pre><code>SecurityEvent
+| where EventID == 4624 and LogonType == 10
+| extend SrcType = iif(
+    ipv4_is_private(IpAddress), 
+    "internal", "external")
+| where SrcType == "internal"
+| summarize 
+    Count = count(), 
+    UniqueTargets = dcount(Computer),
+    Targets = make_set(Computer, 10) 
+  by SourceIP = IpAddress, Account
+| where UniqueTargets > 3
+| extend Alert = "Potential lateral movement via RDP"</code></pre>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Translation Gotchas</h2>
+                    
+                    <h3>1. Case Sensitivity</h3>
+                    <p>SPL is case-insensitive by default. KQL is case-sensitive.</p>
+                    <ul>
+                        <li><code>user=Admin</code> in SPL matches "admin", "ADMIN", "Admin"</li>
+                        <li><code>| where User == "Admin"</code> in KQL only matches "Admin"</li>
+                        <li>Use <code>=~</code> for case-insensitive: <code>| where User =~ "admin"</code></li>
+                    </ul>
+                    
+                    <h3>2. Null Handling</h3>
+                    <p>SPL treats empty as empty string. KQL has explicit null.</p>
+                    <ul>
+                        <li>SPL: <code>| where isnotnull(field)</code></li>
+                        <li>KQL: <code>| where isnotempty(Field)</code> (for strings) or <code>| where isnotnull(Field)</code></li>
+                    </ul>
+                    
+                    <h3>3. Wildcard Differences</h3>
+                    <p>SPL uses * for wildcards. KQL uses different operators.</p>
+                    <ul>
+                        <li>SPL: <code>user=admin*</code></li>
+                        <li>KQL: <code>| where User startswith "admin"</code></li>
+                        <li>SPL: <code>path="*/temp/*"</code></li>
+                        <li>KQL: <code>| where Path has "/temp/"</code></li>
+                    </ul>
+                    
+                    <h3>4. Time Field Names</h3>
+                    <ul>
+                        <li>SPL: <code>_time</code> (epoch seconds)</li>
+                        <li>KQL: <code>TimeGenerated</code> (datetime type)</li>
+                    </ul>
+                    
+                    <h3>5. Multivalue Fields</h3>
+                    <p>SPL has native multivalue support. KQL uses arrays.</p>
+                    <ul>
+                        <li>SPL: <code>| eval combined=mvappend(field1, field2)</code></li>
+                        <li>KQL: <code>| extend Combined = array_concat(Field1, Field2)</code></li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you translate SPL to KQL for a migration?"</strong></p>
+                        <p><strong>A:</strong> "I break it into layers. First, map the data sources—understanding which Splunk index/sourcetype maps to which Sentinel table. Second, translate the core query logic: 'stats' becomes 'summarize', 'eval' becomes 'extend', 'table' becomes 'project'. Third, handle the nuances—KQL is case-sensitive unlike SPL, wildcards work differently, and time handling syntax differs.</p>
+                        <p>For complex rules, I focus on the detection intent rather than literal translation. Sometimes a different approach in KQL works better than direct translation. I always test translated rules against historical data and compare results with the original platform. Common pitfalls include case sensitivity, different null handling, and the lack of a direct 'transaction' equivalent in KQL."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Quick Translation Reference</div>
+                        <h4>Core Commands</h4>
+                        <table>
+                            <tr><th>SPL</th><th>KQL</th></tr>
+                            <tr><td>stats</td><td>summarize</td></tr>
+                            <tr><td>eval</td><td>extend</td></tr>
+                            <tr><td>table</td><td>project</td></tr>
+                            <tr><td>rename</td><td>project-rename</td></tr>
+                            <tr><td>sort</td><td>order by</td></tr>
+                            <tr><td>head / tail</td><td>take / take (with order by desc)</td></tr>
+                            <tr><td>dedup</td><td>distinct</td></tr>
+                            <tr><td>where / search</td><td>where</td></tr>
+                            <tr><td>rex</td><td>extract / parse</td></tr>
+                        </table>
+                        <h4>Aggregation Functions</h4>
+                        <table>
+                            <tr><th>SPL</th><th>KQL</th></tr>
+                            <tr><td>count</td><td>count()</td></tr>
+                            <tr><td>dc(field)</td><td>dcount(field)</td></tr>
+                            <tr><td>values(field)</td><td>make_set(field)</td></tr>
+                            <tr><td>list(field)</td><td>make_list(field)</td></tr>
+                            <tr><td>first(field)</td><td>take_any(field)</td></tr>
+                            <tr><td>earliest(_time)</td><td>min(TimeGenerated)</td></tr>
+                        </table>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="detection-migration.html" class="card-link">← Detection Migration</a>
+                    <a href="spl-fundamentals.html" class="card-link">SPL Fundamentals →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

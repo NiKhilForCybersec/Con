@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Scenarios | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Interview Prep</div>
+                    <a href="common-questions.html" class="nav-item">Common Questions</a>
+                    <a href="interview-scenarios.html" class="nav-item active">Scenarios</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Interview Scenarios</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Interview Scenarios</h1>
+                    <p class="page-subtitle">Technical interviews often include scenario-based questions to assess practical problem-solving. These scenarios cover common situations you'll encounter as a SIEM engineer or consultant.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Scenario 1: Alert Triage</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"You receive an alert: 'Multiple failed login attempts followed by successful login for user jsmith.' The alert fired at 2:47 AM. Walk me through your investigation."</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Context gathering:</strong> "First, I'd understand the user context. Who is jsmith? What's their role? Is 2:47 AM normal for them? Are they in a different timezone?"</li>
+                        <li><strong>Failure analysis:</strong> "I'd look at the failed attempts—how many? Over what timeframe? What were the failure reasons? Password wrong vs account locked vs MFA failed gives different signals."</li>
+                        <li><strong>Source analysis:</strong> "Where did the attempts come from? Same IP or different? Internal or external? If external, what's the geolocation? Does it match the user's expected location?"</li>
+                        <li><strong>Success analysis:</strong> "For the successful login—same IP as failures or different? What authentication method? If different IP or method, that's more concerning."</li>
+                        <li><strong>Post-login activity:</strong> "What did the account do after successful login? Normal activity or immediate privilege escalation, lateral movement, or data access?"</li>
+                        <li><strong>Correlation:</strong> "Are there other alerts for this user or from this source IP? Any related activity on other accounts?"</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Investigation Query</div>
+                        <pre><code>// Timeline for the user
+let targetUser = "jsmith@company.com";
+let timeWindow = 1h;
+union SigninLogs, SecurityEvent
+| where TimeGenerated between (datetime(2024-03-15 02:00) .. datetime(2024-03-15 04:00))
+| where UserPrincipalName == targetUser or TargetUserName has "jsmith"
+| project TimeGenerated, EventType = Type, Result = coalesce(ResultType, tostring(EventID)),
+          IPAddress = coalesce(IPAddress, IpAddress), Location, AppDisplayName
+| order by TimeGenerated asc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 2: Detection Gap</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"A red team exercise revealed that lateral movement via PsExec wasn't detected. How would you build a detection for this?"</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Understand the technique:</strong> "PsExec works by copying a service executable to the target, creating a service, and executing it. This generates specific artifacts: SMB file copy, service creation (Event 7045), and process execution."</li>
+                        <li><strong>Data source requirements:</strong> "I need Windows Security logs for service creation (7045) and Sysmon for process creation (Event 1) with command line. SMB file operations are bonus but not essential."</li>
+                        <li><strong>Detection logic:</strong> "Event 7045 where the service name matches PsExec patterns (PSEXESVC by default, but attackers rename it), or service file path is in a temp directory, or service has suspicious characteristics like a random name."</li>
+                        <li><strong>False positive consideration:</strong> "Legitimate admin tools also create services. I'd baseline normal service creation, exclude known IT management tools, and focus on workstation-to-workstation (not from management servers)."</li>
+                        <li><strong>Testing:</strong> "I'd test with actual PsExec execution, verify the detection fires, then test renamed PsExec to ensure we catch variations."</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: PsExec Detection</div>
+                        <pre><code>index=windows EventCode=7045
+| where Service_Name LIKE "%PSEXE%" 
+    OR Service_File_Name LIKE "%\\PSEXE%"
+    OR Service_File_Name LIKE "%\\Temp\\%"
+    OR Service_File_Name LIKE "%\\Windows\\Temp\\%"
+| lookup asset_inventory ip as dest OUTPUT asset_type as dest_type
+| where dest_type="workstation"  // Focus on workstation targets
+| table _time, ComputerName, Service_Name, Service_File_Name, 
+        Service_Account, src_ip</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 3: SIEM Performance Issue</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"Users complain that SIEM searches are slow and dashboards are timing out. How would you troubleshoot and resolve this?"</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Identify scope:</strong> "Is it all searches or specific ones? All users or certain dashboards? All times or specific periods? This narrows down whether it's a query issue, resource issue, or data issue."</li>
+                        <li><strong>Check resource utilization:</strong> "Review SIEM infrastructure metrics—CPU, memory, disk I/O on search heads and indexers. Are we hitting capacity limits?"</li>
+                        <li><strong>Analyze slow queries:</strong> "Look at the search job inspector (Splunk) or query performance metrics. Which specific queries are slow? Are they scanning too much data? Using inefficient patterns?"</li>
+                        <li><strong>Data volume check:</strong> "Has ingest volume increased significantly? A sudden spike in data could overwhelm search capacity."</li>
+                        <li><strong>Optimization approaches:</strong>
+                            <ul>
+                                <li>Add time bounds to searches (never search 'all time')</li>
+                                <li>Use indexed fields in filters before non-indexed</li>
+                                <li>Replace wildcard searches with specific terms</li>
+                                <li>Use data models or accelerated searches for dashboards</li>
+                                <li>Summary indexing for frequently-queried data</li>
+                            </ul>
+                        </li>
+                        <li><strong>Infrastructure scaling:</strong> "If it's a capacity issue, consider adding search heads, increasing indexer capacity, or implementing search head clustering."</li>
+                    </ol>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 4: High False Positive Rate</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"A detection rule for 'Suspicious PowerShell Commands' is generating 500 alerts per day, and analysts say 95% are false positives. How would you approach this?"</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Analyze the false positives:</strong> "First, I'd sample the FPs to understand patterns. Are they from specific users? Specific scripts? Specific systems? This tells me what to exclude."</li>
+                        <li><strong>Identify legitimate patterns:</strong> "Common FP sources for PowerShell alerts include IT automation, SCCM/MECM, security tools running scans, and scheduled administrative scripts."</li>
+                        <li><strong>Tuning approach:</strong>
+                            <ul>
+                                <li>Exclude known IT automation accounts</li>
+                                <li>Exclude signed scripts from trusted publishers</li>
+                                <li>Exclude specific script paths (IT script repositories)</li>
+                                <li>Add context: workstation-originated commands are higher risk than server-originated from management systems</li>
+                            </ul>
+                        </li>
+                        <li><strong>Refine detection logic:</strong> "Instead of broad pattern matching, focus on specific malicious indicators—base64 with invoke-expression, download cradles, AMSI bypass patterns."</li>
+                        <li><strong>Risk-based prioritization:</strong> "Consider adding risk scoring—command from privileged user + unusual source + obfuscation = high priority. Command from IT service account + known script = low/auto-close."</li>
+                        <li><strong>Validate:</strong> "After tuning, ensure we're not blind to real attacks by testing with known-malicious command patterns."</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Refined PowerShell Detection</div>
+                        <pre><code>index=windows EventCode=4104 
+| where ScriptBlockText LIKE "%encodedcommand%" 
+    OR ScriptBlockText LIKE "%downloadstring%"
+    OR ScriptBlockText LIKE "%invoke-expression%"
+    OR ScriptBlockText LIKE "%bypass%amsi%"
+// Exclude IT automation
+| where NOT user IN ("svc_sccm", "svc_automation", "SYSTEM")
+| where NOT ScriptBlockText LIKE "%\\ITScripts\\%"
+// Focus on workstation origins
+| lookup asset_inventory host OUTPUT asset_type
+| where asset_type="workstation"
+| table _time, host, user, ScriptBlockText</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 5: Ransomware Response</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"It's 3 PM on Friday. You receive multiple alerts for file encryption activity on several servers. Users are reporting they can't access files. Walk me through your response."</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Immediate containment:</strong> "First priority is stopping the spread. Identify affected systems and isolate them from the network—either through EDR network isolation or network-level blocking. Don't shut down yet as memory may contain encryption keys."</li>
+                        <li><strong>Scope assessment:</strong> "Use SIEM to quickly determine: How many systems are affected? Is it spreading? What's the timeline—when did it start?"</li>
+                        <li><strong>Entry point investigation:</strong> "Look back before the encryption started. Common entry points: phishing email, compromised VPN credentials, exploited public-facing system. The SIEM timeline shows what led to this."</li>
+                        <li><strong>Lateral movement analysis:</strong> "How did it spread? PsExec? WMI? Stolen credentials? This tells us what else might be compromised."</li>
+                        <li><strong>Credential assessment:</strong> "Assume all credentials on affected systems are compromised. Identify accounts that were logged in and plan password resets."</li>
+                        <li><strong>Communication:</strong> "Escalate to IR lead, notify management per IR plan. Document timeline and actions taken."</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Ransomware Scoping</div>
+                        <pre><code>// Find all affected systems
+SecurityAlert
+| where TimeGenerated > ago(4h)
+| where AlertName has_any ("ransomware", "encryption", "file modification")
+| summarize 
+    FirstSeen = min(TimeGenerated),
+    AlertCount = count()
+  by CompromisedEntity
+| order by FirstSeen asc
+
+// Timeline leading up to incident
+let affectedHost = "SERVER01";
+union SecurityEvent, DeviceProcessEvents, DeviceNetworkEvents
+| where TimeGenerated > ago(24h)
+| where DeviceName == affectedHost or Computer == affectedHost
+| project TimeGenerated, EventType = Type, Details = coalesce(CommandLine, ProcessCommandLine, FileName)
+| order by TimeGenerated asc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 6: Migration Planning</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"Your organization is migrating from Splunk to Microsoft Sentinel. You have 200 detection rules. How would you approach this migration?"</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Discovery and assessment:</strong> "First, inventory all 200 rules. For each: Is it active? When did it last fire? What's the false positive rate? This identifies which rules are actually providing value."</li>
+                        <li><strong>Prioritization:</strong> "Categorize rules into: Must have (critical detections, high-value), Should have (important but not critical), Nice to have (rarely fires, low value). Focus migration effort on the first two categories."</li>
+                        <li><strong>Data source mapping:</strong> "Map SPL source types to Sentinel tables. Ensure all required data is available in Sentinel before migrating dependent rules."</li>
+                        <li><strong>Translation approach:</strong>
+                            <ul>
+                                <li>Use built-in Sentinel content where equivalent exists</li>
+                                <li>Translate custom rules from SPL to KQL</li>
+                                <li>Adapt logic for Sentinel's different schema</li>
+                            </ul>
+                        </li>
+                        <li><strong>Parallel operation:</strong> "Run both SIEMs simultaneously during migration. Compare alert output to ensure Sentinel detects what Splunk detected."</li>
+                        <li><strong>Phased cutover:</strong> "Migrate in waves—critical detections first, validate, then next priority level. Full cutover only after all critical rules are validated."</li>
+                    </ol>
+                </section>
+
+                <section class="content-section">
+                    <h2>Scenario 7: Log Source Troubleshooting</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">📋 Scenario</div>
+                        <p>"The SOC reports they're not seeing Windows Security events from Domain Controllers. How would you troubleshoot?"</p>
+                    </div>
+
+                    <h3>Strong Answer Approach</h3>
+                    <ol>
+                        <li><strong>Verify the problem:</strong> "Confirm no events are arriving—query the SIEM for any DC events in the last 24 hours. If partial, which DCs are affected?"</li>
+                        <li><strong>Check the collection chain:</strong> Work backwards from SIEM to source:
+                            <ul>
+                                <li><strong>SIEM side:</strong> Is the forwarder/agent reporting as connected? Any parsing errors?</li>
+                                <li><strong>Network:</strong> Can the DC reach the SIEM/forwarder? Firewall rules? DNS resolution?</li>
+                                <li><strong>Agent/forwarder:</strong> Is it running? Any errors in local logs? Configuration correct?</li>
+                                <li><strong>Windows side:</strong> Is the Security log generating events? Is it full? Audit policy configured correctly?</li>
+                            </ul>
+                        </li>
+                        <li><strong>Common causes:</strong>
+                            <ul>
+                                <li>Agent/forwarder service stopped or crashed</li>
+                                <li>Certificate expired (for TLS connections)</li>
+                                <li>Firewall change blocking traffic</li>
+                                <li>Disk full on DC (events not being generated)</li>
+                                <li>Windows audit policy change</li>
+                            </ul>
+                        </li>
+                        <li><strong>Validate fix:</strong> "After fixing, verify events are flowing AND check for any gap in coverage that might need backfill."</li>
+                    </ol>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Scenario Response Framework</div>
+                        <h4>Alert Investigation</h4>
+                        <ol>
+                            <li>Understand context (user, asset, time)</li>
+                            <li>Analyze the specific event data</li>
+                            <li>Check related activity (before/after)</li>
+                            <li>Correlate with other sources</li>
+                            <li>Determine true/false positive</li>
+                            <li>Document and respond</li>
+                        </ol>
+                        <h4>Detection Development</h4>
+                        <ol>
+                            <li>Understand the attack technique</li>
+                            <li>Identify data sources needed</li>
+                            <li>Design detection logic</li>
+                            <li>Consider false positives</li>
+                            <li>Test with real attack simulation</li>
+                            <li>Deploy and monitor</li>
+                        </ol>
+                        <h4>Incident Response</h4>
+                        <ol>
+                            <li>Contain (stop the bleeding)</li>
+                            <li>Scope (how bad is it?)</li>
+                            <li>Investigate (what happened?)</li>
+                            <li>Eradicate (remove threat)</li>
+                            <li>Recover (restore operations)</li>
+                            <li>Learn (prevent recurrence)</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="common-questions.html" class="card-link">← Common Questions</a>
+                    <a href="index.html" class="card-link">Home →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

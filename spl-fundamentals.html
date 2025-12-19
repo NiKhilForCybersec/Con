@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPL Fundamentals | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Query Languages</div>
+                    <a href="spl-fundamentals.html" class="nav-item active">SPL Fundamentals</a>
+                    <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+                    <a href="query-translation.html" class="nav-item">Query Translation</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SPL Fundamentals</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SPL Fundamentals</h1>
+                    <p class="page-subtitle">Splunk Search Processing Language (SPL) is the query language for Splunk. Mastering SPL is essential for security analysis, detection engineering, and Splunk administration.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>SPL Philosophy</h2>
+                    <p>SPL is inspired by Unix pipelines. Data flows from left to right through a series of commands:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SPL Pipeline Structure</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   search index=security EventCode=4625                                      │
+│          │                                                                  │
+│          ▼                                                                  │
+│   | stats count by src_ip                                                   │
+│          │                                                                  │
+│          ▼                                                                  │
+│   | where count > 5                                                         │
+│          │                                                                  │
+│          ▼                                                                  │
+│   | sort -count                                                             │
+│          │                                                                  │
+│          ▼                                                                  │
+│   | head 10                                                                 │
+│                                                                             │
+│   ═══════════════════════════════════════════════════════════════════════   │
+│   Each pipe (|) passes results to the next command                         │
+│   Commands transform, filter, or aggregate the data                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Search Basics</h2>
+                    
+                    <h3>Index and Sourcetype</h3>
+                    <p>Every search starts by specifying where to look:</p>
+                    <pre><code>index=security                           // Search security index
+index=security sourcetype=WinEventLog    // Specific sourcetype
+index=* EventCode=4625                   // All indexes (expensive!)
+index=security OR index=network          // Multiple indexes</code></pre>
+                    
+                    <h3>Time Range</h3>
+                    <p>Always specify time to limit search scope:</p>
+                    <pre><code>earliest=-24h                            // Last 24 hours
+earliest=-7d latest=-1d                  // 7 days ago to 1 day ago
+earliest="01/01/2024:00:00:00"           // Specific date
+earliest=-1h@h                           // Last hour, snapped to hour</code></pre>
+                    
+                    <h3>Field Searches</h3>
+                    <pre><code>user=admin                               // Exact match
+user=admin*                              // Wildcard (starts with)
+user="admin user"                        // Contains space
+user!=admin                              // Not equal
+user IN (admin, administrator, root)     // Multiple values</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Essential Commands</h2>
+                    
+                    <h3>stats - Aggregation</h3>
+                    <p>The most important command. Aggregates data:</p>
+                    <pre><code>| stats count                            // Total events
+| stats count by user                    // Count per user
+| stats count as events by user          // Named count
+| stats count, dc(host) by user          // Multiple aggregations
+| stats count, values(host) by user      // List all hosts per user
+| stats sum(bytes) as total_bytes        // Sum numeric field
+| stats avg(duration), min(duration), max(duration)  // Statistics
+| stats earliest(_time), latest(_time) by session_id // Time range</code></pre>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Common Stats Functions</div>
+                        <table>
+                            <tr><th>Function</th><th>Description</th></tr>
+                            <tr><td><code>count</code></td><td>Number of events</td></tr>
+                            <tr><td><code>dc(field)</code></td><td>Distinct count of values</td></tr>
+                            <tr><td><code>values(field)</code></td><td>List of unique values</td></tr>
+                            <tr><td><code>list(field)</code></td><td>List of all values (including duplicates)</td></tr>
+                            <tr><td><code>sum(field)</code></td><td>Sum of numeric values</td></tr>
+                            <tr><td><code>avg(field)</code></td><td>Average</td></tr>
+                            <tr><td><code>min(field)</code></td><td>Minimum value</td></tr>
+                            <tr><td><code>max(field)</code></td><td>Maximum value</td></tr>
+                            <tr><td><code>first(field)</code></td><td>First value seen</td></tr>
+                            <tr><td><code>last(field)</code></td><td>Last value seen</td></tr>
+                        </table>
+                    </div>
+
+                    <h3>eval - Field Creation</h3>
+                    <p>Create new fields or modify existing ones:</p>
+                    <pre><code>| eval severity="high"                   // Static value
+| eval duration_min=duration/60          // Calculation
+| eval full_name=first." ".last          // Concatenation
+| eval status=if(code=200,"ok","error")  // Conditional
+| eval risk=case(
+    score>90, "critical",
+    score>70, "high",
+    score>50, "medium",
+    true(), "low"
+  )                                       // Multiple conditions
+| eval domain=lower(domain)              // String functions
+| eval ip_parts=split(ip, ".")           // Split to multivalue</code></pre>
+
+                    <h3>where - Filtering Results</h3>
+                    <p>Filter after initial search or aggregation:</p>
+                    <pre><code>| where count > 10                       // Numeric comparison
+| where isnotnull(user)                  // Field exists
+| where like(user, "admin%")             // Pattern match
+| where cidrmatch("10.0.0.0/8", src_ip)  // CIDR match
+| where match(email, ".*@company\.com")  // Regex match</code></pre>
+
+                    <h3>table - Select Fields</h3>
+                    <pre><code>| table _time, user, src_ip, action      // Display specific fields
+| table *                                 // All fields</code></pre>
+
+                    <h3>sort - Order Results</h3>
+                    <pre><code>| sort -count                            // Descending
+| sort +user                             // Ascending
+| sort -count, +user                     // Multiple fields</code></pre>
+
+                    <h3>head / tail - Limit Results</h3>
+                    <pre><code>| head 10                                // First 10
+| tail 10                                // Last 10
+| head 100                               // Limit for performance</code></pre>
+
+                    <h3>dedup - Remove Duplicates</h3>
+                    <pre><code>| dedup user                             // Unique users
+| dedup user, src_ip                     // Unique combinations
+| dedup user sortby -_time               // Keep most recent</code></pre>
+
+                    <h3>rename - Rename Fields</h3>
+                    <pre><code>| rename src_ip as SourceIP
+| rename src_ip as "Source IP"           // With spaces
+| rename src_* as source_*               // Wildcard rename</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Time Commands</h2>
+                    
+                    <h3>bin - Time Buckets</h3>
+                    <pre><code>| bin _time span=1h                      // Group by hour
+| bin _time span=1d                      // Group by day
+| stats count by _time                   // After binning</code></pre>
+
+                    <h3>timechart - Time Series</h3>
+                    <pre><code>| timechart count                        // Events over time
+| timechart count by user                // Per user over time
+| timechart span=1h count by status      // Hourly by status
+| timechart limit=10 count by src_ip     // Top 10 sources</code></pre>
+
+                    <h3>Time Functions in eval</h3>
+                    <pre><code>| eval hour=strftime(_time, "%H")        // Extract hour
+| eval day=strftime(_time, "%A")         // Day name
+| eval age_seconds=now()-_time           // Age of event
+| eval event_date=strftime(_time, "%Y-%m-%d")  // Format date</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Advanced Commands</h2>
+                    
+                    <h3>rex - Field Extraction</h3>
+                    <pre><code>| rex field=_raw "user=(?<username>\w+)"
+| rex field=message "from (?<src_ip>\d+\.\d+\.\d+\.\d+)"
+| rex field=url "https?://(?<domain>[^/]+)"</code></pre>
+
+                    <h3>lookup - Enrich Data</h3>
+                    <pre><code>| lookup threat_intel.csv ip as src_ip OUTPUT threat_type, score
+| lookup users.csv username as user OUTPUT department, manager
+| inputlookup my_watchlist.csv          // Load entire lookup</code></pre>
+
+                    <h3>join - Combine Results</h3>
+                    <pre><code>index=auth user=* 
+| join user [
+    search index=hr 
+    | table user, department
+]</code></pre>
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Join Performance</div>
+                        <p>Joins are expensive. Use sparingly. Consider lookups or subsearches for better performance.</p>
+                    </div>
+
+                    <h3>transaction - Group Related Events</h3>
+                    <pre><code>| transaction session_id maxspan=30m
+| transaction src_ip startswith="login" endswith="logout"
+| transaction user maxevents=100</code></pre>
+
+                    <h3>append / appendcols - Combine Searches</h3>
+                    <pre><code>index=auth 
+| stats count as auth_events
+| append [
+    search index=firewall 
+    | stats count as fw_events
+]</code></pre>
+
+                    <h3>tstats - High Performance</h3>
+                    <pre><code>| tstats count where index=security by _time span=1h
+| tstats summariesonly=t count from datamodel=Authentication 
+    where Authentication.action=failure by Authentication.user</code></pre>
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 tstats Performance</div>
+                        <p>tstats queries indexed fields only - much faster than regular search. Use with data models for best results.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Security-Focused Queries</h2>
+                    
+                    <h3>Failed Login Analysis</h3>
+                    <pre><code>index=wineventlog EventCode=4625
+| stats count as failures, 
+        dc(TargetUserName) as unique_users,
+        values(TargetUserName) as users 
+  by src_ip
+| where failures > 5
+| sort -failures</code></pre>
+
+                    <h3>Successful Login After Failures</h3>
+                    <pre><code>index=wineventlog EventCode IN (4624, 4625)
+| transaction TargetUserName maxspan=10m
+| search EventCode=4625 EventCode=4624
+| table _time, TargetUserName, src_ip, eventcount</code></pre>
+
+                    <h3>PowerShell Suspicious Commands</h3>
+                    <pre><code>index=wineventlog sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational"
+| search CommandLine="*-enc*" OR CommandLine="*downloadstring*" 
+        OR CommandLine="*bypass*"
+| eval risk=case(
+    like(CommandLine, "%encodedcommand%"), "critical",
+    like(CommandLine, "%downloadstring%"), "high",
+    true(), "medium")
+| table _time, host, user, CommandLine, risk</code></pre>
+
+                    <h3>Rare Process Execution</h3>
+                    <pre><code>index=wineventlog EventCode=4688
+| stats count by NewProcessName
+| where count < 5
+| sort count</code></pre>
+
+                    <h3>Outbound Traffic Anomaly</h3>
+                    <pre><code>index=firewall direction=outbound action=allow
+| stats sum(bytes) as total_bytes by src_ip
+| eventstats avg(total_bytes) as avg_bytes, stdev(total_bytes) as stdev_bytes
+| eval zscore=(total_bytes-avg_bytes)/stdev_bytes
+| where zscore > 3
+| table src_ip, total_bytes, zscore</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Optimization Tips</h2>
+                    
+                    <h3>Search Efficiency</h3>
+                    <ul>
+                        <li><strong>Specify index:</strong> Never use <code>index=*</code> in production</li>
+                        <li><strong>Time bounds:</strong> Always include time range</li>
+                        <li><strong>Filter early:</strong> Put restrictive terms first</li>
+                        <li><strong>Use fields:</strong> <code>field=value</code> faster than <code>*value*</code></li>
+                        <li><strong>Avoid regex:</strong> Use <code>field=*pattern*</code> when possible</li>
+                    </ul>
+                    
+                    <h3>Before and After</h3>
+                    <pre><code>// SLOW - Avoid
+index=* error
+| regex _raw="error.*critical"
+| stats count by host
+
+// FAST - Better
+index=application sourcetype=app_logs error critical earliest=-1h
+| stats count by host</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "Write an SPL query to find brute force attacks."</strong></p>
+                        <p><strong>A:</strong></p>
+                        <pre><code>index=wineventlog EventCode=4625 earliest=-1h
+| stats count as failures,
+        dc(TargetUserName) as targeted_users,
+        values(TargetUserName) as users
+  by src_ip
+| where failures > 10
+| eval severity=case(
+    failures>100, "critical",
+    failures>50, "high",
+    failures>20, "medium",
+    true(), "low")
+| sort -failures
+| table src_ip, failures, targeted_users, users, severity</code></pre>
+                        <p>"This query looks at failed logins (4625), groups by source IP, counts failures and unique targeted users, filters to IPs with more than 10 failures, assigns severity, and presents the results sorted by failure count."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 SPL Quick Reference</div>
+                        <h4>Core Commands</h4>
+                        <table>
+                            <tr><th>Command</th><th>Purpose</th><th>Example</th></tr>
+                            <tr><td>stats</td><td>Aggregate</td><td><code>stats count by user</code></td></tr>
+                            <tr><td>eval</td><td>Create field</td><td><code>eval risk="high"</code></td></tr>
+                            <tr><td>where</td><td>Filter</td><td><code>where count > 10</code></td></tr>
+                            <tr><td>table</td><td>Select fields</td><td><code>table _time, user</code></td></tr>
+                            <tr><td>sort</td><td>Order</td><td><code>sort -count</code></td></tr>
+                            <tr><td>dedup</td><td>Unique</td><td><code>dedup user</code></td></tr>
+                            <tr><td>rename</td><td>Rename field</td><td><code>rename src as source</code></td></tr>
+                            <tr><td>rex</td><td>Extract</td><td><code>rex "user=(?<u>\w+)"</code></td></tr>
+                        </table>
+                        <h4>Stats Functions</h4>
+                        <p><code>count</code>, <code>dc()</code>, <code>values()</code>, <code>sum()</code>, <code>avg()</code>, <code>min()</code>, <code>max()</code>, <code>first()</code>, <code>last()</code></p>
+                        <h4>Time Shortcuts</h4>
+                        <p><code>-1h</code>, <code>-24h</code>, <code>-7d</code>, <code>-30d</code>, <code>@d</code> (snap to day), <code>@h</code> (snap to hour)</p>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="query-translation.html" class="card-link">← Query Translation</a>
+                    <a href="kql-fundamentals.html" class="card-link">KQL Fundamentals →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

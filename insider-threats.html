@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insider Threats | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Data Protection</div>
+                    <a href="dlp-monitoring.html" class="nav-item">DLP Monitoring</a>
+                    <a href="data-exfiltration.html" class="nav-item">Exfiltration Detection</a>
+                    <a href="insider-threats.html" class="nav-item active">Insider Threats</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Insider Threats</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Insider Threat Detection</h1>
+                    <p class="page-subtitle">Insider threats—whether malicious or negligent—pose unique challenges because insiders have legitimate access. Detection relies on behavioral analytics, HR correlation, and understanding normal patterns.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Insider Threat Types</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Insider Threat Categories</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    INSIDER THREAT CATEGORIES                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  MALICIOUS INSIDER                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Disgruntled employee stealing data before departure               │   │
+│  │ • Recruited by competitor or nation-state                           │   │
+│  │ • Financial fraud or embezzlement                                   │   │
+│  │ • Sabotage of systems or data                                       │   │
+│  │                                                                      │   │
+│  │ Indicators: Pre-resignation data hoarding, after-hours access,      │   │
+│  │ accessing resources outside job function                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  NEGLIGENT INSIDER                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Accidental data exposure (email to wrong recipient)               │   │
+│  │ • Policy violations (using personal cloud storage)                  │   │
+│  │ • Falling for phishing attacks                                      │   │
+│  │ • Misconfigured systems exposing data                               │   │
+│  │                                                                      │   │
+│  │ Indicators: DLP policy violations, risky app usage, external        │   │
+│  │ sharing patterns                                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  COMPROMISED INSIDER                                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ • Account takeover via phishing                                     │   │
+│  │ • Credential theft (malware, keylogger)                             │   │
+│  │ • Session hijacking                                                 │   │
+│  │                                                                      │   │
+│  │ Indicators: Impossible travel, unusual access patterns, behavioral  │   │
+│  │ deviation from baseline                                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>HR Data Correlation</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Pre-Resignation Monitoring</div>
+                        <pre><code>// Correlate user activity with HR termination data
+index=file_access OR index=email OR index=cloud_activity
+| lookup hr_terminations user OUTPUT resignation_date, termination_date, department
+| where isnotnull(resignation_date)
+| eval days_before_departure = round((termination_date - _time) / 86400)
+| where days_before_departure >= 0 AND days_before_departure <= 14
+| stats count as activity_count,
+        dc(file_path) as unique_files,
+        sum(bytes) as total_bytes
+  by user, department, days_before_departure
+| sort user, days_before_departure</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Departing Employee Activity</div>
+                        <pre><code>let DepartingEmployees = externaldata(UserId:string, DepartureDate:datetime)
+[@"https://storage.blob.core.windows.net/hr/departures.csv"] with (format="csv");
+OfficeActivity
+| where TimeGenerated > ago(14d)
+| join kind=inner DepartingEmployees on $left.UserId == $right.UserId
+| where TimeGenerated between (datetime_add('day', -14, DepartureDate) .. DepartureDate)
+| where Operation in ("FileDownloaded", "FileCopied", "FileAccessed")
+| summarize 
+    FileOperations = count(),
+    UniqueFiles = dcount(SourceFileName)
+  by UserId, DepartureDate, bin(TimeGenerated, 1d)
+| order by UserId, TimeGenerated</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Behavioral Indicators</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Access Outside Job Function</div>
+                        <pre><code>// Detect access to resources outside normal role
+let UserRoles = IdentityInfo
+| project UserId = AccountUPN, Department, JobTitle;
+OfficeActivity
+| where TimeGenerated > ago(7d)
+| where Operation == "FileAccessed"
+| join kind=inner UserRoles on UserId
+| extend FileDepartment = extract(@"\/sites\/([^\/]+)\/", 1, SourceRelativeUrl)
+| where FileDepartment != Department  // Accessing other department's files
+| summarize 
+    CrossDeptAccess = count(),
+    Departments = make_set(FileDepartment)
+  by UserId, Department, JobTitle
+| where CrossDeptAccess > 20
+| order by CrossDeptAccess desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: After-Hours Activity Spike</div>
+                        <pre><code>index=authentication OR index=file_access
+| eval hour = strftime(_time, "%H")
+| eval is_after_hours = if(hour < 6 OR hour > 20, 1, 0)
+| stats sum(is_after_hours) as after_hours_events,
+        count as total_events
+  by user
+| eval after_hours_ratio = round(after_hours_events / total_events * 100, 1)
+| join type=left user [
+    search index=authentication earliest=-30d@d latest=-7d@d
+    | eval hour = strftime(_time, "%H")
+    | eval is_after_hours = if(hour < 6 OR hour > 20, 1, 0)
+    | stats sum(is_after_hours) as baseline_after_hours, count as baseline_total by user
+    | eval baseline_ratio = round(baseline_after_hours / baseline_total * 100, 1)
+]
+| eval ratio_increase = after_hours_ratio - baseline_ratio
+| where ratio_increase > 20  // Significant increase
+| sort -ratio_increase</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privilege Escalation Attempts</div>
+                        <pre><code>// Detect repeated access denied suggesting reconnaissance
+SecurityEvent
+| where TimeGenerated > ago(7d)
+| where EventID == 4625 or EventID == 4656  // Login failure, object access failure
+| summarize 
+    FailedAttempts = count(),
+    UniqueResources = dcount(ObjectName),
+    Resources = make_set(ObjectName, 10)
+  by Account, Computer
+| where FailedAttempts > 50
+| order by FailedAttempts desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>User Risk Scoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Composite Insider Risk Score</div>
+                        <pre><code>// Build composite risk score from multiple signals
+| inputlookup user_directory
+| join type=left user [
+    // DLP violations
+    search index=dlp earliest=-30d
+    | stats count as dlp_violations by user
+    | eval dlp_risk = min(dlp_violations * 5, 25)
+]
+| join type=left user [
+    // After-hours access
+    search index=file_access earliest=-7d
+    | eval is_after_hours = if(date_hour < 6 OR date_hour > 20, 1, 0)
+    | stats sum(is_after_hours) as after_hours by user
+    | eval hours_risk = min(after_hours, 20)
+]
+| join type=left user [
+    // External sharing
+    search index=cloud_activity action=share earliest=-7d
+    | where recipient_domain != "company.com"
+    | stats count as external_shares by user
+    | eval share_risk = min(external_shares * 3, 20)
+]
+| join type=left user [
+    // HR risk factors
+    | inputlookup hr_risk_indicators
+    | eval hr_risk = case(
+        status="resignation", 25,
+        status="pip", 15,
+        status="investigation", 30,
+        0
+    )
+]
+| fillnull value=0 dlp_risk, hours_risk, share_risk, hr_risk
+| eval total_risk = dlp_risk + hours_risk + share_risk + hr_risk
+| eval risk_level = case(
+    total_risk >= 70, "Critical",
+    total_risk >= 50, "High",
+    total_risk >= 30, "Medium",
+    "Low"
+)
+| where total_risk > 0
+| sort -total_risk</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Investigation Workflow</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Insider Threat Investigation Steps</div>
+                        <ol>
+                            <li><strong>Verify the alert:</strong> Confirm anomalous behavior isn't explained by legitimate business activity (travel, project change)</li>
+                            <li><strong>Correlate with HR:</strong> Check for resignation, PIP, job changes that might explain behavior</li>
+                            <li><strong>Build timeline:</strong> Document all activities across email, file access, authentication, cloud apps</li>
+                            <li><strong>Assess data exposure:</strong> What sensitive data was accessed? Was it exfiltrated?</li>
+                            <li><strong>Involve stakeholders:</strong> Coordinate with HR, Legal, and employee's management before confrontation</li>
+                            <li><strong>Preserve evidence:</strong> Ensure forensic preservation of logs, email, and endpoints</li>
+                            <li><strong>Document findings:</strong> Prepare report for potential legal/HR action</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Privacy Considerations</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">Insider Monitoring Ethics</div>
+                        <ul>
+                            <li><strong>Legal compliance:</strong> Ensure monitoring complies with local laws (GDPR, state privacy laws)</li>
+                            <li><strong>Employee notice:</strong> Employees should be informed of monitoring in policies</li>
+                            <li><strong>Proportionality:</strong> Monitoring scope should match risk level</li>
+                            <li><strong>Access controls:</strong> Limit who can view monitoring data</li>
+                            <li><strong>HR involvement:</strong> Include HR in investigation decisions</li>
+                            <li><strong>Avoid profiling:</strong> Don't target based on protected characteristics</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect insider threats?"</strong></p>
+                        <p><strong>A:</strong> "Insider threat detection is challenging because insiders have legitimate access:</p>
+                        <ol>
+                            <li><strong>Behavioral baselines:</strong> I establish what's normal for each user—when they work, what they access, how much data they handle. Deviations from baseline are signals.</li>
+                            <li><strong>HR integration:</strong> The highest-risk period is before departure. I correlate security logs with HR data—resignation notices, PIPs, terminations—to prioritize monitoring.</li>
+                            <li><strong>Cross-source correlation:</strong> A single indicator means little. But file access spike + after-hours activity + external sharing + recent resignation = high confidence.</li>
+                            <li><strong>Peer comparison:</strong> I compare users against their peer group. An accountant accessing engineering files is anomalous even if the volume is low.</li>
+                            <li><strong>Risk scoring:</strong> I combine signals into composite risk scores. This prioritizes investigation and avoids alert fatigue from individual low-confidence signals.</li>
+                            <li><strong>Process, not just technology:</strong> Detection is only half. Investigation requires coordination with HR and Legal to handle sensitively and legally.</li>
+                        </ol>
+                        <p>The balance is detecting real threats while respecting privacy and avoiding a surveillance culture."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Insider Threat Quick Reference</div>
+                        <h4>Risk Indicators</h4>
+                        <ul>
+                            <li>Resignation/termination notice</li>
+                            <li>Performance improvement plan</li>
+                            <li>After-hours data access spike</li>
+                            <li>Accessing outside job function</li>
+                            <li>Large file downloads/copies</li>
+                            <li>External sharing increase</li>
+                        </ul>
+                        <h4>High-Risk Populations</h4>
+                        <ul>
+                            <li>Departing employees (14 days)</li>
+                            <li>Privileged access users</li>
+                            <li>Employees with access to IP</li>
+                            <li>Recently demoted/disciplined</li>
+                            <li>Contractors ending engagement</li>
+                        </ul>
+                        <h4>Key Data Sources</h4>
+                        <ul>
+                            <li>HR systems (terminations, PIPs)</li>
+                            <li>File access logs</li>
+                            <li>Email/communication logs</li>
+                            <li>Cloud activity (O365, GWS)</li>
+                            <li>DLP alerts</li>
+                            <li>Badge/physical access</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="data-exfiltration.html" class="card-link">← Exfiltration Detection</a>
+                    <a href="ueba-analytics.html" class="card-link">UEBA Analytics →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

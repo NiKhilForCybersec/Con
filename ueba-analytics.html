@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UEBA Analytics | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <a href="edr-integration.html" class="nav-item">EDR Integration</a>
+                    <a href="ueba-analytics.html" class="nav-item active">UEBA</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">UEBA Analytics</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">User & Entity Behavior Analytics</h1>
+                    <p class="page-subtitle">UEBA detects threats by identifying anomalous behavior rather than known signatures. By establishing baselines and detecting deviations, UEBA catches insider threats and compromised accounts that evade traditional detection.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>UEBA Concepts</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">UEBA Detection Model</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       UEBA ANALYTICS PIPELINE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  DATA SOURCES                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Authentication │ File Access │ Email │ VPN │ Cloud Apps │ Endpoints │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  BASELINE LEARNING (14-30 days)                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ User: jsmith@company.com                                             │   │
+│  │ • Typical login hours: 8am-6pm EST                                   │   │
+│  │ • Usual locations: New York office, home (NJ)                        │   │
+│  │ • Common apps: Office 365, Salesforce, Slack                         │   │
+│  │ • Normal file access: ~50 files/day, Sales folder                    │   │
+│  │ • Peer group: Sales team (20 users)                                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ANOMALY DETECTION                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ ⚠️ DEVIATION DETECTED:                                               │   │
+│  │ • 3am login from Ukraine (never seen)                                │   │
+│  │ • Accessed Engineering folder (no history)                           │   │
+│  │ • Downloaded 500 files (10x normal)                                  │   │
+│  │ • Used Azure CLI (never used before)                                 │   │
+│  │                                                                      │   │
+│  │ Risk Score: 87/100 → ALERT                                           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Sentinel UEBA</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: User Risk Score Analysis</div>
+                        <pre><code>BehaviorAnalytics
+| where TimeGenerated > ago(24h)
+| where ActivityInsights has "True"  // Has anomaly insights
+| extend RiskScore = InvestigationPriority
+| where RiskScore > 5
+| project TimeGenerated, UserPrincipalName, 
+          ActivityType, SourceIPAddress,
+          ActivityInsights, RiskScore
+| order by RiskScore desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: First-Time Activity Detection</div>
+                        <pre><code>BehaviorAnalytics
+| where TimeGenerated > ago(24h)
+| where ActivityInsights has "FirstTimeUserConnectedViaCountry"
+    or ActivityInsights has "FirstTimeUserAccessedApplication"
+    or ActivityInsights has "FirstTimeUserPerformedAction"
+| extend Insights = parse_json(ActivityInsights)
+| project TimeGenerated, UserPrincipalName, ActivityType,
+          SourceIPAddress, SourceIPLocation,
+          UsersInsights, DevicesInsights
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Peer Group Deviation</div>
+                        <pre><code>// Detect users behaving differently from peers
+BehaviorAnalytics
+| where TimeGenerated > ago(7d)
+| where ActivityInsights has "UncommonActivityComparedToPeers"
+| extend PeerGroup = tostring(parse_json(UsersInsights).PeerGroup)
+| summarize 
+    AnomalyCount = count(),
+    Activities = make_set(ActivityType)
+  by UserPrincipalName, PeerGroup
+| where AnomalyCount > 5
+| order by AnomalyCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Splunk UBA</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Anomalous Login Patterns</div>
+                        <pre><code>index=authentication
+| eval hour = strftime(_time, "%H")
+| stats count as login_count, 
+        avg(eval(if(hour>=9 AND hour<=17, 1, 0))) as business_hours_ratio
+  by user
+| join type=left user [
+    search index=authentication earliest=-30d@d latest=-1d@d
+    | stats avg(eval(if(strftime(_time,"%H")>=9 AND 
+                        strftime(_time,"%H")<=17, 1, 0))) as baseline_ratio
+      by user
+]
+| eval deviation = abs(business_hours_ratio - baseline_ratio)
+| where deviation > 0.3  // Significant change
+| sort -deviation</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Unusual Data Access Volume</div>
+                        <pre><code>index=file_access action=read
+| bucket _time span=1d
+| stats count as daily_files, dc(file_path) as unique_files by user, _time
+| eventstats avg(daily_files) as avg_files, 
+             stdev(daily_files) as stdev_files by user
+| eval zscore = (daily_files - avg_files) / stdev_files
+| where zscore > 3  // More than 3 standard deviations
+| table _time, user, daily_files, avg_files, zscore</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Custom Behavioral Analytics</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Geographic Anomaly Detection</div>
+                        <pre><code>// Detect impossible travel
+let UserLocations = SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| project TimeGenerated, UserPrincipalName, IPAddress, Location,
+          Latitude = toreal(LocationDetails.geoCoordinates.latitude),
+          Longitude = toreal(LocationDetails.geoCoordinates.longitude);
+UserLocations
+| sort by UserPrincipalName, TimeGenerated asc
+| extend PrevTime = prev(TimeGenerated, 1),
+         PrevLat = prev(Latitude, 1),
+         PrevLong = prev(Longitude, 1),
+         PrevUser = prev(UserPrincipalName, 1)
+| where UserPrincipalName == PrevUser
+| extend TimeDiffHours = datetime_diff('hour', TimeGenerated, PrevTime)
+| extend Distance = geo_distance_2points(Longitude, Latitude, PrevLong, PrevLat) / 1000  // km
+| extend SpeedKmh = Distance / TimeDiffHours
+| where SpeedKmh > 800  // Faster than commercial flight
+| project TimeGenerated, UserPrincipalName, Location, 
+          PrevLocation = strcat(PrevLat, ",", PrevLong),
+          TimeDiffHours, Distance, SpeedKmh</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Privileged Account Anomalies</div>
+                        <pre><code>index=authentication user IN (admin*, svc_*, sa_*)
+| stats count as auth_count,
+        dc(src_ip) as unique_sources,
+        dc(app) as unique_apps,
+        values(src_ip) as sources
+  by user, _time span=1h
+| eventstats avg(auth_count) as baseline_auth,
+             avg(unique_sources) as baseline_sources
+  by user
+| eval auth_anomaly = if(auth_count > baseline_auth * 2, 1, 0)
+| eval source_anomaly = if(unique_sources > baseline_sources * 2, 1, 0)
+| where auth_anomaly=1 OR source_anomaly=1
+| table _time, user, auth_count, baseline_auth, unique_sources, sources</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Risk Scoring Model</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Composite User Risk Score</div>
+                        <pre><code>// Combine multiple risk signals
+| inputlookup user_list
+| join type=left user [
+    search index=authentication earliest=-24h
+    | stats count as auth_failures by user
+    | where auth_failures > 5
+    | eval auth_risk = min(auth_failures * 2, 30)
+]
+| join type=left user [
+    search index=dlp earliest=-7d action=block
+    | stats count as dlp_blocks by user
+    | eval dlp_risk = min(dlp_blocks * 5, 30)
+]
+| join type=left user [
+    search index=file_access earliest=-24h
+    | stats count as file_access by user
+    | eventstats avg(file_access) as avg_access
+    | eval access_ratio = file_access / avg_access
+    | where access_ratio > 3
+    | eval access_risk = min(access_ratio * 5, 25)
+]
+| join type=left user [
+    search index=authentication earliest=-24h
+    | iplocation src_ip
+    | where Country NOT IN ("United States", "Canada")
+    | stats dc(Country) as foreign_countries by user
+    | eval geo_risk = foreign_countries * 10
+]
+| fillnull value=0 auth_risk, dlp_risk, access_risk, geo_risk
+| eval total_risk = auth_risk + dlp_risk + access_risk + geo_risk
+| where total_risk > 0
+| sort -total_risk
+| table user, auth_risk, dlp_risk, access_risk, geo_risk, total_risk</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Insider Threat Indicators</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Indicator</th>
+                                    <th>Detection Method</th>
+                                    <th>Risk Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Unusual working hours</strong></td>
+                                    <td>Login time deviation from baseline</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data hoarding</strong></td>
+                                    <td>File access volume spike</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Accessing unfamiliar resources</strong></td>
+                                    <td>First-time folder/app access</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Resignation + data access</strong></td>
+                                    <td>HR data + file/email activity</td>
+                                    <td>Critical</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Privilege escalation attempts</strong></td>
+                                    <td>Access denied patterns</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Peer group deviation</strong></td>
+                                    <td>Activity differs from similar roles</td>
+                                    <td>Medium</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How does UEBA differ from traditional SIEM detection?"</strong></p>
+                        <p><strong>A:</strong> "Traditional SIEM uses signatures—known bad patterns. UEBA detects unknown bad by finding deviations from normal:</p>
+                        <ol>
+                            <li><strong>Baselining:</strong> UEBA learns what's normal for each user over 2-4 weeks. Login times, applications used, data access patterns, geographic locations.</li>
+                            <li><strong>Anomaly detection:</strong> Deviations from baseline trigger risk score increases. No signature needed—if a user who never works weekends suddenly downloads 1000 files on Sunday, that's anomalous.</li>
+                            <li><strong>Peer comparison:</strong> Users are grouped by role/department. Behavior outside peer norms is flagged even if within individual baseline.</li>
+                            <li><strong>Risk scoring:</strong> Multiple weak signals combine into strong indicators. One anomaly isn't alarming; five anomalies together warrant investigation.</li>
+                            <li><strong>Insider threat focus:</strong> Compromised accounts act differently than the real user. Insiders planning exfiltration change behavior before leaving. UEBA catches both.</li>
+                        </ol>
+                        <p>The challenge is tuning. Too sensitive = alert fatigue from normal variation. Too loose = missing real threats. I start with high thresholds and tune down based on investigation results."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 UEBA Quick Reference</div>
+                        <h4>Key Anomaly Types</h4>
+                        <ul>
+                            <li>First-time location/country</li>
+                            <li>Impossible travel</li>
+                            <li>Unusual access time</li>
+                            <li>Abnormal data volume</li>
+                            <li>New application access</li>
+                            <li>Peer group deviation</li>
+                        </ul>
+                        <h4>Baseline Period</h4>
+                        <ul>
+                            <li>Minimum: 14 days</li>
+                            <li>Recommended: 30 days</li>
+                            <li>Exclude known anomalies</li>
+                            <li>Update continuously</li>
+                        </ul>
+                        <h4>Risk Score Thresholds</h4>
+                        <ul>
+                            <li>0-25: Normal</li>
+                            <li>26-50: Monitor</li>
+                            <li>51-75: Investigate</li>
+                            <li>76-100: Critical</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="edr-integration.html" class="card-link">← EDR Integration</a>
+                    <a href="threat-hunting.html" class="card-link">Threat Hunting →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

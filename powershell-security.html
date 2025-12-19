@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell for Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Automation</div>
+                    <a href="soar-automation.html" class="nav-item">SOAR & Automation</a>
+                    <a href="powershell-security.html" class="nav-item active">PowerShell</a>
+                    <a href="python-security.html" class="nav-item">Python</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="soar-automation.html">Automation</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">PowerShell for Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">PowerShell for Security</h1>
+                    <p class="page-subtitle">PowerShell is essential for Windows security automation, Active Directory management, and Microsoft 365 administration. This guide covers security-focused PowerShell techniques.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>PowerShell Security Modules</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Purpose</th>
+                                    <th>Install Command</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>ActiveDirectory</strong></td>
+                                    <td>AD user, group, computer management</td>
+                                    <td>RSAT feature / <code>Import-Module ActiveDirectory</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AzureAD / Microsoft.Graph</strong></td>
+                                    <td>Azure AD / Entra ID management</td>
+                                    <td><code>Install-Module Microsoft.Graph</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ExchangeOnlineManagement</strong></td>
+                                    <td>Exchange Online / email security</td>
+                                    <td><code>Install-Module ExchangeOnlineManagement</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Az.Security</strong></td>
+                                    <td>Azure security settings</td>
+                                    <td><code>Install-Module Az.Security</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Microsoft.Graph.Security</strong></td>
+                                    <td>Microsoft 365 Defender</td>
+                                    <td><code>Install-Module Microsoft.Graph.Security</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Active Directory Security Scripts</h2>
+                    
+                    <h3>Find Privileged Users</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Get All Privileged Users</div>
+                        <pre><code># Get members of high-privilege groups
+$PrivilegedGroups = @(
+    "Domain Admins",
+    "Enterprise Admins", 
+    "Schema Admins",
+    "Administrators",
+    "Account Operators",
+    "Backup Operators"
+)
+
+$Results = foreach ($Group in $PrivilegedGroups) {
+    try {
+        $Members = Get-ADGroupMember -Identity $Group -Recursive
+        foreach ($Member in $Members) {
+            [PSCustomObject]@{
+                Group = $Group
+                Name = $Member.Name
+                SamAccountName = $Member.SamAccountName
+                ObjectClass = $Member.ObjectClass
+            }
+        }
+    } catch {
+        Write-Warning "Could not query group: $Group"
+    }
+}
+
+$Results | Sort-Object Group, Name | Format-Table -AutoSize</code></pre>
+                    </div>
+
+                    <h3>Find Stale Accounts</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Inactive User Accounts</div>
+                        <pre><code># Find users who haven't logged in for 90+ days
+$DaysInactive = 90
+$CutoffDate = (Get-Date).AddDays(-$DaysInactive)
+
+Get-ADUser -Filter {
+    Enabled -eq $true -and 
+    LastLogonDate -lt $CutoffDate
+} -Properties LastLogonDate, PasswordLastSet, Description |
+Select-Object Name, SamAccountName, LastLogonDate, PasswordLastSet, Description |
+Sort-Object LastLogonDate |
+Export-Csv -Path "InactiveUsers.csv" -NoTypeInformation</code></pre>
+                    </div>
+
+                    <h3>Find Service Accounts with Issues</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Service Account Audit</div>
+                        <pre><code># Find service accounts with password never expires or no expiration
+Get-ADUser -Filter {
+    ServicePrincipalName -like "*" -or
+    Name -like "*svc*" -or
+    Name -like "*service*"
+} -Properties PasswordNeverExpires, PasswordLastSet, ServicePrincipalName, 
+              Enabled, LastLogonDate, Description |
+Where-Object { $_.Enabled -eq $true } |
+Select-Object Name, SamAccountName, PasswordNeverExpires, 
+              PasswordLastSet, ServicePrincipalName, Description |
+Export-Csv -Path "ServiceAccounts.csv" -NoTypeInformation</code></pre>
+                    </div>
+
+                    <h3>Kerberoastable Accounts</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Find Kerberoastable Accounts</div>
+                        <pre><code># Find user accounts with SPNs (vulnerable to Kerberoasting)
+Get-ADUser -Filter {ServicePrincipalName -like "*"} `
+    -Properties ServicePrincipalName, PasswordLastSet, Enabled, 
+                MemberOf, LastLogonDate |
+Where-Object { $_.Enabled -eq $true } |
+Select-Object Name, SamAccountName, 
+    @{N='SPNs'; E={$_.ServicePrincipalName -join "; "}},
+    PasswordLastSet, LastLogonDate |
+Export-Csv -Path "KerberoastableAccounts.csv" -NoTypeInformation
+
+# Check if any are in privileged groups (high risk!)
+$PrivGroups = (Get-ADGroup -Filter {
+    Name -like "*admin*" -or Name -like "*privileged*"
+}).DistinguishedName
+
+Get-ADUser -Filter {ServicePrincipalName -like "*"} -Properties MemberOf |
+Where-Object { 
+    $UserGroups = $_.MemberOf
+    $PrivGroups | Where-Object { $UserGroups -contains $_ }
+} | Select-Object Name, SamAccountName</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Azure AD / Entra ID Scripts</h2>
+                    
+                    <h3>Connect to Microsoft Graph</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Graph API Connection</div>
+                        <pre><code># Connect with required scopes
+Connect-MgGraph -Scopes @(
+    "User.Read.All",
+    "Group.Read.All", 
+    "AuditLog.Read.All",
+    "Directory.Read.All"
+)
+
+# Verify connection
+Get-MgContext</code></pre>
+                    </div>
+
+                    <h3>Find Risky Users</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Get Risky Users from Identity Protection</div>
+                        <pre><code># Get users flagged as risky
+$RiskyUsers = Get-MgRiskyUser -Filter "riskState eq 'atRisk'" |
+Select-Object UserDisplayName, UserPrincipalName, RiskLevel, 
+              RiskState, RiskLastUpdatedDateTime
+
+$RiskyUsers | Format-Table -AutoSize
+
+# Get risk detections for investigation
+$RiskDetections = Get-MgRiskDetection -Top 100 |
+Where-Object { $_.RiskLevel -in @('high', 'medium') } |
+Select-Object UserDisplayName, RiskType, RiskLevel, 
+              DetectedDateTime, IpAddress, Location
+
+$RiskDetections | Export-Csv "RiskDetections.csv" -NoTypeInformation</code></pre>
+                    </div>
+
+                    <h3>Audit Privileged Role Assignments</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Get Global Admins</div>
+                        <pre><code># Get all users with Global Administrator role
+$GlobalAdminRole = Get-MgDirectoryRole -Filter "displayName eq 'Global Administrator'"
+$GlobalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $GlobalAdminRole.Id
+
+foreach ($Admin in $GlobalAdmins) {
+    $User = Get-MgUser -UserId $Admin.Id -Property DisplayName, UserPrincipalName, 
+                                                     AccountEnabled, LastSignInDateTime
+    [PSCustomObject]@{
+        DisplayName = $User.DisplayName
+        UPN = $User.UserPrincipalName
+        Enabled = $User.AccountEnabled
+        LastSignIn = $User.SignInActivity.LastSignInDateTime
+    }
+} | Format-Table -AutoSize</code></pre>
+                    </div>
+
+                    <h3>Find Suspicious App Registrations</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Audit App Permissions</div>
+                        <pre><code># Get apps with high-privilege permissions
+$HighRiskPermissions = @(
+    "Mail.ReadWrite",
+    "Mail.Send",
+    "Files.ReadWrite.All",
+    "Directory.ReadWrite.All",
+    "Application.ReadWrite.All"
+)
+
+$Apps = Get-MgApplication -All
+foreach ($App in $Apps) {
+    $Permissions = $App.RequiredResourceAccess.ResourceAccess.Id
+    
+    # Check if app has any high-risk permissions
+    # (Would need to map permission GUIDs to names for production use)
+    
+    [PSCustomObject]@{
+        AppName = $App.DisplayName
+        AppId = $App.AppId
+        CreatedDate = $App.CreatedDateTime
+        PermissionCount = $Permissions.Count
+    }
+} | Sort-Object PermissionCount -Descending | Format-Table</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SIEM Integration Scripts</h2>
+                    
+                    <h3>Export Security Events to SIEM</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Get Security Events</div>
+                        <pre><code># Get recent security events for SIEM ingestion
+$StartTime = (Get-Date).AddHours(-1)
+
+$SecurityEvents = Get-WinEvent -FilterHashtable @{
+    LogName = 'Security'
+    StartTime = $StartTime
+    Id = @(4624, 4625, 4648, 4720, 4728, 4732)  # Key security events
+} -MaxEvents 1000 -ErrorAction SilentlyContinue
+
+$FormattedEvents = foreach ($Event in $SecurityEvents) {
+    [PSCustomObject]@{
+        TimeCreated = $Event.TimeCreated.ToString("o")
+        EventId = $Event.Id
+        Computer = $Event.MachineName
+        Message = $Event.Message.Split("`n")[0]  # First line
+        # Parse XML for structured data
+        EventData = ([xml]$Event.ToXml()).Event.EventData.Data
+    }
+}
+
+# Export as JSON for SIEM
+$FormattedEvents | ConvertTo-Json -Depth 3 | 
+    Out-File "SecurityEvents_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"</code></pre>
+                    </div>
+
+                    <h3>Query Sentinel via API</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Query Log Analytics</div>
+                        <pre><code># Query Microsoft Sentinel / Log Analytics
+$WorkspaceId = "your-workspace-id"
+$Query = @"
+SecurityEvent
+| where TimeGenerated > ago(1h)
+| where EventID == 4625
+| summarize FailCount = count() by TargetUserName, IpAddress
+| where FailCount > 5
+"@
+
+# Using Az module
+Connect-AzAccount
+$Results = Invoke-AzOperationalInsightsQuery -WorkspaceId $WorkspaceId -Query $Query
+
+$Results.Results | Format-Table</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Incident Response Scripts</h2>
+                    
+                    <h3>Disable Compromised Account</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Account Containment</div>
+                        <pre><code># Disable account and force password reset
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$Username
+)
+
+# On-premises AD
+$ADUser = Get-ADUser -Identity $Username
+if ($ADUser) {
+    # Disable account
+    Disable-ADAccount -Identity $Username
+    
+    # Force password change at next logon
+    Set-ADUser -Identity $Username -ChangePasswordAtLogon $true
+    
+    # Remove from privileged groups
+    $PrivGroups = Get-ADPrincipalGroupMembership -Identity $Username |
+        Where-Object { $_.Name -match "admin|privileged" }
+    foreach ($Group in $PrivGroups) {
+        Remove-ADGroupMember -Identity $Group -Members $Username -Confirm:$false
+    }
+    
+    Write-Host "Account $Username has been disabled and removed from privileged groups"
+}
+
+# Azure AD / Entra ID
+Connect-MgGraph -Scopes "User.ReadWrite.All"
+$AzureUser = Get-MgUser -Filter "userPrincipalName eq '$Username'"
+if ($AzureUser) {
+    # Disable account
+    Update-MgUser -UserId $AzureUser.Id -AccountEnabled:$false
+    
+    # Revoke all sessions
+    Revoke-MgUserSignInSession -UserId $AzureUser.Id
+    
+    Write-Host "Azure AD account disabled and sessions revoked"
+}</code></pre>
+                    </div>
+
+                    <h3>Collect Forensic Data</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">PowerShell: Quick Forensic Collection</div>
+                        <pre><code># Collect key forensic artifacts from remote system
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$ComputerName,
+    [string]$OutputPath = "C:\Forensics"
+)
+
+$Session = New-PSSession -ComputerName $ComputerName
+
+# Create output directory
+$CollectionPath = Join-Path $OutputPath $ComputerName
+New-Item -ItemType Directory -Path $CollectionPath -Force
+
+# Collect running processes
+Invoke-Command -Session $Session -ScriptBlock {
+    Get-Process | Select-Object Name, Id, Path, Company, StartTime
+} | Export-Csv "$CollectionPath\Processes.csv" -NoTypeInformation
+
+# Collect network connections
+Invoke-Command -Session $Session -ScriptBlock {
+    Get-NetTCPConnection | Select-Object LocalAddress, LocalPort, 
+        RemoteAddress, RemotePort, State, OwningProcess
+} | Export-Csv "$CollectionPath\NetworkConnections.csv" -NoTypeInformation
+
+# Collect scheduled tasks
+Invoke-Command -Session $Session -ScriptBlock {
+    Get-ScheduledTask | Where-Object {$_.State -ne 'Disabled'} |
+    Select-Object TaskName, TaskPath, State, 
+        @{N='Actions';E={$_.Actions.Execute}}
+} | Export-Csv "$CollectionPath\ScheduledTasks.csv" -NoTypeInformation
+
+# Collect services
+Invoke-Command -Session $Session -ScriptBlock {
+    Get-Service | Select-Object Name, DisplayName, Status, StartType
+} | Export-Csv "$CollectionPath\Services.csv" -NoTypeInformation
+
+# Collect recent security events
+Invoke-Command -Session $Session -ScriptBlock {
+    Get-WinEvent -LogName Security -MaxEvents 5000
+} | Export-Clixml "$CollectionPath\SecurityEvents.xml"
+
+Remove-PSSession $Session
+Write-Host "Collection complete: $CollectionPath"</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you use PowerShell in your security work?"</strong></p>
+                        <p><strong>A:</strong> "I use PowerShell extensively for three main areas:</p>
+                        <ol>
+                            <li><strong>AD Security Auditing:</strong> Scripts to find privileged users, stale accounts, Kerberoastable service accounts, and password policy violations. I run these weekly and compare against baselines.</li>
+                            <li><strong>Azure AD/M365 Security:</strong> Using Microsoft Graph PowerShell to audit role assignments, check for risky sign-ins, review app registrations and their permissions, and monitor Conditional Access policy changes.</li>
+                            <li><strong>Incident Response:</strong> Quick containment scripts—disable accounts across AD and Azure AD, revoke sessions, collect forensic artifacts remotely. Having these ready saves critical time during incidents.</li>
+                        </ol>
+                        <p>I also use PowerShell for SIEM integration—exporting Windows events in structured formats, querying Log Analytics via API, and automating report generation. The key is having tested, documented scripts ready to use rather than writing them during an incident."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 PowerShell Security Quick Reference</div>
+                        <h4>Essential Modules</h4>
+                        <ul>
+                            <li><code>ActiveDirectory</code> - On-prem AD</li>
+                            <li><code>Microsoft.Graph</code> - Entra ID/M365</li>
+                            <li><code>ExchangeOnlineManagement</code> - Email</li>
+                            <li><code>Az.Security</code> - Azure security</li>
+                        </ul>
+                        <h4>Common AD Queries</h4>
+                        <pre><code>Get-ADUser -Filter * -Properties LastLogonDate
+Get-ADGroupMember -Identity "Domain Admins"
+Get-ADUser -Filter {ServicePrincipalName -like "*"}</code></pre>
+                        <h4>Common Graph Commands</h4>
+                        <pre><code>Connect-MgGraph -Scopes "User.Read.All"
+Get-MgUser -Filter "accountEnabled eq true"
+Get-MgRiskyUser -Filter "riskLevel eq 'high'"</code></pre>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soar-automation.html" class="card-link">← SOAR & Automation</a>
+                    <a href="python-security.html" class="card-link">Python Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

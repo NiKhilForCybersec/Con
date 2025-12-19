@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance & Governance | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Compliance</div>
+                    <a href="compliance-governance.html" class="nav-item active">Compliance Overview</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Compliance & Governance</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Compliance & Governance</h1>
+                    <p class="page-subtitle">SIEM platforms are often central to meeting compliance requirements. Understanding regulatory frameworks and how SIEM supports compliance is essential for security consultants.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Compliance Frameworks Overview</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Scope</th>
+                                    <th>Key SIEM Requirements</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>PCI DSS</strong></td>
+                                    <td>Payment card data</td>
+                                    <td>Log retention (1 year), daily log review, file integrity monitoring</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>HIPAA</strong></td>
+                                    <td>Healthcare data</td>
+                                    <td>Audit controls, access monitoring, breach detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SOX</strong></td>
+                                    <td>Financial reporting</td>
+                                    <td>Access controls, change management, audit trails</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GDPR</strong></td>
+                                    <td>EU personal data</td>
+                                    <td>Breach detection, data access logging, 72hr notification</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SOC 2</strong></td>
+                                    <td>Service organizations</td>
+                                    <td>Security monitoring, incident response, logical access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST CSF</strong></td>
+                                    <td>General framework</td>
+                                    <td>Detect function: continuous monitoring, anomaly detection</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>PCI DSS Requirements</h2>
+                    <p>PCI DSS has specific requirements for logging and monitoring:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">PCI DSS Logging Requirements (Req 10)</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PCI DSS REQUIREMENT 10: TRACK ACCESS                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  10.2: IMPLEMENT AUDIT TRAILS                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Log the following events:                                            │   │
+│  │ • Individual user access to cardholder data (10.2.1)                │   │
+│  │ • All actions by admin/root accounts (10.2.2)                       │   │
+│  │ • Access to all audit trails (10.2.3)                               │   │
+│  │ • Invalid logical access attempts (10.2.4)                          │   │
+│  │ • Use of identification mechanisms (10.2.5)                         │   │
+│  │ • Initialization/stopping of audit logs (10.2.6)                    │   │
+│  │ • Creation/deletion of system objects (10.2.7)                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  10.3: RECORD AUDIT TRAIL ENTRIES                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Each entry must include:                                             │   │
+│  │ • User identification (10.3.1)                                      │   │
+│  │ • Type of event (10.3.2)                                            │   │
+│  │ • Date and time (10.3.3)                                            │   │
+│  │ • Success/failure indication (10.3.4)                               │   │
+│  │ • Origination of event (10.3.5)                                     │   │
+│  │ • Identity/name of affected data, component, resource (10.3.6)      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  10.5: SECURE AUDIT TRAILS                                                  │
+│  ├─ Limit viewing to those with job-related need                           │
+│  ├─ Protect from unauthorized modifications                                 │
+│  ├─ Promptly back up to centralized log server                             │
+│  └─ Use file integrity monitoring on logs                                   │
+│                                                                             │
+│  10.6: REVIEW LOGS DAILY                                                    │
+│  ├─ Security events                                                         │
+│  ├─ Logs of all system components storing CHD                              │
+│  ├─ Logs of critical security controls                                      │
+│  └─ Logs of servers performing security functions                           │
+│                                                                             │
+│  10.7: RETAIN LOGS FOR AT LEAST ONE YEAR                                    │
+│  └─ At least 3 months immediately available for analysis                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>PCI DSS SIEM Reports</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Daily PCI Review Dashboard</div>
+                        <pre><code>// Failed access attempts to CDE
+index=* tag=pci_cde (action=failure OR EventCode=4625)
+| stats count by src_ip, user, dest
+| where count > 5
+| sort -count
+
+// Admin account usage
+index=* tag=pci_cde user IN ("admin", "root", "administrator")
+| stats count, values(action) as actions by user, src_ip, dest
+
+// System object changes
+index=* tag=pci_cde (EventCode IN (4720, 4722, 4725, 4726, 4738, 4740))
+| table _time, user, EventCode, Account_Name, action</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>HIPAA Security Requirements</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>HIPAA Safeguard</th>
+                                    <th>Requirement</th>
+                                    <th>SIEM Implementation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>164.312(b)</strong></td>
+                                    <td>Audit Controls</td>
+                                    <td>Record and examine activity in systems containing ePHI</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>164.308(a)(1)(ii)(D)</strong></td>
+                                    <td>Information System Activity Review</td>
+                                    <td>Regular review of audit logs, access reports, security incidents</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>164.308(a)(5)(ii)(C)</strong></td>
+                                    <td>Log-in Monitoring</td>
+                                    <td>Monitor log-in attempts, report discrepancies</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>164.308(a)(6)</strong></td>
+                                    <td>Security Incident Procedures</td>
+                                    <td>Identify, respond to, mitigate, document incidents</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: HIPAA Access Monitoring</div>
+                        <pre><code>// Monitor access to ePHI systems
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResourceDisplayName has_any ("EHR", "Epic", "Cerner", "Patient")
+| summarize 
+    AccessCount = count(),
+    UniqueUsers = dcount(UserPrincipalName),
+    Locations = make_set(Location)
+  by AppDisplayName
+| order by AccessCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SOX Controls</h2>
+                    <p>Sarbanes-Oxley focuses on financial reporting integrity:</p>
+                    
+                    <h3>Key SOX Monitoring Areas</h3>
+                    <ul>
+                        <li><strong>Access Controls:</strong> Who has access to financial systems and data</li>
+                        <li><strong>Change Management:</strong> Changes to financial applications and databases</li>
+                        <li><strong>Segregation of Duties:</strong> No single user can process and approve transactions</li>
+                        <li><strong>Privileged Access:</strong> Admin access to financial systems</li>
+                    </ul>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: SOX Change Monitoring</div>
+                        <pre><code>// Changes to financial applications
+index=* tag=sox_systems (action=modified OR action=created OR action=deleted)
+| stats count by app, user, action, object_type
+| sort -count
+
+// Privileged access to financial systems
+index=* tag=sox_systems user_type=admin
+| stats count, earliest(_time) as first_access, latest(_time) as last_access 
+  by user, system
+| eval duration_hours = round((last_access - first_access) / 3600, 2)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GDPR Breach Detection</h2>
+                    <p>GDPR requires breach notification within 72 hours:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Potential Data Breach Indicators</div>
+                        <pre><code>// Large data access by single user
+OfficeActivity
+| where TimeGenerated > ago(24h)
+| where Operation in ("FileDownloaded", "FileCopied", "FileMoved")
+| summarize 
+    FileCount = count(),
+    TotalSize = sum(FileSize),
+    FileTypes = make_set(FileExtension)
+  by UserId
+| where FileCount > 100 or TotalSize > 100000000
+| extend Alert = "Potential data exfiltration"
+
+// Unusual access patterns
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| where RiskLevelDuringSignIn in ("medium", "high")
+| project UserPrincipalName, Location, RiskLevelDuringSignIn, 
+          RiskEventTypes_V2, AppDisplayName</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Compliance Reporting</h2>
+                    
+                    <h3>Common Compliance Reports</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Report Type</th>
+                                    <th>Frequency</th>
+                                    <th>Content</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Access Review</strong></td>
+                                    <td>Daily/Weekly</td>
+                                    <td>Who accessed sensitive systems, any anomalies</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Failed Authentication</strong></td>
+                                    <td>Daily</td>
+                                    <td>Failed logins, locked accounts, brute force attempts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Privileged Activity</strong></td>
+                                    <td>Daily/Weekly</td>
+                                    <td>Admin actions, configuration changes, elevated access</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Change Management</strong></td>
+                                    <td>Weekly</td>
+                                    <td>System changes, application updates, configuration modifications</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Security Incidents</strong></td>
+                                    <td>Weekly/Monthly</td>
+                                    <td>Detected threats, response actions, resolution status</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Log Health</strong></td>
+                                    <td>Daily</td>
+                                    <td>Log source status, gaps, volume anomalies</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Log Retention Requirements</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Minimum Retention</th>
+                                    <th>Immediate Access</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PCI DSS</td>
+                                    <td>1 year</td>
+                                    <td>3 months</td>
+                                </tr>
+                                <tr>
+                                    <td>HIPAA</td>
+                                    <td>6 years</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>SOX</td>
+                                    <td>7 years</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>GDPR</td>
+                                    <td>Varies (minimal)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>SOC 2</td>
+                                    <td>Varies by org</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Audit Preparation</h2>
+                    
+                    <h3>Pre-Audit Checklist</h3>
+                    <ul>
+                        <li>☐ Verify all required log sources are collecting</li>
+                        <li>☐ Confirm retention periods meet requirements</li>
+                        <li>☐ Generate sample compliance reports</li>
+                        <li>☐ Document log review procedures</li>
+                        <li>☐ Prepare evidence of daily log reviews</li>
+                        <li>☐ Test ability to retrieve historical logs</li>
+                        <li>☐ Document SIEM access controls</li>
+                        <li>☐ Prepare incident response documentation</li>
+                    </ul>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Log Source Health Check</div>
+                        <pre><code>| tstats count WHERE index=* by index, sourcetype, _time span=1d
+| stats 
+    latest(_time) as last_event,
+    avg(count) as avg_daily_events,
+    sparkline(count) as trend
+  by index, sourcetype
+| eval hours_since_last = round((now() - last_event) / 3600, 1)
+| where hours_since_last > 24
+| sort hours_since_last desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How does SIEM support compliance requirements?"</strong></p>
+                        <p><strong>A:</strong> "SIEM is central to meeting compliance requirements across several dimensions:</p>
+                        <ol>
+                            <li><strong>Centralized logging:</strong> Most frameworks require audit trails. SIEM provides a tamper-evident, centralized repository for logs from all systems—which frameworks like PCI DSS explicitly require.</li>
+                            <li><strong>Access monitoring:</strong> HIPAA, SOX, and PCI all require monitoring who accesses sensitive data. SIEM correlates authentication logs to show access patterns and anomalies.</li>
+                            <li><strong>Daily review evidence:</strong> PCI DSS requires daily log review. SIEM dashboards and scheduled reports provide evidence that reviews occurred and what was found.</li>
+                            <li><strong>Breach detection:</strong> GDPR's 72-hour notification requirement means you need to detect breaches quickly. SIEM detection rules identify potential breaches in near-real-time.</li>
+                            <li><strong>Retention compliance:</strong> Different frameworks require different retention periods. SIEM with tiered storage can maintain hot, warm, and cold data to meet requirements cost-effectively.</li>
+                        </ol>
+                        <p>When designing SIEM for compliance, I ensure log sources cover all in-scope systems, retention meets the longest requirement, and reports map directly to control requirements for easy audit evidence."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Compliance Quick Reference</div>
+                        <h4>Retention Requirements</h4>
+                        <ul>
+                            <li>PCI DSS: 1 year (3 months hot)</li>
+                            <li>HIPAA: 6 years</li>
+                            <li>SOX: 7 years</li>
+                        </ul>
+                        <h4>Key PCI DSS Events (10.2)</h4>
+                        <ul>
+                            <li>User access to CHD</li>
+                            <li>Admin/root actions</li>
+                            <li>Audit trail access</li>
+                            <li>Invalid access attempts</li>
+                            <li>System object changes</li>
+                        </ul>
+                        <h4>Audit Evidence Needed</h4>
+                        <ul>
+                            <li>Daily log review records</li>
+                            <li>Incident response documentation</li>
+                            <li>Access control reports</li>
+                            <li>Change management logs</li>
+                            <li>Log source inventory</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soc-operations.html" class="card-link">← SOC Operations</a>
+                    <a href="common-questions.html" class="card-link">Interview Questions →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

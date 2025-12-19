@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Retention Strategy | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Data Management</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources</a>
+                    <a href="log-retention.html" class="nav-item active">Retention Strategy</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Log Retention Strategy</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Log Retention Strategy</h1>
+                    <p class="page-subtitle">Log retention balances security needs, compliance requirements, and cost constraints. A tiered retention strategy ensures critical data is available for investigation while managing storage costs.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Retention Drivers</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Retention Decision Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    RETENTION DECISION FACTORS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  COMPLIANCE REQUIREMENTS          SECURITY NEEDS                            │
+│  ┌─────────────────────┐         ┌─────────────────────────────┐           │
+│  │ PCI DSS: 1 year     │         │ Incident investigation:     │           │
+│  │ HIPAA: 6 years      │         │ 90 days typical             │           │
+│  │ SOX: 7 years        │         │                             │           │
+│  │ GDPR: Varies        │         │ Threat hunting:             │           │
+│  │ Industry regs       │         │ 6-12 months                 │           │
+│  └─────────────────────┘         │                             │           │
+│                                  │ Insider threat:             │           │
+│  COST FACTORS                    │ 12-24 months                │           │
+│  ┌─────────────────────┐         └─────────────────────────────┘           │
+│  │ Storage cost        │                                                   │
+│  │ License cost        │         OPERATIONAL VALUE                         │
+│  │ Query performance   │         ┌─────────────────────────────┐           │
+│  │ Backup/recovery     │         │ High-value: Authentication, │           │
+│  └─────────────────────┘         │ security events             │           │
+│                                  │                             │           │
+│                                  │ Medium: Network, app logs   │           │
+│                                  │                             │           │
+│                                  │ Low: Debug, verbose logs    │           │
+│                                  └─────────────────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Tiered Retention Model</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tier</th>
+                                    <th>Retention</th>
+                                    <th>Storage</th>
+                                    <th>Log Types</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Hot (Active)</strong></td>
+                                    <td>30-90 days</td>
+                                    <td>SIEM (fast SSD)</td>
+                                    <td>Security events, alerts, authentication</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Warm (Searchable)</strong></td>
+                                    <td>90-365 days</td>
+                                    <td>Data lake / Archive tier</td>
+                                    <td>Network flows, application logs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cold (Archive)</strong></td>
+                                    <td>1-7 years</td>
+                                    <td>Object storage (S3/Glacier)</td>
+                                    <td>Compliance, audit trails</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Delete</strong></td>
+                                    <td>< 30 days</td>
+                                    <td>Ephemeral / Drop</td>
+                                    <td>Debug, health checks, verbose</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Compliance Requirements</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Regulation</th>
+                                    <th>Retention</th>
+                                    <th>Specific Requirements</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>PCI DSS</strong></td>
+                                    <td>1 year</td>
+                                    <td>Audit trails, 90 days immediately available</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>HIPAA</strong></td>
+                                    <td>6 years</td>
+                                    <td>PHI access logs, security events</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SOX</strong></td>
+                                    <td>7 years</td>
+                                    <td>Financial system audit trails</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GDPR</strong></td>
+                                    <td>Varies</td>
+                                    <td>Purpose limitation, right to erasure</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GLBA</strong></td>
+                                    <td>6 years</td>
+                                    <td>Financial customer data</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>FISMA</strong></td>
+                                    <td>3 years</td>
+                                    <td>Federal system logs</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Implementation Examples</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk: Index Retention Configuration</div>
+                        <pre><code># indexes.conf
+
+[security]
+homePath = $SPLUNK_DB/security/db
+coldPath = $SPLUNK_DB/security/colddb
+thawedPath = $SPLUNK_DB/security/thaweddb
+frozenTimePeriodInSecs = 7776000      # 90 days hot
+coldToFrozenDir = /archive/security   # Archive location
+
+[network_verbose]
+homePath = $SPLUNK_DB/network/db
+coldPath = $SPLUNK_DB/network/colddb
+frozenTimePeriodInSecs = 2592000      # 30 days
+coldToFrozenScript = $SPLUNK_HOME/bin/archive_to_s3.sh
+
+[compliance_audit]
+frozenTimePeriodInSecs = 220752000    # 7 years
+enableDataArchive = true</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sentinel: Table-Level Retention</div>
+                        <pre><code># Azure CLI - Set table retention
+az monitor log-analytics workspace table update \
+    --resource-group "rg-sentinel" \
+    --workspace-name "sentinel-workspace" \
+    --name "SecurityEvent" \
+    --retention-time 365 \
+    --total-retention-time 730
+
+# Different retention per table
+# SecurityEvent: 365 days hot, 730 total
+# Syslog: 90 days hot, 365 total  
+# AzureDiagnostics: 30 days hot, 90 total</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Retention Usage Analysis</div>
+                        <pre><code>Usage
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalGB = sum(Quantity) / 1000,
+    DailyAvgGB = avg(Quantity) / 1000
+  by DataType
+| extend MonthlyGB = DailyAvgGB * 30
+| extend YearlyCost90Days = MonthlyGB * 3 * 2.30  // Example pricing
+| extend YearlyCost365Days = MonthlyGB * 12 * 2.30
+| project DataType, DailyAvgGB, YearlyCost90Days, YearlyCost365Days
+| order by DailyAvgGB desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Archive and Restore</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Archive to S3 Script</div>
+                        <pre><code>#!/bin/bash
+# archive_to_s3.sh - Called by Splunk when bucket freezes
+
+BUCKET_PATH=$1
+BUCKET_NAME=$(basename $BUCKET_PATH)
+S3_BUCKET="s3://company-siem-archive"
+INDEX_NAME=$(echo $BUCKET_PATH | cut -d'/' -f4)
+
+# Compress and upload
+tar -czf /tmp/${BUCKET_NAME}.tar.gz -C $(dirname $BUCKET_PATH) $BUCKET_NAME
+aws s3 cp /tmp/${BUCKET_NAME}.tar.gz ${S3_BUCKET}/${INDEX_NAME}/
+
+# Verify upload
+if [ $? -eq 0 ]; then
+    rm -rf $BUCKET_PATH
+    rm /tmp/${BUCKET_NAME}.tar.gz
+    logger "Archived $BUCKET_NAME to S3"
+else
+    logger "ERROR: Failed to archive $BUCKET_NAME"
+    exit 1
+fi</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Restore Procedures</div>
+                        <ol>
+                            <li><strong>Identify time range:</strong> Determine exact dates needed</li>
+                            <li><strong>Retrieve from archive:</strong> Download from cold storage</li>
+                            <li><strong>Thaw to searchable:</strong> Restore to thawed path</li>
+                            <li><strong>Search:</strong> Query with index= and timerange</li>
+                            <li><strong>Clean up:</strong> Remove thawed data after investigation</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you design a log retention strategy?"</strong></p>
+                        <p><strong>A:</strong> "Retention strategy balances three factors:</p>
+                        <ol>
+                            <li><strong>Compliance first:</strong> I identify regulatory requirements—PCI, HIPAA, SOX all have specific retention mandates. These are non-negotiable minimums.</li>
+                            <li><strong>Security value:</strong> Different log types have different value over time. Authentication logs are valuable for 12+ months. Debug logs rarely matter after 30 days.</li>
+                            <li><strong>Tiered architecture:</strong> I implement hot/warm/cold tiers. Hot tier (SIEM) for active detection and investigation. Warm tier (data lake) for historical hunting. Cold tier (archive) for compliance.</li>
+                            <li><strong>Cost optimization:</strong> Hot storage costs 10-100x more than cold. I only keep what's needed in expensive tiers. Verbose logs go straight to cheap storage.</li>
+                            <li><strong>Restore capability:</strong> Long retention only matters if you can actually use it. I ensure archive data can be restored and searched when needed.</li>
+                            <li><strong>Documentation:</strong> I document retention policies, justify decisions, and ensure legal/compliance sign-off.</li>
+                        </ol>
+                        <p>The goal is having data available when you need it without paying for storage you'll never use."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Retention Quick Reference</div>
+                        <h4>Typical Retention by Log Type</h4>
+                        <ul>
+                            <li>Authentication: 1-2 years</li>
+                            <li>Security alerts: 2-3 years</li>
+                            <li>Firewall: 90 days - 1 year</li>
+                            <li>Network flow: 30-90 days</li>
+                            <li>Application: 30-90 days</li>
+                            <li>Debug/verbose: 7-30 days</li>
+                        </ul>
+                        <h4>Storage Cost Comparison</h4>
+                        <ul>
+                            <li>SIEM hot: $$$$ (per GB/day)</li>
+                            <li>Data lake: $$ (per GB stored)</li>
+                            <li>S3 Standard: $ </li>
+                            <li>S3 Glacier: ¢</li>
+                        </ul>
+                        <h4>Key Decisions</h4>
+                        <ul>
+                            <li>What's the longest breach dwell time?</li>
+                            <li>What's required for compliance?</li>
+                            <li>What's affordable?</li>
+                            <li>What can you restore quickly?</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="log-sources-overview.html" class="card-link">← Log Sources</a>
+                    <a href="cost-optimization.html" class="card-link">Cost Optimization →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Network Security</div>
+                    <a href="network-security-monitoring.html" class="nav-item active">Network Monitoring</a>
+                    <a href="firewall-monitoring.html" class="nav-item">Firewall Analysis</a>
+                    <a href="dns-security.html" class="nav-item">DNS Security</a>
+                    <a href="proxy-monitoring.html" class="nav-item">Proxy & Web</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Network Security Monitoring</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Network Security Monitoring</h1>
+                    <p class="page-subtitle">Network telemetry provides visibility into lateral movement, command and control, data exfiltration, and reconnaissance. Effective network monitoring combines multiple data sources for comprehensive coverage.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Network Security Data Sources</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Network Visibility Stack</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      NETWORK SECURITY DATA SOURCES                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  PERIMETER                    INTERNAL                   ENDPOINT           │
+│  ┌─────────────────┐         ┌─────────────────┐        ┌─────────────────┐│
+│  │ Firewall Logs   │         │ Internal FW     │        │ Host Firewall   ││
+│  │ • Allow/Deny    │         │ • East-West     │        │ • Local traffic ││
+│  │ • NAT           │         │ • Segmentation  │        │ • App-level     ││
+│  │ • Threat        │         │                 │        │                 ││
+│  └─────────────────┘         └─────────────────┘        └─────────────────┘│
+│                                                                             │
+│  ┌─────────────────┐         ┌─────────────────┐        ┌─────────────────┐│
+│  │ Proxy/SWG       │         │ Flow Data       │        │ EDR Network     ││
+│  │ • URL/Domain    │         │ • NetFlow/sFlow │        │ • Process→Conn  ││
+│  │ • User-Agent    │         │ • Metadata only │        │ • DNS queries   ││
+│  │ • Categories    │         │ • Volume/timing │        │ • TLS details   ││
+│  └─────────────────┘         └─────────────────┘        └─────────────────┘│
+│                                                                             │
+│  ┌─────────────────┐         ┌─────────────────┐        ┌─────────────────┐│
+│  │ IDS/IPS         │         │ DNS Logs        │        │ VPN Logs        ││
+│  │ • Signatures    │         │ • All queries   │        │ • Remote access ││
+│  │ • Anomalies     │         │ • Responses     │        │ • Geo location  ││
+│  │ • TLS inspect   │         │ • DNS over HTTPS│        │ • Split tunnel  ││
+│  └─────────────────┘         └─────────────────┘        └─────────────────┘│
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Categories</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>MITRE Tactics</th>
+                                    <th>Data Sources</th>
+                                    <th>Example Detections</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Command & Control</strong></td>
+                                    <td>TA0011</td>
+                                    <td>Firewall, Proxy, DNS</td>
+                                    <td>Beaconing, DNS tunneling, unusual ports</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lateral Movement</strong></td>
+                                    <td>TA0008</td>
+                                    <td>Internal FW, Flow, EDR</td>
+                                    <td>SMB scanning, RDP from workstation, WMI</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Exfiltration</strong></td>
+                                    <td>TA0010</td>
+                                    <td>Proxy, DLP, Flow</td>
+                                    <td>Large uploads, cloud storage, encoding</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reconnaissance</strong></td>
+                                    <td>TA0043</td>
+                                    <td>Firewall, IDS</td>
+                                    <td>Port scanning, vulnerability probing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Initial Access</strong></td>
+                                    <td>TA0001</td>
+                                    <td>VPN, Proxy, Email</td>
+                                    <td>Brute force, phishing callbacks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>C2 Detection Techniques</h2>
+                    
+                    <h3>Beaconing Detection</h3>
+                    <p>Malware often "beacons" home at regular intervals. Detecting this pattern:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Beaconing Detection</div>
+                        <pre><code>index=firewall action=allowed dest_port IN (80, 443)
+| bucket _time span=1m
+| stats count as connections by src_ip, dest_ip, dest_port, _time
+| streamstats window=60 stdev(connections) as conn_stdev, 
+              avg(connections) as conn_avg by src_ip, dest_ip
+| where conn_stdev < 0.5 AND conn_avg > 0  // Very regular pattern
+| stats count as beacon_minutes, 
+        values(dest_port) as ports,
+        avg(conn_avg) as avg_conns_per_min
+  by src_ip, dest_ip
+| where beacon_minutes > 30  // Sustained for 30+ minutes
+| sort -beacon_minutes</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Beaconing Detection</div>
+                        <pre><code>CommonSecurityLog
+| where TimeGenerated > ago(4h)
+| where DeviceAction == "allow"
+| where DestinationPort in (80, 443)
+| summarize ConnectionCount = count() by SourceIP, DestinationIP, 
+            bin(TimeGenerated, 1m)
+| summarize 
+    TotalMinutes = count(),
+    StdDev = stdev(ConnectionCount),
+    AvgConn = avg(ConnectionCount)
+  by SourceIP, DestinationIP
+| where StdDev < 0.5 and TotalMinutes > 30
+| order by TotalMinutes desc</code></pre>
+                    </div>
+
+                    <h3>Unusual Port Usage</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Non-Standard Ports</div>
+                        <pre><code>index=firewall action=allowed 
+| where NOT dest_port IN (80, 443, 53, 25, 22, 21, 3389, 445, 135, 389, 636)
+| where dest_port > 1024
+| stats count, dc(dest_ip) as unique_dests, values(dest_ip) as sample_dests 
+  by src_ip, dest_port
+| where count > 100 OR unique_dests > 10
+| sort -count</code></pre>
+                    </div>
+
+                    <h3>Long Connection Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Long-Lived Connections</div>
+                        <pre><code>index=firewall action=allowed
+| where duration > 3600  // Connections over 1 hour
+| where NOT dest_port IN (443, 22)  // Exclude expected long connections
+| stats count, sum(bytes_out) as total_bytes, max(duration) as max_duration 
+  by src_ip, dest_ip, dest_port
+| eval duration_hours = round(max_duration/3600, 1)
+| where total_bytes > 10000000  // Over 10MB transferred
+| sort -total_bytes</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Lateral Movement Detection</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Lateral Movement Indicators</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     LATERAL MOVEMENT PATTERNS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  WORKSTATION → SERVER (Normal)        WORKSTATION → WORKSTATION (Abnormal) │
+│  ┌─────────┐      ┌─────────┐         ┌─────────┐      ┌─────────┐        │
+│  │  User   │ ───► │  File   │         │  User   │ ───► │  User   │        │
+│  │   PC    │      │ Server  │         │   PC    │      │   PC    │ ⚠️     │
+│  └─────────┘      └─────────┘         └─────────┘      └─────────┘        │
+│       Standard access pattern              Potential lateral movement       │
+│                                                                             │
+│  SUSPICIOUS PORTS FOR WORKSTATION-TO-WORKSTATION:                          │
+│  ├─ TCP 445 (SMB)      - File shares, PsExec                               │
+│  ├─ TCP 135 (RPC)      - WMI, DCOM                                         │
+│  ├─ TCP 3389 (RDP)     - Remote desktop                                    │
+│  ├─ TCP 5985/5986      - WinRM/PowerShell remoting                         │
+│  ├─ TCP 22 (SSH)       - Linux lateral movement                            │
+│  └─ TCP 139 (NetBIOS)  - Legacy file sharing                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Workstation-to-Workstation SMB</div>
+                        <pre><code>index=firewall dest_port=445 action=allowed
+| lookup asset_inventory ip as src_ip OUTPUT asset_type as src_type
+| lookup asset_inventory ip as dest_ip OUTPUT asset_type as dest_type
+| where src_type="workstation" AND dest_type="workstation"
+| stats count, dc(dest_ip) as targets, values(dest_ip) as target_ips 
+  by src_ip
+| where targets > 3  // Scanning multiple workstations
+| sort -targets</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Unusual RDP Sources</div>
+                        <pre><code>// RDP from workstations (not jump servers)
+CommonSecurityLog
+| where DestinationPort == 3389 and DeviceAction == "allow"
+| join kind=leftouter (
+    _GetWatchlist('JumpServers') | project SourceIP = IPAddress
+) on SourceIP
+| where isempty(SourceIP1)  // Not from approved jump server
+| summarize 
+    ConnectionCount = count(),
+    UniqueDestinations = dcount(DestinationIP),
+    Destinations = make_set(DestinationIP, 10)
+  by SourceIP
+| where ConnectionCount > 5 or UniqueDestinations > 2</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Data Exfiltration Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Large Outbound Transfers</div>
+                        <pre><code>index=proxy action=allowed 
+| where bytes_out > 50000000  // Over 50MB
+| lookup threat_intel domain as dest_domain OUTPUT threat_category
+| stats sum(bytes_out) as total_bytes, 
+        count as request_count,
+        values(url_category) as categories,
+        values(threat_category) as threat_info
+  by src_ip, dest_domain, user
+| eval total_mb = round(total_bytes/1024/1024, 2)
+| where total_mb > 100
+| sort -total_mb</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Upload to Cloud Storage</div>
+                        <pre><code>index=proxy http_method IN (POST, PUT)
+| where url_category IN ("Cloud Storage", "File Sharing", "Personal Storage")
+| where bytes_out > 10000000
+| stats sum(bytes_out) as total_uploaded, 
+        count as upload_count,
+        values(dest_domain) as destinations
+  by src_ip, user
+| eval uploaded_mb = round(total_uploaded/1024/1024, 2)
+| where uploaded_mb > 50
+| sort -uploaded_mb</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Network Baseline Anomalies</h2>
+                    
+                    <h3>First-Time Connections</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: New External Destination</div>
+                        <pre><code>index=firewall action=allowed direction=outbound
+| where NOT [search index=firewall earliest=-30d latest=-1d 
+             | stats count by dest_ip | fields dest_ip]
+| stats count, values(dest_port) as ports, values(src_ip) as sources 
+  by dest_ip
+| lookup geoip ip as dest_ip OUTPUT country, city
+| sort -count</code></pre>
+                    </div>
+
+                    <h3>Traffic Volume Anomalies</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Volume Spike Detection</div>
+                        <pre><code>index=firewall action=allowed
+| bucket _time span=1h
+| stats sum(bytes) as hourly_bytes by src_ip, _time
+| streamstats window=168 avg(hourly_bytes) as baseline_avg, 
+                        stdev(hourly_bytes) as baseline_stdev by src_ip
+| eval upper_threshold = baseline_avg + (baseline_stdev * 3)
+| where hourly_bytes > upper_threshold AND hourly_bytes > 100000000
+| eval anomaly_factor = round(hourly_bytes / baseline_avg, 1)
+| sort -anomaly_factor</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Key Detection Fields</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Use Case</th>
+                                    <th>Detection Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>bytes_in/bytes_out</code></td>
+                                    <td>Data transfer volume</td>
+                                    <td>Exfiltration, C2 payload size</td>
+                                </tr>
+                                <tr>
+                                    <td><code>duration</code></td>
+                                    <td>Connection length</td>
+                                    <td>Long-lived C2, tunneling</td>
+                                </tr>
+                                <tr>
+                                    <td><code>packets</code></td>
+                                    <td>Connection activity</td>
+                                    <td>Beaconing patterns</td>
+                                </tr>
+                                <tr>
+                                    <td><code>dest_port</code></td>
+                                    <td>Service identification</td>
+                                    <td>Non-standard ports, lateral movement</td>
+                                </tr>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>Allow/deny</td>
+                                    <td>Blocked attacks, policy enforcement</td>
+                                </tr>
+                                <tr>
+                                    <td><code>geo</code></td>
+                                    <td>Destination country</td>
+                                    <td>Unusual destinations, sanctions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect command and control traffic?"</strong></p>
+                        <p><strong>A:</strong> "I use multiple detection approaches because C2 varies widely:</p>
+                        <ol>
+                            <li><strong>Beaconing analysis:</strong> Looking for regular, periodic connections—malware often calls home at fixed intervals. I measure connection timing variance; legitimate traffic is irregular while beacons are suspiciously consistent.</li>
+                            <li><strong>DNS anomalies:</strong> High query volume to single domain, long subdomain strings (DNS tunneling), newly registered domains, or domains with high entropy names.</li>
+                            <li><strong>Protocol anomalies:</strong> HTTP traffic on non-standard ports, unusual User-Agent strings, or TLS connections to IPs (not domains).</li>
+                            <li><strong>Threat intelligence:</strong> Known C2 infrastructure—domains, IPs, JA3 fingerprints.</li>
+                            <li><strong>Behavioral baselines:</strong> Connections to destinations never seen before, unusual data volumes, or connections at odd hours.</li>
+                        </ol>
+                        <p>I layer these detections because sophisticated attackers vary their C2 to evade single detection methods."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Network Security Quick Reference</div>
+                        <h4>Suspicious Ports (Workstation-to-Workstation)</h4>
+                        <ul>
+                            <li>445 - SMB (PsExec, file shares)</li>
+                            <li>135 - RPC (WMI, DCOM)</li>
+                            <li>3389 - RDP</li>
+                            <li>5985/5986 - WinRM</li>
+                            <li>22 - SSH</li>
+                        </ul>
+                        <h4>C2 Indicators</h4>
+                        <ul>
+                            <li>Regular beacon intervals (low variance)</li>
+                            <li>Long connection durations</li>
+                            <li>Unusual destination countries</li>
+                            <li>High DNS query volume</li>
+                            <li>Encoded payloads in HTTP</li>
+                        </ul>
+                        <h4>Exfiltration Indicators</h4>
+                        <ul>
+                            <li>Large uploads (>100MB)</li>
+                            <li>Cloud storage POST/PUT</li>
+                            <li>After-hours transfers</li>
+                            <li>Encrypted uploads to unknown sites</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="network-logs.html" class="card-link">← Network Logs</a>
+                    <a href="firewall-monitoring.html" class="card-link">Firewall Analysis →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runbook Development | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Operations</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="dashboard-design.html" class="nav-item">Dashboard Design</a>
+                    <a href="runbook-development.html" class="nav-item active">Runbooks</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Runbook Development</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Runbook Development</h1>
+                    <p class="page-subtitle">Runbooks standardize incident response procedures. Well-designed runbooks enable consistent, efficient response across analyst skill levels while capturing institutional knowledge.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Runbook Structure</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Standard Runbook Template</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        RUNBOOK TEMPLATE                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  HEADER                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Title: Suspicious PowerShell Execution                               │   │
+│  │ ID: RB-WIN-001  │  Version: 2.3  │  Last Updated: 2024-01-15        │   │
+│  │ Alert Type: Windows Security  │  Severity: Medium-High               │   │
+│  │ Owner: Detection Engineering  │  Review Cycle: Quarterly             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  OVERVIEW                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Purpose: Investigate alerts for encoded/obfuscated PowerShell        │   │
+│  │ Trigger: Detection rule "Encoded PowerShell Execution"               │   │
+│  │ MITRE: T1059.001 (PowerShell), T1027 (Obfuscated Files)             │   │
+│  │ Expected Time: 15-30 minutes                                         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  TRIAGE STEPS                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ □ Step 1: Verify alert details (host, user, command)                │   │
+│  │ □ Step 2: Check if known-good (admin script, IT tool)               │   │
+│  │ □ Step 3: Decode the PowerShell command                             │   │
+│  │ □ Step 4: Analyze parent process chain                              │   │
+│  │ □ Step 5: Check for related alerts on same host                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  INVESTIGATION QUERIES                                                      │
+│  ESCALATION CRITERIA                                                        │
+│  RESPONSE ACTIONS                                                           │
+│  DOCUMENTATION REQUIREMENTS                                                 │
+│  REFERENCES                                                                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Example Runbook: Encoded PowerShell</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">RB-WIN-001: Suspicious PowerShell Execution</div>
+                        
+                        <h4>Overview</h4>
+                        <p>This runbook guides investigation of alerts triggered by encoded, obfuscated, or otherwise suspicious PowerShell execution. Encoded PowerShell is commonly used by malware to evade detection.</p>
+                        
+                        <h4>Triage Checklist</h4>
+                        <ol>
+                            <li><strong>Identify the host and user:</strong> Is this an admin workstation or server? Is the user an IT administrator?</li>
+                            <li><strong>Review the command:</strong> Copy the encoded command for analysis</li>
+                            <li><strong>Decode the payload:</strong> Use the decoding query below</li>
+                            <li><strong>Check execution context:</strong> What process spawned PowerShell?</li>
+                            <li><strong>Review timeline:</strong> What else happened on this host?</li>
+                        </ol>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Decode Base64 PowerShell</div>
+                        <pre><code>DeviceProcessEvents
+| where TimeGenerated > ago(24h)
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine has "-enc" or ProcessCommandLine has "-EncodedCommand"
+| extend EncodedPart = extract(@"-[Ee]nc[odedCommand]*\s+([A-Za-z0-9+/=]+)", 1, ProcessCommandLine)
+| extend DecodedCommand = base64_decode_tostring(EncodedPart)
+| project TimeGenerated, DeviceName, AccountName,
+          InitiatingProcessFileName, EncodedPart, DecodedCommand</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Process Tree Analysis</div>
+                        <pre><code>index=windows EventCode=4688
+| where New_Process_Name LIKE "%powershell.exe"
+| where Process_Command_Line LIKE "%encoded%" OR Process_Command_Line LIKE "%-enc%"
+| table _time, ComputerName, Account_Name, Creator_Process_Name, 
+        New_Process_Name, Process_Command_Line
+| join ComputerName, Creator_Process_Name [
+    search index=windows EventCode=4688
+    | rename New_Process_Name as Creator_Process_Name
+    | table ComputerName, Creator_Process_Name, Creator_Process_Name as grandparent
+]</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Escalation Criteria</div>
+                        <p><strong>Escalate to Tier 2/Incident Response if:</strong></p>
+                        <ul>
+                            <li>Decoded command contains download cradles (IEX, Invoke-WebRequest to external URLs)</li>
+                            <li>Parent process is Office application (Word, Excel, Outlook)</li>
+                            <li>Multiple hosts affected with similar commands</li>
+                            <li>Command attempts credential dumping (Mimikatz patterns)</li>
+                            <li>Lateral movement indicators (PsExec, WMI to other hosts)</li>
+                        </ul>
+                        <p><strong>Close as False Positive if:</strong></p>
+                        <ul>
+                            <li>Known IT automation tool (SCCM, Intune, documented scripts)</li>
+                            <li>Admin user running documented administrative task</li>
+                            <li>Hash matches known-good in allowlist</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Example Runbook: Impossible Travel</h2>
+                    
+                    <div class="info-box">
+                        <div class="info-box-title">RB-IAM-003: Impossible Travel Alert</div>
+                        
+                        <h4>Overview</h4>
+                        <p>Investigate when a user authenticates from geographically distant locations in an impossibly short time, indicating potential credential compromise.</p>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: User Login Timeline</div>
+                        <pre><code>let TargetUser = "user@company.com";
+SigninLogs
+| where TimeGenerated > ago(7d)
+| where UserPrincipalName == TargetUser
+| where ResultType == 0
+| project TimeGenerated, Location, IPAddress, 
+          AppDisplayName, DeviceDetail,
+          ConditionalAccessStatus
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Triage Decision Tree</div>
+                        <pre><code>
+Is the user traveling?
+├── YES → Check travel approval, verify with user/manager
+│         └── Confirmed legitimate → Close as False Positive
+│         └── Cannot verify → Escalate for user verification
+└── NO → Check for VPN/proxy usage
+         ├── Known corporate VPN → Verify VPN logs, Close as FP
+         ├── Unknown VPN/proxy → Possible evasion, Escalate
+         └── No VPN indicators → Likely compromised, Escalate
+         
+If escalated:
+□ Reset user password
+□ Revoke active sessions
+□ Enable MFA if not present
+□ Review user's recent activity for data access
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Runbook Best Practices</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Principle</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Specific</strong></td>
+                                    <td>One runbook per alert type, not generic</td>
+                                    <td>"Encoded PowerShell" not "Suspicious Activity"</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Actionable</strong></td>
+                                    <td>Each step produces a decision or artifact</td>
+                                    <td>Step: "Decode command" → Output: decoded string</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Decision points</strong></td>
+                                    <td>Clear escalation/close criteria</td>
+                                    <td>If download cradle → Escalate</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Queries included</strong></td>
+                                    <td>Copy-paste ready investigation queries</td>
+                                    <td>KQL/SPL with placeholders for variables</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time-boxed</strong></td>
+                                    <td>Expected investigation duration</td>
+                                    <td>"Triage: 15 min, Full investigation: 30 min"</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Maintained</strong></td>
+                                    <td>Regular review and updates</td>
+                                    <td>Quarterly review, update after major incidents</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SOAR Integration</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Automated Runbook Steps</div>
+                        <pre><code># SOAR Playbook: Encoded PowerShell (Automated Triage)
+
+1. ENRICHMENT (Automated)
+   - Query EDR for full process tree
+   - Check file hash against VT, internal allowlist
+   - Lookup user in HR system (role, department)
+   - Check asset criticality in CMDB
+   - Decode Base64 command
+
+2. AUTO-CLOSE CONDITIONS (Automated)
+   IF hash in allowlist AND user is IT_Admin AND host is Admin_Workstation:
+       → Close as "Known Good"
+       → Log decision
+
+3. AUTO-ESCALATE CONDITIONS (Automated)
+   IF decoded contains (mimikatz|cobalt|beacon|metasploit):
+       → Isolate endpoint via EDR
+       → Create P1 incident
+       → Page on-call IR
+
+4. MANUAL REVIEW (Analyst)
+   - Present enriched data in structured format
+   - Analyst reviews and decides
+   - Decision logged for ML training</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you develop effective runbooks?"</strong></p>
+                        <p><strong>A:</strong> "I approach runbooks as executable documentation:</p>
+                        <ol>
+                            <li><strong>Start from real incidents:</strong> After every significant investigation, I document what worked. Real-world experience beats theoretical procedures.</li>
+                            <li><strong>Include queries:</strong> A runbook without copy-paste queries is incomplete. Analysts shouldn't have to figure out the search—it should be provided.</li>
+                            <li><strong>Clear decision points:</strong> At each step, the analyst should know: escalate, investigate further, or close. No ambiguity.</li>
+                            <li><strong>Time expectations:</strong> I set expected triage time (usually 10-15 min). If exceeding, escalate. This prevents rabbit holes.</li>
+                            <li><strong>Automation opportunities:</strong> Every runbook step is a candidate for SOAR automation. I mark steps as 'automate' or 'human required'.</li>
+                            <li><strong>Living documents:</strong> Runbooks decay. I schedule quarterly reviews and update after every incident that revealed a gap.</li>
+                        </ol>
+                        <p>Good runbooks enable a junior analyst to handle alerts that previously required seniors, improving team scalability."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Runbook Quick Reference</div>
+                        <h4>Essential Runbook Sections</h4>
+                        <ul>
+                            <li>Alert overview & trigger</li>
+                            <li>Triage checklist</li>
+                            <li>Investigation queries</li>
+                            <li>Escalation criteria</li>
+                            <li>Response actions</li>
+                            <li>Documentation requirements</li>
+                        </ul>
+                        <h4>Common Investigation Data</h4>
+                        <ul>
+                            <li>User context (role, department)</li>
+                            <li>Asset context (criticality, owner)</li>
+                            <li>Process tree / parent chain</li>
+                            <li>Network connections</li>
+                            <li>Related alerts (same entity)</li>
+                        </ul>
+                        <h4>Automation Candidates</h4>
+                        <ul>
+                            <li>Enrichment lookups</li>
+                            <li>Known-good checking</li>
+                            <li>IOC extraction</li>
+                            <li>Ticket creation</li>
+                            <li>Containment actions</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="dashboard-design.html" class="card-link">← Dashboard Design</a>
+                    <a href="soar-automation.html" class="card-link">SOAR Automation →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

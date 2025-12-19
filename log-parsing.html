@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Parsing | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Engineering</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources</a>
+                    <a href="log-parsing.html" class="nav-item active">Log Parsing</a>
+                    <a href="log-pipeline.html" class="nav-item">Log Pipeline</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Log Parsing</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Log Parsing & Field Extraction</h1>
+                    <p class="page-subtitle">Raw logs are just text. Parsing transforms them into structured, searchable fields. Good parsing enables fast queries, accurate detections, and meaningful dashboards.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Parsing Concepts</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Log Parsing Pipeline</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LOG PARSING FLOW                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  RAW LOG                                                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Jan 15 14:32:05 webserver01 nginx: 192.168.1.100 - admin [15/Jan/   │   │
+│  │ 2024:14:32:05 -0500] "GET /api/users HTTP/1.1" 200 1542 "-"         │   │
+│  │ "Mozilla/5.0" rt=0.032                                               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  PARSING STEPS                                                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
+│  │ Timestamp   │→ │ Source      │→ │ Regex/Grok  │→ │ Field Type  │       │
+│  │ Extraction  │  │ Identification│ │ Patterns   │  │ Conversion  │       │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘       │
+│                                    │                                        │
+│                                    ▼                                        │
+│  STRUCTURED OUTPUT                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ {                                                                    │   │
+│  │   "timestamp": "2024-01-15T14:32:05-05:00",                         │   │
+│  │   "host": "webserver01",                                            │   │
+│  │   "source": "nginx",                                                │   │
+│  │   "src_ip": "192.168.1.100",                                        │   │
+│  │   "user": "admin",                                                  │   │
+│  │   "method": "GET",                                                  │   │
+│  │   "uri": "/api/users",                                              │   │
+│  │   "status_code": 200,                                               │   │
+│  │   "bytes": 1542,                                                    │   │
+│  │   "response_time": 0.032                                            │   │
+│  │ }                                                                    │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Splunk Field Extraction</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">props.conf: Sourcetype Configuration</div>
+                        <pre><code>[nginx:access]
+TIME_FORMAT = %d/%b/%Y:%H:%M:%S %z
+TIME_PREFIX = \[
+MAX_TIMESTAMP_LOOKAHEAD = 30
+SHOULD_LINEMERGE = false
+LINE_BREAKER = ([\r\n]+)
+TRUNCATE = 10000
+CHARSET = UTF-8
+
+# Inline field extractions
+EXTRACT-nginx_fields = ^(?P<src_ip>\d+\.\d+\.\d+\.\d+)\s+-\s+(?P<user>\S+)\s+\[(?P<timestamp>[^\]]+)\]\s+"(?P<method>\w+)\s+(?P<uri>\S+)\s+(?P<http_version>[^"]+)"\s+(?P<status_code>\d+)\s+(?P<bytes>\d+)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Search-Time Extraction</div>
+                        <pre><code>index=web sourcetype=nginx:access
+| rex field=_raw "^(?P<src_ip>\d+\.\d+\.\d+\.\d+)"
+| rex field=_raw "\"(?P<method>\w+)\s+(?P<uri>[^\s]+)"
+| rex field=_raw "\"\s+(?P<status>\d{3})\s+(?P<bytes>\d+)"
+| rex field=_raw "rt=(?P<response_time>[\d.]+)"
+| eval response_time_ms = round(response_time * 1000, 2)
+| table _time, src_ip, method, uri, status, bytes, response_time_ms</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">transforms.conf: Lookup-Based Extraction</div>
+                        <pre><code># transforms.conf
+[nginx_status_lookup]
+filename = http_status_codes.csv
+match_type = WILDCARD(status_code)
+default_match = Unknown
+
+# props.conf
+[nginx:access]
+LOOKUP-status = nginx_status_lookup status_code OUTPUT status_description</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Microsoft Sentinel Parsing</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Parse JSON Logs</div>
+                        <pre><code>// Parse JSON from raw log
+CommonSecurityLog
+| where DeviceVendor == "CustomApp"
+| extend ParsedMessage = parse_json(Message)
+| extend 
+    UserName = tostring(ParsedMessage.user),
+    Action = tostring(ParsedMessage.action),
+    ResourceId = tostring(ParsedMessage.resource_id),
+    Result = tostring(ParsedMessage.result)
+| project TimeGenerated, UserName, Action, ResourceId, Result</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Regex Field Extraction</div>
+                        <pre><code>// Extract fields from unstructured log
+Syslog
+| where Facility == "local0"
+| extend UserName = extract(@"user=([^\s,]+)", 1, SyslogMessage)
+| extend SourceIP = extract(@"src=(\d+\.\d+\.\d+\.\d+)", 1, SyslogMessage)
+| extend Action = extract(@"action=(\w+)", 1, SyslogMessage)
+| extend Status = extract(@"status=(\w+)", 1, SyslogMessage)
+| where isnotempty(UserName)
+| project TimeGenerated, UserName, SourceIP, Action, Status</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Parse Key-Value Pairs</div>
+                        <pre><code>// Parse key=value format
+Syslog
+| where SyslogMessage has "key="
+| extend KVPairs = parse_kv(SyslogMessage, "=", " ")
+| extend 
+    User = tostring(KVPairs.user),
+    Source = tostring(KVPairs.src),
+    Destination = tostring(KVPairs.dst),
+    Port = toint(KVPairs.dpt)
+| project TimeGenerated, User, Source, Destination, Port</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Parsing Patterns</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Syslog Parsing</div>
+                        <pre><code>// Standard syslog format
+// &lt;priority&gt;timestamp hostname process[pid]: message
+
+Regex Pattern:
+^<(?P<priority>\d+)>(?P<timestamp>\w+\s+\d+\s+[\d:]+)\s+(?P<hostname>\S+)\s+(?P<process>\S+?)(?:\[(?P<pid>\d+)\])?:\s+(?P<message>.*)$
+
+// Example:
+// <134>Jan 15 14:32:05 server01 sshd[12345]: Accepted password for user1 from 10.1.1.1</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Windows Event Log XML</div>
+                        <pre><code>// Windows Security Event parsing in Splunk
+[source::WinEventLog:Security]
+KV_MODE = xml
+SHOULD_LINEMERGE = false
+
+// Search example
+index=windows sourcetype=WinEventLog:Security EventCode=4624
+| eval src_ip = mvindex(Logon_Information.Workstation_Name, 0)
+| eval user = mvindex(New_Logon.Account_Name, 0)
+| eval logon_type = mvindex(Logon_Information.Logon_Type, 0)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">CEF (Common Event Format)</div>
+                        <pre><code>// CEF format parsing
+// CEF:Version|Device Vendor|Device Product|Device Version|Signature ID|Name|Severity|Extension
+
+Regex:
+^CEF:(?P<version>\d+)\|(?P<vendor>[^|]*)\|(?P<product>[^|]*)\|(?P<device_version>[^|]*)\|(?P<sig_id>[^|]*)\|(?P<name>[^|]*)\|(?P<severity>[^|]*)\|(?P<extension>.*)$
+
+// Extension fields are key=value pairs
+// Example: src=10.0.0.1 dst=192.168.1.1 act=blocked</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Field Normalization</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Field Aliasing</div>
+                        <pre><code># props.conf - Normalize field names across sources
+[firewall:paloalto]
+FIELDALIAS-src = src_ip AS src
+FIELDALIAS-dst = dst_ip AS dest
+FIELDALIAS-user = user_name AS user
+
+[firewall:cisco]
+FIELDALIAS-src = source_address AS src
+FIELDALIAS-dst = destination_address AS dest
+FIELDALIAS-user = username AS user
+
+# Now queries work across both:
+index=firewall src=10.1.1.* | stats count by dest</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Union with Normalization</div>
+                        <pre><code>// Normalize across different log sources
+let PaloAlto = CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"
+| extend 
+    SourceIP = SourceIP,
+    DestIP = DestinationIP,
+    User = SourceUserName,
+    Action = DeviceAction;
+let Cisco = CommonSecurityLog
+| where DeviceVendor == "Cisco"
+| extend 
+    SourceIP = SourceIP,
+    DestIP = DestinationIP,
+    User = coalesce(SourceUserName, "Unknown"),
+    Action = DeviceAction;
+union PaloAlto, Cisco
+| project TimeGenerated, DeviceVendor, SourceIP, DestIP, User, Action</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Parsing Best Practices</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Practice</th>
+                                    <th>Rationale</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Parse at index time</strong></td>
+                                    <td>Faster searches, smaller index</td>
+                                    <td>Use EXTRACT in props.conf</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Normalize field names</strong></td>
+                                    <td>Enable cross-source correlation</td>
+                                    <td>src_ip, dest_ip, user (not source_addr)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Type fields correctly</strong></td>
+                                    <td>Enable proper sorting/comparison</td>
+                                    <td>status_code as int, not string</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Handle multi-value</strong></td>
+                                    <td>Some fields have multiple values</td>
+                                    <td>mvindex(), mv-expand in KQL</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Test edge cases</strong></td>
+                                    <td>Logs vary; patterns must handle variation</td>
+                                    <td>Missing fields, special characters</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you approach parsing a new log source?"</strong></p>
+                        <p><strong>A:</strong> "I follow a systematic process:</p>
+                        <ol>
+                            <li><strong>Sample collection:</strong> Get representative samples including edge cases—errors, missing fields, different event types. One example isn't enough.</li>
+                            <li><strong>Identify structure:</strong> Is it JSON, key-value, fixed position, or freeform? This determines the parsing approach.</li>
+                            <li><strong>Map to use cases:</strong> What fields do detections need? I don't parse everything—only fields that support security use cases.</li>
+                            <li><strong>Build incrementally:</strong> Start with core fields, validate, then add more. Complex regex that breaks is worse than simple regex that works.</li>
+                            <li><strong>Normalize names:</strong> I follow a standard naming convention so this source correlates with others. src_ip not source_address.</li>
+                            <li><strong>Test thoroughly:</strong> Run against historical data, check for extraction failures, validate field types.</li>
+                        </ol>
+                        <p>Good parsing is invisible—analysts don't think about it because fields just work. Bad parsing causes constant frustration."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Log Parsing Quick Reference</div>
+                        <h4>Common Regex Patterns</h4>
+                        <ul>
+                            <li>IPv4: <code>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}</code></li>
+                            <li>IPv6: <code>[0-9a-fA-F:]+</code></li>
+                            <li>Email: <code>[\w.-]+@[\w.-]+</code></li>
+                            <li>Domain: <code>[\w.-]+\.[a-zA-Z]{2,}</code></li>
+                            <li>MAC: <code>[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}</code></li>
+                        </ul>
+                        <h4>Splunk Extraction Types</h4>
+                        <ul>
+                            <li>EXTRACT - Regex at index time</li>
+                            <li>REPORT - Reference transforms.conf</li>
+                            <li>FIELDALIAS - Create field aliases</li>
+                            <li>EVAL - Calculated fields</li>
+                            <li>LOOKUP - Enrich from CSV</li>
+                        </ul>
+                        <h4>KQL Parse Functions</h4>
+                        <ul>
+                            <li>parse_json() - JSON parsing</li>
+                            <li>parse_kv() - Key-value parsing</li>
+                            <li>extract() - Regex extraction</li>
+                            <li>split() - Delimiter splitting</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="log-sources-overview.html" class="card-link">← Log Sources</a>
+                    <a href="log-pipeline.html" class="card-link">Log Pipeline →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

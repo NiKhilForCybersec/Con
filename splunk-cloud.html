@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splunk Cloud | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Understanding Splunk Cloud architecture, deployment models, and key differences from Splunk Enterprise on-premises.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item active">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Deployments</div>
+                    <a href="deployment-approach.html" class="nav-item">Deployment Approach</a>
+                    <a href="splunk-cloud-deployment.html" class="nav-item">Splunk Cloud Deployment</a>
+                    <a href="splunk-enterprise-deployment.html" class="nav-item">Splunk Enterprise</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Splunk Cloud</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Splunk Cloud</h1>
+                    <p class="page-subtitle">Splunk as a managed SaaS - architecture, deployment models, and key considerations</p>
+                </header>
+                
+                <!-- What is Splunk Cloud -->
+                <h2>What is Splunk Cloud?</h2>
+                
+                <p>Splunk Cloud is the managed SaaS version of Splunk. Instead of running indexers and search heads yourself, Splunk manages the backend infrastructure. You focus on getting data in and using it.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Distinction</div>
+                    <p><strong>Splunk Enterprise:</strong> You manage everything - servers, storage, scaling, upgrades</p>
+                    <p><strong>Splunk Cloud:</strong> Splunk manages the backend; you manage forwarders and configuration</p>
+                </div>
+                
+                <!-- Cloud Architecture -->
+                <h2>Splunk Cloud Architecture</h2>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Splunk Cloud Architecture</div>
+                    <pre><code>
+┌─────────────────────────────────────────────────────────────────────┐
+│                     YOUR ENVIRONMENT                                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│  │  Universal  │  │   Heavy     │  │  HTTP Event │                 │
+│  │  Forwarders │  │  Forwarders │  │  Collector  │                 │
+│  │  (on hosts) │  │  (syslog    │  │  (APIs,     │                 │
+│  │             │  │   aggregator)│  │   webhooks) │                 │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                 │
+└─────────┼────────────────┼────────────────┼─────────────────────────┘
+          │                │                │
+          │     Encrypted over Internet     │
+          │       (TLS, certificates)       │
+          ▼                ▼                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SPLUNK CLOUD (Managed by Splunk)                 │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │                   INPUTS DATA MANAGER (IDM)                    │ │
+│  │     Receives data, routes to appropriate indexer cluster       │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+│                              │                                      │
+│                              ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │                    INDEXER CLUSTER                             │ │
+│  │   ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐          │ │
+│  │   │Indexer 1│  │Indexer 2│  │Indexer 3│  │Indexer N│  (auto-  │ │
+│  │   │         │  │         │  │         │  │         │  scaled) │ │
+│  │   └─────────┘  └─────────┘  └─────────┘  └─────────┘          │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+│                              │                                      │
+│                              ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │                   SEARCH HEAD CLUSTER                          │ │
+│  │   ┌──────────┐  ┌──────────┐  ┌──────────┐                    │ │
+│  │   │ Search   │  │ Search   │  │ Search   │  (load balanced)   │ │
+│  │   │ Head 1   │  │ Head 2   │  │ Head 3   │                    │ │
+│  │   └──────────┘  └──────────┘  └──────────┘                    │ │
+│  │              Enterprise Security, SOAR                         │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+│                              │                                      │
+│                              ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │                   CLOUD CONSOLE                                │ │
+│  │     Admin portal for monitoring, support, maintenance          │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <!-- Deployment Models -->
+                <h2>Splunk Cloud Deployment Models</h2>
+                
+                <p>Splunk Cloud comes in different flavors depending on your needs:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Description</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Splunk Cloud Platform</strong></td>
+                                <td>Standard multi-tenant SaaS on AWS</td>
+                                <td>Most organizations, fastest deployment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Victoria Experience</strong></td>
+                                <td>Latest cloud-native architecture with self-service features</td>
+                                <td>New deployments, want latest features</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk Cloud on GCP</strong></td>
+                                <td>Same service, hosted on Google Cloud</td>
+                                <td>GCP-first organizations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FedRAMP (GovCloud)</strong></td>
+                                <td>FedRAMP-authorized environment</td>
+                                <td>US government, regulated industries</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Victoria Experience</h3>
+                
+                <p>The Victoria Experience is Splunk's latest cloud architecture, offering:</p>
+                
+                <ul>
+                    <li><strong>Self-Service:</strong> Install apps, create indexes, manage inputs without support tickets</li>
+                    <li><strong>Admin Config Service (ACS):</strong> API and CLI for automation</li>
+                    <li><strong>Faster Updates:</strong> Continuous deployment of new features</li>
+                    <li><strong>Better Scaling:</strong> More elastic resource allocation</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Classic vs Victoria</div>
+                    <p><strong>Classic Experience:</strong> Older deployments - many changes require Splunk support tickets</p>
+                    <p><strong>Victoria Experience:</strong> Newer deployments - self-service for most admin tasks</p>
+                    <p>New Splunk Cloud customers automatically get Victoria Experience.</p>
+                </div>
+                
+                <!-- Getting Data In -->
+                <h2>Getting Data Into Splunk Cloud</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>How It Works</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Universal Forwarder</strong></td>
+                                <td>Agent on hosts → sends to Cloud via port 9997</td>
+                                <td>Windows/Linux servers, on-prem infrastructure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HTTP Event Collector (HEC)</strong></td>
+                                <td>HTTPS POST to Splunk's HEC endpoint</td>
+                                <td>Applications, cloud services, serverless</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk Connect for Syslog (SC4S)</strong></td>
+                                <td>Container that receives syslog and forwards to Cloud</td>
+                                <td>Network devices, firewalls, anything using syslog</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Manager</strong></td>
+                                <td>Web UI for configuring cloud-to-cloud ingestion</td>
+                                <td>AWS, Azure, GCP, O365, other SaaS</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk Add-ons</strong></td>
+                                <td>Pre-built integrations in Splunkbase</td>
+                                <td>Specific products (CrowdStrike, Palo Alto, etc.)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Inputs Data Manager (IDM)</h3>
+                
+                <p>IDM is a key component in Splunk Cloud that handles data ingestion from cloud sources:</p>
+                
+                <ul>
+                    <li>Connects to AWS, Azure, GCP without on-prem forwarders</li>
+                    <li>Pulls from S3 buckets, CloudWatch, Azure Event Hubs</li>
+                    <li>No agents needed for cloud-native sources</li>
+                    <li>Managed entirely through web UI</li>
+                </ul>
+                
+                <!-- Cloud vs Enterprise Comparison -->
+                <h2>Cloud vs Enterprise: Key Differences</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Splunk Cloud</th>
+                                <th>Splunk Enterprise (On-Prem)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Infrastructure</strong></td>
+                                <td>Splunk manages</td>
+                                <td>You manage</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Upgrades</strong></td>
+                                <td>Automatic (scheduled windows)</td>
+                                <td>You plan and execute</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scaling</strong></td>
+                                <td>Request increase, Splunk handles</td>
+                                <td>Buy and deploy hardware</td>
+                            </tr>
+                            <tr>
+                                <td><strong>App Installation</strong></td>
+                                <td>Cloud-vetted apps only (Victoria: self-service)</td>
+                                <td>Any app from Splunkbase or custom</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Configuration</strong></td>
+                                <td>Limited direct access to .conf files</td>
+                                <td>Full access to all configurations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Location</strong></td>
+                                <td>Splunk's cloud (region selectable)</td>
+                                <td>Your data center</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost Model</strong></td>
+                                <td>Subscription (GB/day ingestion)</td>
+                                <td>License + infrastructure + staff</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Heavy Forwarders</strong></td>
+                                <td>You manage (usually on-prem)</td>
+                                <td>You manage</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Cost Model -->
+                <h2>Splunk Cloud Cost Model</h2>
+                
+                <p>Splunk Cloud pricing is based on data ingestion:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Workload Pricing</h3>
+                        <p class="card-description">Based on GB/day ingested plus compute usage. More predictable for variable workloads. Introduced 2023.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📈</div>
+                        <h3 class="card-title">Ingest Pricing</h3>
+                        <p class="card-description">Traditional model - pay per GB/day. Simple but can be expensive at scale.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">💰</div>
+                        <h3 class="card-title">SVCs (Splunk Virtual Compute)</h3>
+                        <p class="card-description">Credits for compute resources. Used for intensive searches and premium apps.</p>
+                    </div>
+                </div>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Cost Considerations</div>
+                    <p>Splunk Cloud can be expensive. Key strategies to manage costs:</p>
+                    <ul>
+                        <li>Filter noisy data at the forwarder (don't ingest what you don't need)</li>
+                        <li>Use summary indexing for frequently-searched data</li>
+                        <li>Leverage Ingest Actions to route/filter at ingestion</li>
+                        <li>Consider Splunk SmartStore for cold data</li>
+                    </ul>
+                </div>
+                
+                <!-- Limitations to Know -->
+                <h2>Limitations to Know</h2>
+                
+                <p>Splunk Cloud has some constraints compared to on-prem:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Limitation</th>
+                                <th>Impact</th>
+                                <th>Workaround</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>No direct indexer access</strong></td>
+                                <td>Can't SSH to indexers, limited debugging</td>
+                                <td>Use diagnostic tools in Cloud Console</td>
+                            </tr>
+                            <tr>
+                                <td><strong>App restrictions</strong></td>
+                                <td>Apps must be cloud-vetted</td>
+                                <td>Request vetting for needed apps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maintenance windows</strong></td>
+                                <td>Splunk schedules upgrades</td>
+                                <td>Can negotiate preferred windows</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Outbound connections</strong></td>
+                                <td>Limited ability to reach on-prem systems</td>
+                                <td>Use hybrid with on-prem search head</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Custom commands</strong></td>
+                                <td>Some Python libraries restricted</td>
+                                <td>Use cloud-compatible alternatives</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Enterprise Security on Cloud -->
+                <h2>Enterprise Security on Splunk Cloud</h2>
+                
+                <p>ES runs fully on Splunk Cloud with some considerations:</p>
+                
+                <ul>
+                    <li><strong>Full functionality:</strong> Notable events, correlation searches, risk-based alerting all work</li>
+                    <li><strong>Asset/Identity lookup:</strong> Can use scheduled searches or Lookup Manager to update</li>
+                    <li><strong>Threat Intel:</strong> TAXII feeds, file uploads, or third-party integrations</li>
+                    <li><strong>SOAR Integration:</strong> Splunk SOAR Cloud or on-prem SOAR can connect</li>
+                </ul>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "When would you recommend Splunk Cloud vs on-prem?"</p>
+                    <p><strong>Good Answer:</strong> "Splunk Cloud for organizations that want to reduce operational overhead, don't have deep Splunk expertise in-house, are already cloud-first, or want predictable scaling. On-prem for strict data residency requirements, need full configuration control, have existing infrastructure investment, or require apps that aren't cloud-vetted. Many enterprises use hybrid - Cloud for the backend with on-prem Heavy Forwarders for data that can't leave the network."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "How do you get data into Splunk Cloud?"</p>
+                    <p><strong>Good Answer:</strong> "Multiple methods depending on the source. Universal Forwarders for on-prem servers - they connect to Cloud over 9997 with TLS. HTTP Event Collector for applications and serverless. Splunk Connect for Syslog (SC4S) as a container for network devices. Data Manager or Inputs Data Manager for cloud-to-cloud - AWS CloudWatch, S3, Azure Event Hubs. And pre-built add-ons from Splunkbase for specific products."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Splunk Cloud Quick Reference</div>
+                    
+                    <h4>Data Ingestion Methods</h4>
+                    <ul>
+                        <li><strong>UF → Cloud:</strong> Port 9997 with TLS certificates</li>
+                        <li><strong>HEC:</strong> HTTPS POST to Cloud HEC endpoint</li>
+                        <li><strong>SC4S:</strong> Syslog container → forwards to Cloud</li>
+                        <li><strong>Data Manager:</strong> Cloud-to-cloud (AWS, Azure, GCP)</li>
+                    </ul>
+                    
+                    <h4>Victoria Experience Features</h4>
+                    <ul>
+                        <li>Self-service app installation</li>
+                        <li>Self-service index creation</li>
+                        <li>Admin Config Service (ACS) API</li>
+                        <li>Token authentication management</li>
+                    </ul>
+                    
+                    <h4>Key Endpoints</h4>
+                    <ul>
+                        <li>Search: <code>https://&lt;stack&gt;.splunkcloud.com</code></li>
+                        <li>HEC: <code>https://http-inputs-&lt;stack&gt;.splunkcloud.com</code></li>
+                        <li>Forwarders: <code>inputs1.&lt;stack&gt;.splunkcloud.com:9997</code></li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="splunk-overview.html" class="card-link">← Splunk Overview</a>
+                    <a href="splunk-hybrid.html" class="card-link">Splunk Hybrid →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

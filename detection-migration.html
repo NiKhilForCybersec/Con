@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Migration | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Methodology</a>
+                    <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+                    <a href="log-migration.html" class="nav-item">Log Migration</a>
+                    <a href="detection-migration.html" class="nav-item active">Detection Migration</a>
+                    <a href="query-translation.html" class="nav-item">Query Translation</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="migration-methodology.html">Migrations</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Detection Migration</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Detection Migration</h1>
+                    <p class="page-subtitle">Detection rules are the most labor-intensive component of SIEM migration. They require query translation, schema mapping, threshold tuning, and comprehensive testing. This guide provides a systematic approach to migrating detection content effectively.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>The Detection Migration Challenge</h2>
+                    <p>Detection migration is harder than it looks. A rule isn't just a query—it's an ecosystem:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Detection Rule Components</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DETECTION RULE ANATOMY                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  QUERY LOGIC                                                         │   │
+│  │  The actual search - SPL, KQL, AQL, etc.                            │   │
+│  │  Dependencies: Field names, data schemas, functions                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────┐     │
+│  │                                 │                                 │     │
+│  ▼                                 ▼                                 ▼     │
+│  ┌───────────────┐    ┌───────────────────┐    ┌───────────────────┐      │
+│  │   SCHEDULING  │    │    ENRICHMENT     │    │   THRESHOLDS      │      │
+│  │               │    │                   │    │                   │      │
+│  │ • Run interval│    │ • Lookups         │    │ • Count limits    │      │
+│  │ • Time window │    │ • Asset context   │    │ • Time windows    │      │
+│  │ • Cron expr   │    │ • User context    │    │ • Severity calc   │      │
+│  └───────────────┘    └───────────────────┘    └───────────────────┘      │
+│                                    │                                        │
+│  ┌─────────────────────────────────┼─────────────────────────────────┐     │
+│  │                                 │                                 │     │
+│  ▼                                 ▼                                 ▼     │
+│  ┌───────────────┐    ┌───────────────────┐    ┌───────────────────┐      │
+│  │   ALERTING    │    │    RESPONSE       │    │   DOCUMENTATION   │      │
+│  │               │    │                   │    │                   │      │
+│  │ • Recipients  │    │ • SOAR playbooks  │    │ • Description     │      │
+│  │ • Routing     │    │ • Auto-actions    │    │ • Investigation   │      │
+│  │ • Severity    │    │ • Ticketing       │    │ • MITRE mapping   │      │
+│  └───────────────┘    └───────────────────┘    └───────────────────┘      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                    
+                    <p>When migrating a rule, you must address all of these components—not just translate the query.</p>
+                </section>
+
+                <section class="content-section">
+                    <h2>Migration Decision Framework</h2>
+                    <p>Not every rule deserves migration effort. Categorize rules before starting:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Criteria</th>
+                                    <th>Action</th>
+                                    <th>Effort</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Tier 1: Critical</strong></td>
+                                    <td>Fires regularly, always investigated, high-value threats</td>
+                                    <td>Full migration with extensive testing</td>
+                                    <td>4-8 hours each</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tier 2: Important</strong></td>
+                                    <td>Fires occasionally, investigated when occurs, compliance-required</td>
+                                    <td>Migration with standard testing</td>
+                                    <td>2-4 hours each</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tier 3: Evaluate</strong></td>
+                                    <td>Rarely fires, or fires but auto-closed, no recent investigation</td>
+                                    <td>Review need, migrate if justified</td>
+                                    <td>1-2 hours each</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tier 4: Skip</strong></td>
+                                    <td>Disabled, never fires, or duplicates native functionality</td>
+                                    <td>Don't migrate—use native equivalent or retire</td>
+                                    <td>0 (document only)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 The 80/20 Reality</div>
+                        <p>In a typical enterprise with 200 detection rules:</p>
+                        <ul>
+                            <li><strong>~30-40 rules</strong> provide 80% of detection value (Tier 1-2)</li>
+                            <li><strong>~60-80 rules</strong> are duplicated by new platform's built-in content (Tier 4)</li>
+                            <li><strong>~80-100 rules</strong> are dormant, broken, or obsolete (Tier 4)</li>
+                        </ul>
+                        <p>Don't migrate 200 rules. Migrate the 40 that matter.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Migration Workflow</h2>
+                    <p>For each rule being migrated, follow this systematic process:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Rule Migration Process</div>
+                        <pre><code>
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│   EXTRACT   │ → │   ANALYZE   │ → │  TRANSLATE  │ → │    TEST     │ → │   DEPLOY    │
+├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤
+│Export rule  │   │Understand   │   │Convert query│   │Historical   │   │Enable in    │
+│from source  │   │detection    │   │to target    │   │data test    │   │production   │
+│SIEM         │   │intent       │   │language     │   │             │   │             │
+│             │   │             │   │             │   │Atomic test  │   │Monitor for  │
+│Document all │   │Identify     │   │Map schemas  │   │if possible  │   │false pos    │
+│components   │   │dependencies │   │             │   │             │   │             │
+│             │   │             │   │Recreate     │   │Compare with │   │Tune as      │
+│             │   │Map to MITRE │   │enrichment   │   │legacy alerts│   │needed       │
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Step 1: Extract</h3>
+                    <p>Document everything about the original rule:</p>
+                    <ul>
+                        <li>Query/search logic (exact syntax)</li>
+                        <li>Scheduling (frequency, time window)</li>
+                        <li>Thresholds and conditions</li>
+                        <li>Lookups and enrichment used</li>
+                        <li>Alert routing and actions</li>
+                        <li>Historical performance (fire rate, FP rate)</li>
+                    </ul>
+
+                    <h3>Step 2: Analyze</h3>
+                    <p>Understand the detection's purpose:</p>
+                    <ul>
+                        <li>What threat does this detect? (MITRE technique)</li>
+                        <li>What data sources are required?</li>
+                        <li>What's the expected true positive behavior?</li>
+                        <li>What causes false positives?</li>
+                        <li>Is the logic still valid for current threats?</li>
+                    </ul>
+
+                    <h3>Step 3: Translate</h3>
+                    <p>Convert to target platform:</p>
+                    <ul>
+                        <li>Translate query syntax (SPL → KQL or vice versa)</li>
+                        <li>Map field names to target schema</li>
+                        <li>Recreate lookups/enrichment in new format</li>
+                        <li>Configure scheduling appropriately</li>
+                        <li>Set up alert routing</li>
+                    </ul>
+
+                    <h3>Step 4: Test</h3>
+                    <p>Validate the rule works correctly:</p>
+                    <ul>
+                        <li><strong>Historical test:</strong> Run against past data, compare results with legacy</li>
+                        <li><strong>Atomic test:</strong> Execute attack technique, verify detection fires</li>
+                        <li><strong>Parallel test:</strong> During dual-run, compare alerts from both platforms</li>
+                    </ul>
+
+                    <h3>Step 5: Deploy</h3>
+                    <p>Enable in production with monitoring:</p>
+                    <ul>
+                        <li>Enable in "alert only" mode initially (no auto-response)</li>
+                        <li>Monitor for 1-2 weeks</li>
+                        <li>Tune thresholds based on production data</li>
+                        <li>Enable response actions after validation</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Schema Mapping Challenges</h2>
+                    <p>The hardest part of detection migration is often schema differences. The same log event has different field names across platforms:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Concept</th>
+                                    <th>Splunk CIM</th>
+                                    <th>Sentinel ASIM</th>
+                                    <th>Raw Windows</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Source IP</strong></td>
+                                    <td>src_ip, src</td>
+                                    <td>SrcIpAddr</td>
+                                    <td>IpAddress</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Destination IP</strong></td>
+                                    <td>dest_ip, dest</td>
+                                    <td>DstIpAddr</td>
+                                    <td>DestAddress</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Username</strong></td>
+                                    <td>user, user_name</td>
+                                    <td>TargetUsername</td>
+                                    <td>TargetUserName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Process Name</strong></td>
+                                    <td>process_name, process</td>
+                                    <td>TargetProcessName</td>
+                                    <td>NewProcessName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Event ID</strong></td>
+                                    <td>EventCode, signature_id</td>
+                                    <td>EventID</td>
+                                    <td>EventID</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Schema Mapping Strategy</div>
+                        <p>Create a schema mapping document before translating rules. This single reference prevents inconsistent field names across your migrated detection content.</p>
+                        <p>Consider using normalized schemas (Splunk CIM, Sentinel ASIM) in the target platform from day one—it makes future migrations easier.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Translation Examples</h2>
+                    
+                    <h3>Example 1: Brute Force Detection</h3>
+                    <p><strong>Detection Intent:</strong> Alert when a single source has more than 5 failed logins in 10 minutes.</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk ES (Original)</div>
+                        <pre><code>index=wineventlog EventCode=4625 
+| bin _time span=10m 
+| stats count as failure_count, dc(TargetUserName) as users_targeted by src_ip, _time 
+| where failure_count > 5 
+| eval severity=if(failure_count>20, "critical", "high")</code></pre>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Microsoft Sentinel (Translated)</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4625
+| summarize 
+    FailureCount = count(),
+    UsersTargeted = dcount(TargetUserName),
+    TargetUsers = make_set(TargetUserName, 10)
+  by SourceIP = IpAddress, bin(TimeGenerated, 10m)
+| where FailureCount > 5
+| extend Severity = iif(FailureCount > 20, "Critical", "High")</code></pre>
+                    </div>
+
+                    <h3>Example 2: Suspicious PowerShell</h3>
+                    <p><strong>Detection Intent:</strong> Alert on PowerShell commands containing encoded content or web downloads.</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Splunk ES (Original)</div>
+                        <pre><code>index=wineventlog source="WinEventLog:Microsoft-Windows-PowerShell/Operational"
+| search CommandLine="*-enc*" OR CommandLine="*downloadstring*" OR CommandLine="*WebClient*"
+| eval risk_score=case(
+    like(CommandLine, "%encodedcommand%"), 80,
+    like(CommandLine, "%downloadstring%"), 90,
+    true(), 50
+)
+| table _time, host, user, CommandLine, risk_score</code></pre>
+                    </div>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">Microsoft Sentinel (Translated)</div>
+                        <pre><code>SecurityEvent
+| where EventID == 4104  // PowerShell Script Block Logging
+| where ScriptBlockText has_any ("-enc", "downloadstring", "WebClient", "IEX", "Invoke-Expression")
+| extend RiskScore = case(
+    ScriptBlockText has "encodedcommand", 80,
+    ScriptBlockText has "downloadstring", 90,
+    ScriptBlockText has "WebClient", 70,
+    true, 50
+)
+| project TimeGenerated, Computer, Account, ScriptBlockText, RiskScore</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Testing Migrated Detections</h2>
+                    <p>Every migrated rule must be validated. Use multiple testing approaches:</p>
+                    
+                    <h3>1. Historical Replay</h3>
+                    <p>Run the translated rule against historical data in the new platform:</p>
+                    <ul>
+                        <li>Query last 30-90 days</li>
+                        <li>Compare result count with legacy platform</li>
+                        <li>Investigate any significant differences</li>
+                    </ul>
+                    
+                    <h3>2. Atomic Testing</h3>
+                    <p>Execute the actual attack technique and verify detection:</p>
+                    <ul>
+                        <li>Use Atomic Red Team tests mapped to the detection's MITRE technique</li>
+                        <li>Execute in controlled environment</li>
+                        <li>Verify alert fires within expected timeframe</li>
+                    </ul>
+                    
+                    <h3>3. Parallel Comparison</h3>
+                    <p>During dual-SIEM operation:</p>
+                    <ul>
+                        <li>Run same detection in both platforms</li>
+                        <li>Compare alerts daily</li>
+                        <li>Investigate any detection that fires in one but not the other</li>
+                    </ul>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Testing Documentation</div>
+                        <p>Document every test:</p>
+                        <pre><code>Detection: Brute Force Login
+Test Type: Atomic Red Team T1110.001
+Test Date: 2024-03-15
+Test Action: 10 failed SSH logins from attack host
+Expected: Alert within 15 minutes
+Actual: Alert fired in 8 minutes ✓
+Result: PASS
+Notes: Threshold tuned from 5 to 10 based on environment baseline</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Handling Complex Rules</h2>
+                    <p>Some rules are particularly challenging to migrate:</p>
+                    
+                    <h3>Multi-Stage Correlation Rules</h3>
+                    <p><strong>Challenge:</strong> Rules that look for a sequence of events (A → B → C)</p>
+                    <p><strong>Approach:</strong> In Sentinel, use multiple queries with union or write to a custom table for correlation. In Splunk, use transaction or event correlation.</p>
+                    
+                    <h3>Rules with Heavy Lookup Dependencies</h3>
+                    <p><strong>Challenge:</strong> Rules that join against multiple lookup tables for context</p>
+                    <p><strong>Approach:</strong> Migrate lookups first, verify data. Consider if native enrichment (asset inventory, identity) can replace custom lookups.</p>
+                    
+                    <h3>ML-Based Detections</h3>
+                    <p><strong>Challenge:</strong> Rules using machine learning models (MLTK in Splunk, UEBA)</p>
+                    <p><strong>Approach:</strong> These rarely translate directly. Evaluate if target platform has equivalent capability, or rebuild using native ML features.</p>
+                    
+                    <h3>Real-Time vs Scheduled</h3>
+                    <p><strong>Challenge:</strong> Rules that must run in near-real-time</p>
+                    <p><strong>Approach:</strong> In Sentinel, use NRT rules (1-minute frequency). In Splunk, use real-time searches (resource intensive) or accelerated data models.</p>
+                </section>
+
+                <section class="content-section">
+                    <h2>Migration Tracking</h2>
+                    <p>Track progress systematically:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Detection Migration Tracker</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DETECTION MIGRATION STATUS                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Rule Name                  │ Tier │ Status      │ Owner  │ Test Result    │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Brute Force - Windows      │  1   │ ✓ Deployed  │ JSmith │ Pass           │
+│  Brute Force - SSH          │  1   │ ✓ Deployed  │ JSmith │ Pass           │
+│  Kerberoasting              │  1   │ ◐ Testing   │ MJones │ In Progress    │
+│  Pass-the-Hash              │  1   │ ◐ Testing   │ MJones │ In Progress    │
+│  Suspicious PowerShell      │  1   │ ○ Translate │ AKhan  │ Not Started    │
+│  Data Exfiltration          │  2   │ ○ Queued    │ --     │ Not Started    │
+│  Admin Group Change         │  2   │ ○ Queued    │ --     │ Not Started    │
+│  ...                        │      │             │        │                │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  Summary: 45 rules total │ 12 deployed │ 8 testing │ 25 pending            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you approach detection rule migration?"</strong></p>
+                        <p><strong>A:</strong> "First, I categorize rules into tiers based on value—not all 200 rules deserve equal effort. Typically, 20% of rules provide 80% of detection value. For each rule I migrate, I follow a five-step process: extract all components (not just the query), analyze the detection intent and map to MITRE, translate the query and recreate enrichment, test using historical data and atomic tests, then deploy with a monitoring period.</p>
+                        <p>The hardest part is usually schema mapping—field names differ between platforms. I create a comprehensive mapping document before starting translation. For complex rules like multi-stage correlations or ML-based detections, I evaluate whether to rebuild using native capabilities rather than attempting direct translation. Throughout the process, I track progress in a migration tracker and require documented test results before marking any rule as complete."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Detection Migration Checklist</div>
+                        <h4>Pre-Migration</h4>
+                        <ul>
+                            <li>☐ Rules categorized by tier (1-4)</li>
+                            <li>☐ Schema mapping document created</li>
+                            <li>☐ Lookups/enrichment migrated</li>
+                            <li>☐ Data sources available in target platform</li>
+                        </ul>
+                        <h4>Per-Rule Migration</h4>
+                        <ul>
+                            <li>☐ Original rule documented completely</li>
+                            <li>☐ Detection intent understood (MITRE mapped)</li>
+                            <li>☐ Query translated with correct field names</li>
+                            <li>☐ Scheduling and thresholds configured</li>
+                            <li>☐ Historical test completed</li>
+                            <li>☐ Atomic/purple team test if possible</li>
+                            <li>☐ Alert routing configured</li>
+                            <li>☐ Documentation updated</li>
+                        </ul>
+                        <h4>Post-Migration Validation</h4>
+                        <ul>
+                            <li>☐ 1-week monitoring period completed</li>
+                            <li>☐ False positive rate acceptable</li>
+                            <li>☐ True positive validated (detection actually works)</li>
+                            <li>☐ Response actions enabled (if applicable)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="log-migration.html" class="card-link">← Log Migration</a>
+                    <a href="query-translation.html" class="card-link">Query Translation →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

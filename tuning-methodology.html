@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuning Methodology | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection Engineering</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                    <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+                    <a href="tuning-methodology.html" class="nav-item active">Tuning Methodology</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Query Languages</div>
+                    <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+                    <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="detection-fundamentals.html">Detection</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Tuning Methodology</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Tuning Methodology</h1>
+                    <p class="page-subtitle">False positives kill SOC efficiency. A detection that fires 100 times a day with 95% false positives isn't a detection—it's noise. This guide covers systematic approaches to reducing false positives while maintaining detection efficacy.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>The False Positive Problem</h2>
+                    <p>False positives are the #1 complaint from SOC teams. They cause:</p>
+                    <ul>
+                        <li><strong>Alert fatigue:</strong> Analysts start ignoring alerts</li>
+                        <li><strong>Missed threats:</strong> Real attacks hidden in noise</li>
+                        <li><strong>Wasted resources:</strong> Time spent investigating non-issues</li>
+                        <li><strong>Low morale:</strong> Analysts feel like they're chasing ghosts</li>
+                    </ul>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ The Tuning Balance</div>
+                        <p>Tuning is a balance. Too aggressive = blind spots. Too loose = noise. The goal is <strong>actionable alerts</strong>—every alert should be worth investigating.</p>
+                        <p>A good target: <strong>70%+ true positive rate</strong> for high-severity alerts.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>The Tuning Process</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Systematic Tuning Workflow</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           TUNING LIFECYCLE                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────┐    ┌───────────┐    ┌───────────┐    ┌───────────┐          │
+│  │  COLLECT  │ →  │  ANALYZE  │ →  │   TUNE    │ →  │  VALIDATE │          │
+│  └───────────┘    └───────────┘    └───────────┘    └───────────┘          │
+│       │                │                │                │                  │
+│       ▼                ▼                ▼                ▼                  │
+│  ┌───────────┐    ┌───────────┐    ┌───────────┐    ┌───────────┐          │
+│  │ Gather FP │    │ Identify  │    │ Apply     │    │ Monitor   │          │
+│  │ samples   │    │ root      │    │ targeted  │    │ for 1-2   │          │
+│  │ from SOC  │    │ cause     │    │ fix       │    │ weeks     │          │
+│  │           │    │ patterns  │    │           │    │           │          │
+│  │ Export    │    │           │    │ Document  │    │ Compare   │          │
+│  │ closed    │    │ Categorize│    │ change    │    │ before/   │          │
+│  │ alerts    │    │           │    │           │    │ after     │          │
+│  └───────────┘    └───────────┘    └───────────┘    └───────────┘          │
+│                                                                             │
+│                         ┌─────────────────────┐                             │
+│                         │      DOCUMENT       │                             │
+│                         ├─────────────────────┤                             │
+│                         │ Record all changes  │                             │
+│                         │ Track FP rate over  │                             │
+│                         │ time                │                             │
+│                         └─────────────────────┘                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Step 1: Collect False Positive Data</h2>
+                    <p>Before tuning, understand what's happening:</p>
+                    
+                    <h3>Data Collection Methods</h3>
+                    <ul>
+                        <li><strong>SOC feedback:</strong> Ask analysts which alerts they close without investigation</li>
+                        <li><strong>Closed alert analysis:</strong> Export alerts closed as "false positive" or "benign"</li>
+                        <li><strong>Time-to-close metrics:</strong> Alerts closed in < 1 minute are likely FPs</li>
+                        <li><strong>No-action alerts:</strong> Alerts that never result in investigation or response</li>
+                    </ul>
+                    
+                    <h3>Sample Collection Query (Sentinel)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Identify High-FP Rules</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Classification == "FalsePositive" 
+     or Classification == "BenignPositive"
+| summarize 
+    FPCount = count(),
+    TotalIncidents = count()
+  by Title
+| extend FPRate = round(FPCount * 100.0 / TotalIncidents, 1)
+| where TotalIncidents > 10  // Statistically meaningful
+| order by FPRate desc
+| project Title, FPCount, TotalIncidents, FPRate</code></pre>
+                    </div>
+                    
+                    <h3>Sample Collection Query (Splunk ES)</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Identify High-FP Rules</div>
+                        <pre><code>index=notable earliest=-30d
+| stats count as total,
+        count(eval(status="closed" AND status_description="*false*")) as fp_count
+  by rule_name
+| eval fp_rate = round(fp_count/total*100, 1)
+| where total > 10
+| sort -fp_rate
+| table rule_name, fp_count, total, fp_rate</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Step 2: Analyze Root Causes</h2>
+                    <p>False positives have identifiable patterns. Categorize them:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Root Cause</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                    <th>Fix Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Legitimate Admin Activity</strong></td>
+                                    <td>Normal IT operations trigger security alerts</td>
+                                    <td>IT admin running PowerShell scripts</td>
+                                    <td>Allowlist admin accounts or source IPs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scheduled Tasks</strong></td>
+                                    <td>Automated jobs create predictable patterns</td>
+                                    <td>Backup service triggering file access alerts</td>
+                                    <td>Exclude service accounts, add time conditions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Security Tools</strong></td>
+                                    <td>Scanning and monitoring tools look like attacks</td>
+                                    <td>Vulnerability scanner triggering brute force detection</td>
+                                    <td>Exclude scanner IPs or service accounts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Business Applications</strong></td>
+                                    <td>Normal app behavior matches attack patterns</td>
+                                    <td>CRM export triggering data exfiltration alert</td>
+                                    <td>Exclude specific applications or processes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Threshold Too Low</strong></td>
+                                    <td>Normal variance exceeds detection threshold</td>
+                                    <td>5 failed logins is normal for large org</td>
+                                    <td>Increase threshold based on baseline</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time-Based Pattern</strong></td>
+                                    <td>Normal activity at certain times looks suspicious</td>
+                                    <td>Batch jobs running at 2 AM</td>
+                                    <td>Add business hours logic or exclude time windows</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Overly Broad Logic</strong></td>
+                                    <td>Detection matches more than intended</td>
+                                    <td>"PowerShell download" catches Windows Update</td>
+                                    <td>Refine detection logic, add specificity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Quality</strong></td>
+                                    <td>Parsing errors or missing fields cause mismatches</td>
+                                    <td>Null values triggering string matches</td>
+                                    <td>Add null checks, fix parsing</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Analysis Questions</h3>
+                    <p>For each false positive pattern, ask:</p>
+                    <ul>
+                        <li>What entity is involved? (user, host, IP, process)</li>
+                        <li>Is it always the same entity, or varying?</li>
+                        <li>Is there a time pattern? (business hours, weekends, specific schedule)</li>
+                        <li>What's the common attribute? (source IP range, process path, user group)</li>
+                        <li>Can this be safely excluded without creating blind spots?</li>
+                    </ul>
+                </section>
+
+                <section class="content-section">
+                    <h2>Step 3: Apply Tuning Fixes</h2>
+                    <p>Choose the right tuning technique for each root cause:</p>
+                    
+                    <h3>Tuning Techniques</h3>
+                    
+                    <h4>1. Allowlist Exclusions</h4>
+                    <p>Exclude known-good entities from detection:</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Exclude Admin Accounts</div>
+                        <pre><code>// Before tuning
+SecurityEvent
+| where EventID == 4688
+| where CommandLine has "mimikatz"
+
+// After tuning - exclude IT admin accounts
+SecurityEvent
+| where EventID == 4688
+| where CommandLine has "mimikatz"
+| where SubjectUserName !in ("admin_john", "admin_sarah", "svc_deploy")</code></pre>
+                    </div>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Allowlist Risks</div>
+                        <p>Every exclusion creates a potential blind spot. An attacker who compromises an excluded account won't be detected. Use allowlists sparingly and review them quarterly.</p>
+                    </div>
+
+                    <h4>2. Threshold Adjustment</h4>
+                    <p>Raise thresholds based on environmental baseline:</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Baseline-Based Threshold</div>
+                        <pre><code>// Step 1: Determine baseline
+SecurityEvent
+| where EventID == 4625
+| where TimeGenerated > ago(30d)
+| summarize DailyFailures = count() by bin(TimeGenerated, 1d)
+| summarize 
+    AvgDaily = avg(DailyFailures),
+    P95Daily = percentile(DailyFailures, 95),
+    MaxDaily = max(DailyFailures)
+
+// Result: Avg=450, P95=820, Max=1200
+// Set threshold at P95 + buffer = 1000
+
+// Step 2: Apply to detection
+SecurityEvent
+| where EventID == 4625
+| summarize Failures = count() by IpAddress, bin(TimeGenerated, 1h)
+| where Failures > 20  // Raised from 5 based on baseline</code></pre>
+                    </div>
+
+                    <h4>3. Conditional Logic</h4>
+                    <p>Add context-aware conditions:</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Business Hours Context</div>
+                        <pre><code>// Alert on admin tool usage outside business hours only
+SecurityEvent
+| where EventID == 4688
+| where NewProcessName has_any ("psexec", "wmic", "net.exe")
+| extend HourOfDay = datetime_part("hour", TimeGenerated)
+| extend DayOfWeek = dayofweek(TimeGenerated)
+// Only alert outside business hours (before 7 AM, after 7 PM, or weekends)
+| where HourOfDay < 7 or HourOfDay > 19 
+     or DayOfWeek in (0d, 6d)  // Sunday=0, Saturday=6</code></pre>
+                    </div>
+
+                    <h4>4. Enrichment-Based Filtering</h4>
+                    <p>Use context data to filter results:</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Exclude Known Security Scanners</div>
+                        <pre><code>let SecurityScanners = datatable(IPAddress:string)
+[
+    "10.1.50.10",  // Qualys Scanner
+    "10.1.50.11",  // Nessus Scanner
+    "10.1.50.20"   // Rapid7 Scanner
+];
+SecurityEvent
+| where EventID == 4625
+| summarize Failures = count() by IpAddress, bin(TimeGenerated, 10m)
+| where Failures > 10
+| where IpAddress !in (SecurityScanners)  // Exclude scanners</code></pre>
+                    </div>
+
+                    <h4>5. Correlation Requirements</h4>
+                    <p>Require additional indicators before alerting:</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Example: Require Multiple Indicators</div>
+                        <pre><code>// Instead of alerting on any encoded PowerShell...
+// Require encoded PowerShell AND (download OR outbound connection)
+let SuspiciousPowerShell = SecurityEvent
+| where EventID == 4104
+| where ScriptBlockText has "-enc" or ScriptBlockText has "encodedcommand"
+| project TimeGenerated, Computer, Account, ScriptBlockText;
+
+let NetworkConnections = SecurityEvent
+| where EventID == 5156
+| where DestPort in (80, 443, 8080)
+| project TimeGenerated, Computer, DestIP = DestAddress;
+
+SuspiciousPowerShell
+| join kind=inner (NetworkConnections) 
+  on Computer, $left.TimeGenerated == $right.TimeGenerated
+// Only alert when BOTH conditions met</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Step 4: Validate Changes</h2>
+                    <p>Never tune blindly. Validate that changes work:</p>
+                    
+                    <h3>Validation Checklist</h3>
+                    <ul>
+                        <li>☐ <strong>FP reduction:</strong> Did false positive rate decrease?</li>
+                        <li>☐ <strong>No blind spots:</strong> Can we still detect the original threat?</li>
+                        <li>☐ <strong>Test with atomic:</strong> Run attack simulation to confirm detection works</li>
+                        <li>☐ <strong>Monitor period:</strong> Watch for 1-2 weeks before considering complete</li>
+                    </ul>
+                    
+                    <h3>Before/After Comparison</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">Track Tuning Impact</div>
+                        <pre><code>// Compare alert volume before and after tuning
+// Run weekly to track trends
+SecurityAlert
+| where AlertName == "Brute Force Detection"
+| summarize 
+    AlertCount = count(),
+    FPCount = countif(Status == "Dismissed"),
+    TPCount = countif(Status == "Resolved" and Severity != "Informational")
+  by bin(TimeGenerated, 1w)
+| extend FPRate = round(FPCount * 100.0 / AlertCount, 1)
+| order by TimeGenerated asc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Documentation Standards</h2>
+                    <p>Every tuning change must be documented:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Tuning Change Record</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TUNING RECORD                                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Detection Rule: Suspicious PowerShell Execution                            │
+│  Change Date: 2024-03-15                                                    │
+│  Changed By: J. Smith                                                       │
+│  Ticket/CR: SEC-2024-0342                                                   │
+│                                                                             │
+│  PROBLEM                                                                    │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  FP Rate: 78% (312 FPs out of 400 alerts in 30 days)                       │
+│  Root Cause: SCCM deployment scripts use encoded PowerShell                │
+│  Pattern: All FPs from SCCM service account (svc_sccm) on                  │
+│           distribution points (DP01, DP02, DP03)                           │
+│                                                                             │
+│  CHANGE APPLIED                                                             │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  Added exclusion:                                                           │
+│  | where not (SubjectUserName == "svc_sccm"                                │
+│              and Computer in ("DP01", "DP02", "DP03"))                     │
+│                                                                             │
+│  VALIDATION                                                                 │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  - Atomic test T1059.001 still triggers alert: ✓                           │
+│  - FP rate after 1 week: 12% (down from 78%)                               │
+│  - No blind spots identified                                                │
+│                                                                             │
+│  RISK ASSESSMENT                                                            │
+│  ─────────────────────────────────────────────────────────────────────────  │
+│  If svc_sccm account is compromised, malicious PowerShell from             │
+│  DP01/02/03 won't be detected. Mitigated by:                               │
+│  - Separate detection for svc_sccm unusual activity                        │
+│  - PAM controls on service account                                          │
+│  - Quarterly review of this exclusion                                       │
+│                                                                             │
+│  REVIEW DATE: 2024-06-15                                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Tuning Anti-Patterns</h2>
+                    <p>Avoid these common tuning mistakes:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Anti-Pattern</th>
+                                    <th>Why It's Bad</th>
+                                    <th>Better Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Blanket User Exclusion</strong></td>
+                                    <td>Excluding a user entirely means you'll never detect if they're compromised</td>
+                                    <td>Exclude user + specific action + specific source</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Disabling Instead of Tuning</strong></td>
+                                    <td>Turning off a noisy rule loses all detection value</td>
+                                    <td>Investigate root cause, apply targeted fix</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Undocumented Changes</strong></td>
+                                    <td>Can't review or audit exclusions later</td>
+                                    <td>Document every change with rationale</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>One-and-Done</strong></td>
+                                    <td>Environment changes, tuning becomes stale</td>
+                                    <td>Quarterly review of all exclusions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Threshold to Infinity</strong></td>
+                                    <td>Raising threshold too high defeats the detection</td>
+                                    <td>Use baseline + reasonable buffer</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>No Validation</strong></td>
+                                    <td>Tuning might break detection entirely</td>
+                                    <td>Always test after tuning</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Tuning Prioritization</h2>
+                    <p>Which rules to tune first?</p>
+                    
+                    <h3>Priority Matrix</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Criteria</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>P1 - Urgent</strong></td>
+                                    <td>High-severity rule with >50% FP rate, >10 alerts/day</td>
+                                    <td>Tune immediately</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>P2 - High</strong></td>
+                                    <td>Any rule with >80% FP rate regardless of volume</td>
+                                    <td>Tune this week</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>P3 - Medium</strong></td>
+                                    <td>Rule with 50-80% FP rate, moderate volume</td>
+                                    <td>Tune this sprint</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>P4 - Low</strong></td>
+                                    <td>Rule with <50% FP rate or low volume</td>
+                                    <td>Backlog, address opportunistically</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>Calculate Tuning ROI</h3>
+                    <p>Prioritize based on analyst time saved:</p>
+                    <pre><code>Analyst Time Saved = (Current FP Count) × (Avg Minutes per FP Investigation)
+
+Example:
+- Rule fires 50 times/week
+- 40 are false positives (80% FP rate)
+- Each FP takes ~5 minutes to investigate
+- Tuning could save: 40 × 5 = 200 analyst-minutes/week</code></pre>
+                </section>
+
+                <section class="content-section">
+                    <h2>Real-World Tuning Examples</h2>
+                    
+                    <h3>Example 1: Brute Force Detection</h3>
+                    <p><strong>Problem:</strong> 85% false positive rate. All FPs from corporate SSO provider doing health checks.</p>
+                    <p><strong>Analysis:</strong> SSO provider IPs (10.1.100.0/24) generate auth failures during normal operation.</p>
+                    <p><strong>Fix:</strong></p>
+                    <pre><code>// Add exclusion for SSO health check IPs
+| where not (ipv4_is_in_range(IpAddress, "10.1.100.0/24"))</code></pre>
+                    <p><strong>Result:</strong> FP rate dropped to 15%. Still detects real brute force from other sources.</p>
+                    
+                    <h3>Example 2: Suspicious Process Execution</h3>
+                    <p><strong>Problem:</strong> "cmd.exe spawned by Office" fires constantly.</p>
+                    <p><strong>Analysis:</strong> Legitimate macro-enabled reports spawn cmd.exe. All from Finance team running monthly reports.</p>
+                    <p><strong>Fix:</strong></p>
+                    <pre><code>// Exclude known report macro, but only for specific users/machines
+| where not (
+    ParentProcessName endswith "EXCEL.EXE"
+    and CommandLine has "report_generator.bat"
+    and SubjectUserName in ("finance_report_svc")
+)</code></pre>
+                    <p><strong>Result:</strong> FP rate dropped. Still detects malicious Office → cmd.exe from other sources.</p>
+                    
+                    <h3>Example 3: Data Exfiltration</h3>
+                    <p><strong>Problem:</strong> Upload size threshold too low. Normal cloud sync triggers alerts.</p>
+                    <p><strong>Analysis:</strong> Baseline shows normal daily upload is 500MB-2GB. Threshold was 100MB.</p>
+                    <p><strong>Fix:</strong></p>
+                    <pre><code>// Raise threshold to P95 of baseline + buffer
+| where BytesUploaded > 5000000000  // 5GB instead of 100MB
+// Add correlation: exclude known cloud sync apps
+| where TargetApp !in ("OneDrive", "Dropbox", "GoogleDrive")</code></pre>
+                    <p><strong>Result:</strong> Alerts reduced from 50/day to 2/day, all actionable.</p>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you approach reducing false positives in detection rules?"</strong></p>
+                        <p><strong>A:</strong> "I follow a systematic four-step process: Collect, Analyze, Tune, Validate.</p>
+                        <p>First, I collect false positive data—pulling alerts closed as FP from the SIEM, talking to analysts about what they're ignoring, looking at time-to-close metrics.</p>
+                        <p>Then I analyze for patterns. Is it always the same user? Same source IP range? Same time of day? I categorize root causes: legitimate admin activity, scheduled tasks, security tools, or overly broad logic.</p>
+                        <p>Based on the root cause, I apply the most targeted fix possible. For known-good entities, I add exclusions—but always as specific as possible, never blanket exclusions. For threshold issues, I baseline the environment and set thresholds at the 95th percentile plus a buffer. For timing issues, I add business hours logic.</p>
+                        <p>Finally, I validate. I run atomic tests to confirm the detection still works, then monitor for 1-2 weeks to measure the actual FP reduction. Every change is documented with rationale and reviewed quarterly.</p>
+                        <p>The key principle: every exclusion is a potential blind spot. I'm aggressive about reducing noise, but conservative about what I exclude."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Tuning Quick Reference</div>
+                        <h4>Root Cause → Fix Mapping</h4>
+                        <table>
+                            <tr><th>Root Cause</th><th>Tuning Technique</th></tr>
+                            <tr><td>Admin activity</td><td>User/IP allowlist (specific)</td></tr>
+                            <tr><td>Scheduled tasks</td><td>Service account exclusion + time window</td></tr>
+                            <tr><td>Security tools</td><td>Scanner IP/account exclusion</td></tr>
+                            <tr><td>Threshold too low</td><td>Baseline analysis, raise to P95</td></tr>
+                            <tr><td>Time pattern</td><td>Business hours logic</td></tr>
+                            <tr><td>Overly broad</td><td>Add specificity to detection logic</td></tr>
+                        </table>
+                        <h4>Tuning Principles</h4>
+                        <ul>
+                            <li>Be specific: User + Action + Source, not just User</li>
+                            <li>Document everything: Rationale, risk, review date</li>
+                            <li>Validate always: Test detection still works</li>
+                            <li>Review quarterly: Exclusions become stale</li>
+                            <li>Target 70%+ true positive rate for high-severity</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="use-case-development.html" class="card-link">← Use Case Development</a>
+                    <a href="spl-fundamentals.html" class="card-link">SPL Fundamentals →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

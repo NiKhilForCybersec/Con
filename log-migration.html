@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Source Migration | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Methodology</a>
+                    <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+                    <a href="log-migration.html" class="nav-item active">Log Migration</a>
+                    <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+                    <a href="query-translation.html" class="nav-item">Query Translation</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows</a>
+                    <a href="linux-logs.html" class="nav-item">Linux</a>
+                    <a href="network-logs.html" class="nav-item">Network</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="migration-methodology.html">Migrations</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Log Migration</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Log Source Migration</h1>
+                    <p class="page-subtitle">Migrating data sources is the foundation of SIEM migration. Without logs flowing correctly, nothing else works. This guide covers wave planning, collection methods, and validation strategies.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Wave-Based Migration Strategy</h2>
+                    <p>Never migrate all sources at once. A wave-based approach manages risk and allows course correction:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Migration Wave Structure</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         MIGRATION WAVES                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  WAVE 0: Pilot (Week 1)                                                     │
+│  ├─ Goal: Validate platform and collection works                           │
+│  ├─ Sources: 2-3 non-critical, diverse types                               │
+│  └─ Success: Data flowing, parsing correct, basic queries work             │
+│                                                                             │
+│  WAVE 1: Foundation (Week 2-3)                                              │
+│  ├─ Goal: Core security visibility in new platform                         │
+│  ├─ Sources: Identity, Perimeter Firewall, EDR                             │
+│  └─ Success: Can detect basic attacks, SOC can investigate                 │
+│                                                                             │
+│  WAVE 2: Expansion (Week 4-6)                                               │
+│  ├─ Goal: Broad coverage                                                    │
+│  ├─ Sources: Windows DCs, DNS, Proxy, Email                                │
+│  └─ Success: Most detection rules have required data                       │
+│                                                                             │
+│  WAVE 3: Completion (Week 7-10)                                             │
+│  ├─ Goal: Full parity with legacy SIEM                                     │
+│  ├─ Sources: Remaining servers, applications, cloud                        │
+│  └─ Success: All required sources migrated                                 │
+│                                                                             │
+│  WAVE 4: Optimization (Ongoing)                                             │
+│  ├─ Goal: Reduce noise, improve quality                                    │
+│  ├─ Actions: Filter unnecessary data, tune parsing                         │
+│  └─ Success: Optimal cost/value ratio                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Wave Planning Criteria</h2>
+                    <p>Assign sources to waves based on:</p>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Factor</th>
+                                    <th>Wave 1 (Earlier)</th>
+                                    <th>Wave 3 (Later)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Security Value</strong></td>
+                                    <td>High (identity, perimeter, EDR)</td>
+                                    <td>Lower (application logs, debug)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Detection Dependencies</strong></td>
+                                    <td>Required for critical rules</td>
+                                    <td>Nice-to-have or single-use</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Collection Complexity</strong></td>
+                                    <td>Native connectors available</td>
+                                    <td>Custom parsing required</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Volume</strong></td>
+                                    <td>Start with manageable volumes</td>
+                                    <td>High-volume after platform proven</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Risk</strong></td>
+                                    <td>Well-understood sources</td>
+                                    <td>Complex or problematic sources</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Wave 1 Recommendation</div>
+                        <p>For most enterprise migrations, Wave 1 should include:</p>
+                        <ul>
+                            <li><strong>Azure AD / Entra ID</strong> - Identity is the new perimeter</li>
+                            <li><strong>Perimeter Firewall</strong> - Network boundary visibility</li>
+                            <li><strong>EDR (Defender/CrowdStrike)</strong> - Endpoint threats</li>
+                            <li><strong>Windows Domain Controllers</strong> - AD authentication</li>
+                        </ul>
+                        <p>These four sources enable 60-70% of typical detection scenarios.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Collection Method Mapping</h2>
+                    <p>Each source type has different collection options depending on the target platform:</p>
+                    
+                    <h3>Splunk Collection Methods</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source Type</th>
+                                    <th>Primary Method</th>
+                                    <th>Alternative</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Windows Servers</strong></td>
+                                    <td>Universal Forwarder → Indexers</td>
+                                    <td>WEC → Heavy Forwarder</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Linux Servers</strong></td>
+                                    <td>Universal Forwarder</td>
+                                    <td>Rsyslog → Heavy Forwarder</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Network Devices</strong></td>
+                                    <td>Syslog → Heavy Forwarder</td>
+                                    <td>SC4S (Syslog-ng container)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AWS</strong></td>
+                                    <td>Splunk Add-on for AWS (S3, CloudWatch)</td>
+                                    <td>Kinesis Firehose → HEC</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure</strong></td>
+                                    <td>Azure Event Hub → Splunk Add-on</td>
+                                    <td>Azure Functions → HEC</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SaaS Apps</strong></td>
+                                    <td>Vendor add-ons (O365, Okta, etc.)</td>
+                                    <td>API polling via scripted input</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Microsoft Sentinel Collection Methods</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source Type</th>
+                                    <th>Primary Method</th>
+                                    <th>Target Table</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Windows Servers</strong></td>
+                                    <td>Azure Monitor Agent + DCR</td>
+                                    <td>SecurityEvent / WindowsEvent</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Linux Servers</strong></td>
+                                    <td>Azure Monitor Agent</td>
+                                    <td>Syslog</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Network Devices</strong></td>
+                                    <td>Syslog via AMA or Log Forwarder</td>
+                                    <td>CommonSecurityLog / Syslog</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Resources</strong></td>
+                                    <td>Diagnostic Settings</td>
+                                    <td>AzureActivity, resource-specific</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Microsoft 365</strong></td>
+                                    <td>Native Connector (one-click)</td>
+                                    <td>SigninLogs, OfficeActivity, etc.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AWS</strong></td>
+                                    <td>S3 Connector via SQS</td>
+                                    <td>AWSCloudTrail, custom</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Third-Party</strong></td>
+                                    <td>Data Connectors / CEF</td>
+                                    <td>CommonSecurityLog / custom</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Parallel Ingestion Strategy</h2>
+                    <p>During migration, send data to both old and new SIEMs. This enables validation without losing visibility:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Dual Ingestion Architecture</div>
+                        <pre><code>
+                              ┌─────────────────┐
+                              │   LOG SOURCES   │
+                              │  (Servers, FW,  │
+                              │   Cloud, Apps)  │
+                              └────────┬────────┘
+                                       │
+                          ┌────────────┴────────────┐
+                          │   COLLECTION LAYER      │
+                          │   (Forwarders, Syslog)  │
+                          └────────────┬────────────┘
+                                       │
+                    ┌──────────────────┴──────────────────┐
+                    │            FANOUT                    │
+                    │  (Dual outputs, syslog mirroring)   │
+                    └──────────────────┬──────────────────┘
+                                       │
+            ┌──────────────────────────┼──────────────────────────┐
+            │                          │                          │
+            ▼                          │                          ▼
+  ┌─────────────────┐                  │                ┌─────────────────┐
+  │   LEGACY SIEM   │                  │                │    NEW SIEM     │
+  │   (Production)  │                  │                │  (Validation)   │
+  ├─────────────────┤                  │                ├─────────────────┤
+  │ • SOC monitors  │                  │                │ • Compare data  │
+  │ • Alerts active │                  │                │ • Test rules    │
+  │ • Primary       │                  │                │ • Build content │
+  └─────────────────┘                  │                └─────────────────┘
+            │                          │                          │
+            └──────────────────────────┼──────────────────────────┘
+                                       │
+                          ┌────────────┴────────────┐
+                          │     VALIDATION          │
+                          │  Compare volumes, gaps, │
+                          │  parsing, timestamps    │
+                          └─────────────────────────┘
+                        </code></pre>
+                    </div>
+
+                    <h3>Implementing Parallel Ingestion</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Collection Type</th>
+                                    <th>Dual-Send Approach</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Splunk UF</strong></td>
+                                    <td>Configure multiple outputs.conf targets (one legacy indexer, one new)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Syslog</strong></td>
+                                    <td>Use rsyslog/syslog-ng to send to multiple destinations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Azure Diagnostic</strong></td>
+                                    <td>Add multiple diagnostic settings (legacy + new workspace)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API-based</strong></td>
+                                    <td>Configure both platforms to poll same API (watch rate limits)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Cost Consideration</div>
+                        <p>Parallel ingestion means paying for data twice during migration. Budget for 2-3 months of double licensing/ingestion costs. This investment pays off in reduced risk and confident cutover.</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Source Validation Checklist</h2>
+                    <p>For each migrated source, validate comprehensively:</p>
+                    
+                    <h3>Data Arrival Validation</h3>
+                    <ul>
+                        <li>✅ Events arriving in target SIEM (check last 15 minutes)</li>
+                        <li>✅ No gaps in data flow (compare hourly counts)</li>
+                        <li>✅ Volume matches expected (±10% of legacy)</li>
+                    </ul>
+                    
+                    <h3>Parsing Validation</h3>
+                    <ul>
+                        <li>✅ Key fields extracted correctly (timestamp, source, user, etc.)</li>
+                        <li>✅ No parsing errors or broken events</li>
+                        <li>✅ Field names match expected schema</li>
+                    </ul>
+                    
+                    <h3>Timestamp Validation</h3>
+                    <ul>
+                        <li>✅ Event time matches reality (not ingestion time)</li>
+                        <li>✅ Timezone handled correctly (especially for network devices)</li>
+                        <li>✅ No future-dated or ancient events</li>
+                    </ul>
+                    
+                    <h3>Content Validation</h3>
+                    <ul>
+                        <li>✅ Detection rules using this source work correctly</li>
+                        <li>✅ Dashboards populate as expected</li>
+                        <li>✅ Searches return expected results</li>
+                    </ul>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">Sentinel: Validate Data Ingestion</div>
+                        <pre><code>// Check for recent data from specific source
+CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"
+| where TimeGenerated > ago(1h)
+| summarize Count = count(), 
+            FirstEvent = min(TimeGenerated),
+            LastEvent = max(TimeGenerated)
+
+// Compare with expected volume
+CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"
+| where TimeGenerated > ago(24h)
+| summarize HourlyCount = count() by bin(TimeGenerated, 1h)
+| render timechart</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Common Migration Challenges</h2>
+                    
+                    <h3>Challenge: Syslog Source Identification</h3>
+                    <p><strong>Problem:</strong> Multiple devices send to same syslog port. In legacy SIEM, source was identified by IP. New platform parses differently.</p>
+                    <p><strong>Solution:</strong> Use hostname/device identification fields in the log payload. Configure parsing rules to extract device identity from CEF headers or message content.</p>
+                    
+                    <h3>Challenge: Timezone Inconsistency</h3>
+                    <p><strong>Problem:</strong> Network devices send timestamps in local time without timezone indicator. New platform assumes UTC.</p>
+                    <p><strong>Solution:</strong> Configure devices to send UTC, or create parsing rules that apply timezone offset based on source IP ranges.</p>
+                    
+                    <h3>Challenge: Volume Spike During Parallel</h3>
+                    <p><strong>Problem:</strong> Sending to both SIEMs doubles network/processing load.</p>
+                    <p><strong>Solution:</strong> Migrate in waves to spread load. Consider filtering verbose logs (debug, informational) to new platform initially.</p>
+                    
+                    <h3>Challenge: Custom Parsing in Legacy</h3>
+                    <p><strong>Problem:</strong> Legacy SIEM has custom parsing (props.conf, custom parsers) that took years to develop.</p>
+                    <p><strong>Solution:</strong> Document all custom parsing. Evaluate if built-in solutions exist in new platform. Budget time for parser recreation.</p>
+                </section>
+
+                <section class="content-section">
+                    <h2>Migration Runbook Template</h2>
+                    <p>For each source, create a migration runbook:</p>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Source Migration Runbook</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SOURCE: Palo Alto PA-5260                                                  │
+│  WAVE: 1                                                                    │
+│  DATE: 2024-03-15                                                           │
+│  OWNER: J. Smith                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  PRE-MIGRATION                                                              │
+│  ☐ Verify network path to new SIEM (TCP 6514 open)                         │
+│  ☐ Confirm data connector deployed and configured                          │
+│  ☐ Baseline 24hr volume from legacy: _______ GB                            │
+│  ☐ Document current parsing rules                                          │
+│                                                                             │
+│  MIGRATION STEPS                                                            │
+│  ☐ Configure dual syslog destination on PA-5260                            │
+│  ☐ Verify events arriving in new SIEM                                      │
+│  ☐ Confirm parsing is correct                                              │
+│  ☐ Validate timestamp accuracy                                             │
+│  ☐ Compare 24hr volume: Legacy _____ GB vs New _____ GB                    │
+│                                                                             │
+│  VALIDATION                                                                 │
+│  ☐ Run test detection rule - confirmed firing                              │
+│  ☐ Dashboard populating correctly                                          │
+│  ☐ No gaps in data over 48hr observation                                   │
+│                                                                             │
+│  POST-MIGRATION (After cutover)                                             │
+│  ☐ Remove legacy destination from syslog config                            │
+│  ☐ Update documentation                                                    │
+│  ☐ Close migration ticket                                                  │
+│                                                                             │
+│  ROLLBACK PLAN                                                              │
+│  If issues: Revert syslog config to legacy-only destination                │
+│  Contact: Network Team (ext 5555)                                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you approach log source migration for a SIEM project?"</strong></p>
+                        <p><strong>A:</strong> "I use a wave-based approach. Wave 0 is a pilot with 2-3 non-critical sources to validate the platform works. Wave 1 brings in the high-value security sources—identity provider, perimeter firewall, EDR—because these enable 60-70% of detection scenarios. Subsequent waves expand coverage based on detection dependencies and complexity.</p>
+                        <p>During migration, I always run parallel ingestion, sending data to both old and new SIEMs. This lets us validate without losing visibility. For each source, I verify: data arriving, parsing correct, volume matches expectations, timestamps accurate. Only after comprehensive validation do we proceed to content migration. The key is never rushing—a broken data source undermines all downstream detection."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Log Migration Quick Reference</div>
+                        <h4>Wave 1 Sources (Migrate First)</h4>
+                        <ul>
+                            <li>Identity Provider (Azure AD, Okta, AD)</li>
+                            <li>Perimeter Firewall (Palo Alto, Fortinet, etc.)</li>
+                            <li>EDR Platform (Defender, CrowdStrike, SentinelOne)</li>
+                            <li>Windows Domain Controllers</li>
+                        </ul>
+                        <h4>Validation Commands</h4>
+                        <p><strong>Splunk - Check ingestion:</strong></p>
+                        <pre><code>index=* sourcetype=pan:traffic earliest=-1h | stats count</code></pre>
+                        <p><strong>Sentinel - Check ingestion:</strong></p>
+                        <pre><code>CommonSecurityLog | where TimeGenerated > ago(1h) | count</code></pre>
+                        <h4>Success Criteria</h4>
+                        <ul>
+                            <li>Volume within ±10% of legacy</li>
+                            <li>No gaps > 5 minutes</li>
+                            <li>All key fields parsed</li>
+                            <li>Timestamps accurate to source</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="discovery-assessment.html" class="card-link">← Discovery & Assessment</a>
+                    <a href="detection-migration.html" class="card-link">Detection Migration →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

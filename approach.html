@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SIEM Consultant Approach - My methodology for SIEM migrations and deployments">
+  <title>My Approach | SIEM Consultant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle navigation">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+  </button>
+  <div class="sidebar-overlay"></div>
+  
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">🛡️</div>
+          <div class="sidebar-logo-text">
+            SIEM Consultant
+            <span>Portfolio & Reference</span>
+          </div>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <!-- Section 1: Foundation -->
+        <div class="nav-section" data-section="1">
+          <div class="nav-section-header">
+            <span>1. Consultant Foundation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="approach.html" class="nav-item">My Approach</a>
+            <a href="deliverables.html" class="nav-item">Deliverables</a>
+            <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+          </div>
+        </div>
+        
+        <!-- Section 2: SIEM Fundamentals -->
+        <div class="nav-section" data-section="2">
+          <div class="nav-section-header">
+            <span>2. SIEM Fundamentals</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+            <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+            <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+            <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+            <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+            <a href="sentinel-overview.html" class="nav-item">Sentinel Overview</a>
+            <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+            <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+          </div>
+        </div>
+        
+        <!-- Section 3: Log Source Engineering -->
+        <div class="nav-section" data-section="3">
+          <div class="nav-section-header">
+            <span>3. Log Source Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+            <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+            <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+            <a href="network-logs.html" class="nav-item">Network Logs</a>
+            <a href="identity-logs.html" class="nav-item">Identity Logs</a>
+            <a href="cloud-logs.html" class="nav-item">Cloud Logs</a>
+            <a href="endpoint-logs.html" class="nav-item">Endpoint/EDR Logs</a>
+            <a href="application-logs.html" class="nav-item">Application Logs</a>
+          </div>
+        </div>
+        
+        <!-- Section 4: SIEM Migrations -->
+        <div class="nav-section" data-section="4">
+          <div class="nav-section-header">
+            <span>4. SIEM Migrations</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+            <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+            <a href="log-migration.html" class="nav-item">Log Source Migration</a>
+            <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+            <a href="query-translation.html" class="nav-item">Query Translation</a>
+            <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+            <a href="parallel-cutover.html" class="nav-item">Parallel Run & Cutover</a>
+            <a href="migration-challenges.html" class="nav-item">Challenges & Solutions</a>
+          </div>
+        </div>
+        
+        <!-- Section 5: SIEM Deployments -->
+        <div class="nav-section" data-section="5">
+          <div class="nav-section-header">
+            <span>5. SIEM Deployments</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="deployment-approach.html" class="nav-item">Deployment Approach</a>
+            <a href="splunk-cloud-deployment.html" class="nav-item">Splunk Cloud Deployment</a>
+            <a href="splunk-enterprise-deployment.html" class="nav-item">Splunk Enterprise Deployment</a>
+            <a href="sentinel-deployment.html" class="nav-item">Sentinel Deployment</a>
+            <a href="architecture-design.html" class="nav-item">Architecture Design</a>
+            <a href="workspace-design.html" class="nav-item">Workspace Design</a>
+            <a href="initial-onboarding.html" class="nav-item">Initial Onboarding</a>
+            <a href="operationalization.html" class="nav-item">Operationalization</a>
+          </div>
+        </div>
+        
+        <!-- Section 6: Detection Engineering -->
+        <div class="nav-section" data-section="6">
+          <div class="nav-section-header">
+            <span>6. Detection Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+            <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+            <a href="splunk-detections.html" class="nav-item">Splunk Detections</a>
+            <a href="sentinel-detections.html" class="nav-item">Sentinel Detections</a>
+            <a href="tuning-methodology.html" class="nav-item">Tuning Methodology</a>
+            <a href="detection-testing.html" class="nav-item">Detection Testing</a>
+          </div>
+        </div>
+        
+        <!-- Section 7: Threat Frameworks -->
+        <div class="nav-section" data-section="7">
+          <div class="nav-section-header">
+            <span>7. Threat Frameworks</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK Intro</a>
+            <a href="mitre-for-detection.html" class="nav-item">ATT&CK for Detection</a>
+            <a href="cyber-kill-chain.html" class="nav-item">Cyber Kill Chain</a>
+            <a href="detection-coverage.html" class="nav-item">Detection Coverage</a>
+            <a href="threat-modeling-basics.html" class="nav-item">Threat Modeling</a>
+          </div>
+        </div>
+        
+        <!-- Section 8: Windows Security -->
+        <div class="nav-section" data-section="8">
+          <div class="nav-section-header">
+            <span>8. Windows Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="windows-security-basics.html" class="nav-item">Windows Security Basics</a>
+            <a href="windows-authentication.html" class="nav-item">Windows Authentication</a>
+            <a href="critical-event-ids.html" class="nav-item">Critical Event IDs</a>
+            <a href="windows-attacks.html" class="nav-item">Windows Attacks</a>
+            <a href="sysmon-basics.html" class="nav-item">Sysmon Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 9: Network Security -->
+        <div class="nav-section" data-section="9">
+          <div class="nav-section-header">
+            <span>9. Network Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="network-fundamentals.html" class="nav-item">Network Fundamentals</a>
+            <a href="network-protocols.html" class="nav-item">Network Protocols</a>
+            <a href="network-attacks.html" class="nav-item">Network Attacks</a>
+            <a href="network-architecture.html" class="nav-item">Network Architecture</a>
+            <a href="visibility-points.html" class="nav-item">Visibility Points</a>
+          </div>
+        </div>
+        
+        <!-- Section 10: Cloud Security -->
+        <div class="nav-section" data-section="10">
+          <div class="nav-section-header">
+            <span>10. Cloud Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="cloud-security-basics.html" class="nav-item">Cloud Security Basics</a>
+            <a href="aws-security.html" class="nav-item">AWS Security</a>
+            <a href="azure-security.html" class="nav-item">Azure Security</a>
+            <a href="cloud-siem-integration.html" class="nav-item">Cloud SIEM Integration</a>
+          </div>
+        </div>
+        
+        <!-- Section 11: Identity Security -->
+        <div class="nav-section" data-section="11">
+          <div class="nav-section-header">
+            <span>11. Identity Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="identity-fundamentals.html" class="nav-item">Identity Fundamentals</a>
+            <a href="active-directory.html" class="nav-item">Active Directory</a>
+            <a href="entra-id.html" class="nav-item">Entra ID</a>
+            <a href="identity-attacks.html" class="nav-item">Identity Attacks</a>
+          </div>
+        </div>
+        
+        <!-- Section 12: Scripting & Automation -->
+        <div class="nav-section" data-section="12">
+          <div class="nav-section-header">
+            <span>12. Scripting & Automation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="scripting-overview.html" class="nav-item">Scripting Overview</a>
+            <a href="powershell-for-siem.html" class="nav-item">PowerShell for SIEM</a>
+            <a href="python-for-siem.html" class="nav-item">Python for SIEM</a>
+            <a href="soar-basics.html" class="nav-item">SOAR Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 13: Query Languages -->
+        <div class="nav-section" data-section="13">
+          <div class="nav-section-header">
+            <span>13. Query Languages</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+            <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+            <a href="query-patterns.html" class="nav-item">Query Patterns</a>
+            <a href="query-cheatsheet.html" class="nav-item">Query Cheat Sheet</a>
+          </div>
+        </div>
+        
+        <!-- Section 14: SOC Context -->
+        <div class="nav-section" data-section="14">
+          <div class="nav-section-header">
+            <span>14. SOC Context</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="soc-fundamentals.html" class="nav-item">SOC Fundamentals</a>
+            <a href="alert-lifecycle.html" class="nav-item">Alert Lifecycle</a>
+            <a href="metrics-reporting.html" class="nav-item">Metrics & Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 15: Compliance -->
+        <div class="nav-section" data-section="15">
+          <div class="nav-section-header">
+            <span>15. Compliance & Governance</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="compliance-overview.html" class="nav-item">Compliance Overview</a>
+            <a href="log-retention.html" class="nav-item">Log Retention</a>
+            <a href="audit-reporting.html" class="nav-item">Audit Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 16: Interview Prep -->
+        <div class="nav-section" data-section="16">
+          <div class="nav-section-header">
+            <span>16. Interview Preparation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="common-questions.html" class="nav-item">Common Questions</a>
+            <a href="scenario-questions.html" class="nav-item">Scenario Questions</a>
+            <a href="technical-exercises.html" class="nav-item">Technical Exercises</a>
+            <a href="architecture-diagrams.html" class="nav-item">Architecture Diagrams</a>
+            <a href="your-experience.html" class="nav-item">Your Experience</a>
+          </div>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>SIEM Consultant Portfolio</p>
+        <p>Built for Interview Success</p>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span>My Approach</span>
+        </nav>
+        
+        <header class="page-header">
+          <h1 class="page-title">My Consulting Approach</h1>
+          <p class="page-subtitle">How I deliver SIEM migrations and deployments - from discovery to handover</p>
+        </header>
+        
+        <!-- The Analogy -->
+        <div class="info-box note">
+          <div class="info-box-title">🎯 The Simple Version</div>
+          <p>Think of a SIEM project like moving houses. You don't just throw everything in a truck and hope for the best. You inventory what you have, decide what's worth keeping, pack carefully, move in phases, and make sure the new place works before you cancel your old lease.</p>
+        </div>
+        
+        <h2>My Project Lifecycle</h2>
+        <p>Every SIEM project - whether migration or greenfield - follows this proven framework:</p>
+        
+        <!-- Project Phases Diagram -->
+        <div class="diagram">
+          <div class="diagram-title">SIEM Project Lifecycle</div>
+<pre>
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│          │    │          │    │          │    │          │    │          │    │          │
+│ DISCOVER │───▶│  DESIGN  │───▶│  BUILD   │───▶│ MIGRATE  │───▶│ VALIDATE │───▶│ HANDOVER │
+│          │    │          │    │          │    │          │    │          │    │          │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+     │               │               │               │               │               │
+     ▼               ▼               ▼               ▼               ▼               ▼
+  Weeks 1-2       Weeks 3-4      Weeks 5-8      Weeks 9-12     Weeks 13-14    Weeks 15-16
+</pre>
+        </div>
+        
+        <h2>Phase 1: Discover</h2>
+        <p><strong>Goal:</strong> Understand what exists today and what the organization actually needs.</p>
+        
+        <h3>What I Do</h3>
+        <ul>
+          <li><strong>Stakeholder interviews</strong> - Talk to SOC analysts, security engineers, IT ops, compliance team</li>
+          <li><strong>Current state assessment</strong> - Document existing SIEM, log sources, detection rules</li>
+          <li><strong>Pain point identification</strong> - What's not working? What's missing?</li>
+          <li><strong>Requirements gathering</strong> - Compliance needs, use cases, integration requirements</li>
+        </ul>
+        
+        <h3>Key Questions I Ask</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Stakeholder</th>
+                <th>Key Questions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SOC Analysts</td>
+                <td>What alerts are useful? What's noise? What takes too long to investigate?</td>
+              </tr>
+              <tr>
+                <td>Security Engineers</td>
+                <td>What's hard to maintain? What integrations are missing?</td>
+              </tr>
+              <tr>
+                <td>Compliance Team</td>
+                <td>What reports are required? What retention periods? What audits?</td>
+              </tr>
+              <tr>
+                <td>IT Operations</td>
+                <td>What log sources exist? What's the data volume? Network constraints?</td>
+              </tr>
+              <tr>
+                <td>Leadership</td>
+                <td>What's the timeline? Budget? Success criteria?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h3>Deliverable: Discovery Report</h3>
+        <ul>
+          <li>Current state documentation</li>
+          <li>Gap analysis</li>
+          <li>Risk assessment</li>
+          <li>Preliminary recommendations</li>
+        </ul>
+        
+        <div class="info-box tip">
+          <div class="info-box-title">💡 Interview Tip</div>
+          <p>"I always start with discovery because assumptions kill projects. I've seen migrations fail because someone assumed all detection rules were documented - they weren't. Discovery surfaces these risks early."</p>
+        </div>
+        
+        <h2>Phase 2: Design</h2>
+        <p><strong>Goal:</strong> Create the blueprint for the new SIEM environment.</p>
+        
+        <h3>What I Produce</h3>
+        <ul>
+          <li><strong>High-Level Design (HLD)</strong> - Architecture overview, component selection, integration points</li>
+          <li><strong>Low-Level Design (LLD)</strong> - Detailed configurations, naming conventions, RBAC model</li>
+          <li><strong>Migration Plan</strong> - Phased approach, timeline, dependencies, rollback strategy</li>
+          <li><strong>Test Plan</strong> - How we'll validate everything works</li>
+        </ul>
+        
+        <h3>Design Decisions I Make</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Decision Area</th>
+                <th>Considerations</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Platform Selection</td>
+                <td>Splunk vs Sentinel vs others - based on requirements, budget, existing stack</td>
+              </tr>
+              <tr>
+                <td>Architecture Pattern</td>
+                <td>Cloud, on-prem, hybrid - based on data residency, latency, cost</td>
+              </tr>
+              <tr>
+                <td>Log Source Priority</td>
+                <td>Which sources first? Critical security value vs effort</td>
+              </tr>
+              <tr>
+                <td>Detection Strategy</td>
+                <td>Migrate all rules? Use built-in content? Build custom?</td>
+              </tr>
+              <tr>
+                <td>Integration Approach</td>
+                <td>SOAR, ticketing, threat intel - what connects to what?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Phase 3: Build</h2>
+        <p><strong>Goal:</strong> Set up the new SIEM environment and prepare for data.</p>
+        
+        <h3>What I Build</h3>
+        <ul>
+          <li><strong>Infrastructure</strong> - Workspaces, clusters, forwarders, connectors</li>
+          <li><strong>Ingestion pipelines</strong> - Data connectors, parsing rules, field mappings</li>
+          <li><strong>Detection content</strong> - Translated rules, new analytics, correlation searches</li>
+          <li><strong>Dashboards & workbooks</strong> - Operational views, investigation tools</li>
+          <li><strong>Automation</strong> - Playbooks, response actions, integrations</li>
+        </ul>
+        
+        <h3>Build Order</h3>
+        <div class="diagram">
+          <div class="diagram-title">Build Sequence</div>
+<pre>
+1. INFRASTRUCTURE     2. INGESTION          3. DETECTION          4. OPERATIONS
+   └─ Workspaces         └─ Connectors         └─ Analytics          └─ Dashboards
+   └─ RBAC               └─ Parsers            └─ Rules              └─ Playbooks
+   └─ Retention          └─ Field Mapping      └─ Alerts             └─ Integrations
+</pre>
+        </div>
+        
+        <h2>Phase 4: Migrate</h2>
+        <p><strong>Goal:</strong> Move data sources and detection content to the new platform.</p>
+        
+        <h3>My Phased Approach</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>What Migrates</th>
+                <th>Why This Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wave 1</td>
+                <td>Authentication logs (AD, Entra ID)</td>
+                <td>High security value, well-understood format</td>
+              </tr>
+              <tr>
+                <td>Wave 2</td>
+                <td>Endpoint logs (Windows, EDR)</td>
+                <td>Critical for detection, largest volume</td>
+              </tr>
+              <tr>
+                <td>Wave 3</td>
+                <td>Network logs (Firewall, Proxy)</td>
+                <td>Network visibility, perimeter detection</td>
+              </tr>
+              <tr>
+                <td>Wave 4</td>
+                <td>Cloud logs (AWS, Azure, GCP)</td>
+                <td>Cloud-native threats, compliance</td>
+              </tr>
+              <tr>
+                <td>Wave 5</td>
+                <td>Application logs (O365, custom apps)</td>
+                <td>Business context, insider threat</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Phase 5: Validate</h2>
+        <p><strong>Goal:</strong> Prove the new SIEM works as well as (or better than) the old one.</p>
+        
+        <h3>What I Validate</h3>
+        <ul>
+          <li><strong>Data completeness</strong> - All expected logs are arriving, no gaps</li>
+          <li><strong>Parsing accuracy</strong> - Fields are extracted correctly</li>
+          <li><strong>Detection parity</strong> - Alerts that fired before still fire now</li>
+          <li><strong>Performance</strong> - Search times, dashboard load times, alert latency</li>
+          <li><strong>Workflow testing</strong> - End-to-end investigation scenarios</li>
+        </ul>
+        
+        <h3>Parallel Running</h3>
+        <p>I always run both SIEMs in parallel for 2-4 weeks:</p>
+        <ul>
+          <li>Same logs go to both platforms</li>
+          <li>Compare alerts side-by-side</li>
+          <li>Identify gaps before cutover</li>
+          <li>Build team confidence</li>
+        </ul>
+        
+        <div class="info-box warning">
+          <div class="info-box-title">⚠️ Common Mistake</div>
+          <p>Never skip parallel running. I've seen organizations cut over too early and miss critical alerts. The cost of running two SIEMs for a month is far less than missing a breach.</p>
+        </div>
+        
+        <h2>Phase 6: Handover</h2>
+        <p><strong>Goal:</strong> Transfer knowledge and ensure the team can operate independently.</p>
+        
+        <h3>What I Deliver</h3>
+        <ul>
+          <li><strong>Operational runbooks</strong> - Day-to-day procedures, troubleshooting guides</li>
+          <li><strong>Training sessions</strong> - Platform training, query writing, investigation workflows</li>
+          <li><strong>Documentation</strong> - Architecture docs, configuration references, decision logs</li>
+          <li><strong>Knowledge transfer</strong> - Shadowing, Q&A sessions, hands-on exercises</li>
+          <li><strong>Support transition</strong> - Hypercare period, escalation paths</li>
+        </ul>
+        
+        <h3>Success Criteria</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Log source coverage</td>
+                <td>100% of planned sources ingesting</td>
+              </tr>
+              <tr>
+                <td>Detection parity</td>
+                <td>All critical rules migrated and validated</td>
+              </tr>
+              <tr>
+                <td>Team readiness</td>
+                <td>Team can operate without consultant support</td>
+              </tr>
+              <tr>
+                <td>Documentation complete</td>
+                <td>All runbooks and guides delivered</td>
+              </tr>
+              <tr>
+                <td>Legacy decommissioned</td>
+                <td>Old SIEM shut down (after retention period)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Why This Approach Works</h2>
+        <ul>
+          <li><strong>Reduces risk</strong> - Phased approach catches issues early</li>
+          <li><strong>Builds confidence</strong> - Stakeholders see progress throughout</li>
+          <li><strong>Ensures adoption</strong> - Team is trained and ready before go-live</li>
+          <li><strong>Creates documentation</strong> - Knowledge doesn't walk out the door with me</li>
+        </ul>
+        
+        <div class="info-box tip">
+          <div class="info-box-title">💡 Interview Tip</div>
+          <p>"When asked 'How do you approach a SIEM project?', walk through these six phases. It shows you have a structured methodology, not just technical skills. Interviewers want to see that you can lead a project, not just configure a tool."</p>
+        </div>
+        
+        <!-- Page Navigation -->
+        <div class="page-nav">
+          <a href="index.html" class="page-nav-btn prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">← Home</span>
+          </a>
+          <a href="deliverables.html" class="page-nav-btn next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Deliverables →</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

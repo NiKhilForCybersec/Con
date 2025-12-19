@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Platform Comparison | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Compare Splunk vs Microsoft Sentinel vs other SIEM platforms. Decision matrix for selecting the right SIEM for your organization.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item active">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Migrations</div>
+                    <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+                    <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Platform Comparison</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Platform Comparison</h1>
+                    <p class="page-subtitle">Decision matrix for selecting the right SIEM platform</p>
+                </header>
+                
+                <!-- The Decision Framework -->
+                <h2>The Decision Framework</h2>
+                
+                <p>Choosing a SIEM isn't about finding the "best" platform - it's about finding the right fit for your organization's needs, skills, and budget.</p>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Decision Factors</div>
+                    <ul>
+                        <li><strong>Environment:</strong> Microsoft-heavy? Multi-cloud? On-premises?</li>
+                        <li><strong>Team skills:</strong> Existing expertise with specific platforms?</li>
+                        <li><strong>Data volume:</strong> How many GB/day?</li>
+                        <li><strong>Data residency:</strong> Any requirements for where data lives?</li>
+                        <li><strong>Budget model:</strong> CapEx vs OpEx preference?</li>
+                        <li><strong>Integration needs:</strong> What sources must be supported?</li>
+                    </ul>
+                </div>
+                
+                <!-- Splunk vs Sentinel -->
+                <h2>Splunk vs Microsoft Sentinel</h2>
+                
+                <p>The two dominant modern SIEM platforms, each with distinct strengths:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Splunk</th>
+                                <th>Microsoft Sentinel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Deployment</strong></td>
+                                <td>On-prem, Cloud, or Hybrid</td>
+                                <td>Cloud-only (Azure)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Infrastructure</strong></td>
+                                <td>Self-managed (Enterprise) or managed (Cloud)</td>
+                                <td>Fully serverless</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Query Language</strong></td>
+                                <td>SPL (Search Processing Language)</td>
+                                <td>KQL (Kusto Query Language)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Sources</strong></td>
+                                <td>Extremely flexible - anything</td>
+                                <td>Strong Microsoft; growing third-party</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOAR</strong></td>
+                                <td>Splunk SOAR (separate product)</td>
+                                <td>Logic Apps (built-in)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pricing Model</strong></td>
+                                <td>GB/day ingestion or workload-based</td>
+                                <td>GB/day ingestion</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Learning Curve</strong></td>
+                                <td>Steeper - powerful but complex</td>
+                                <td>Moderate - easier for Azure users</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ecosystem</strong></td>
+                                <td>Mature marketplace, huge community</td>
+                                <td>Growing Content Hub, Microsoft backing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Large enterprises, complex environments</td>
+                                <td>Microsoft shops, cloud-first orgs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Decision Matrix -->
+                <h2>Decision Matrix</h2>
+                
+                <p>Score each factor based on your organization's priorities:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>If Your Priority Is...</th>
+                                <th>Lean Toward</th>
+                                <th>Why</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Microsoft M365/Azure ecosystem</td>
+                                <td><span class="tag tag-blue">Sentinel</span></td>
+                                <td>Native integration, unified security portal</td>
+                            </tr>
+                            <tr>
+                                <td>On-premises data residency</td>
+                                <td><span class="tag tag-green">Splunk Enterprise</span></td>
+                                <td>Full control over data location</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-cloud (AWS + Azure + GCP)</td>
+                                <td><span class="tag tag-green">Splunk</span></td>
+                                <td>Cloud-agnostic, consistent experience</td>
+                            </tr>
+                            <tr>
+                                <td>Diverse log sources</td>
+                                <td><span class="tag tag-green">Splunk</span></td>
+                                <td>Most flexible ingestion, huge app ecosystem</td>
+                            </tr>
+                            <tr>
+                                <td>Minimize infrastructure management</td>
+                                <td><span class="tag tag-blue">Sentinel</span></td>
+                                <td>Truly serverless, no backend to manage</td>
+                            </tr>
+                            <tr>
+                                <td>Existing Splunk expertise</td>
+                                <td><span class="tag tag-green">Splunk</span></td>
+                                <td>Leverage existing skills and content</td>
+                            </tr>
+                            <tr>
+                                <td>Budget constraints</td>
+                                <td><span class="tag tag-amber">Depends</span></td>
+                                <td>TCO varies by volume and requirements</td>
+                            </tr>
+                            <tr>
+                                <td>Fastest deployment</td>
+                                <td><span class="tag tag-blue">Sentinel</span></td>
+                                <td>No infrastructure - enable and connect</td>
+                            </tr>
+                            <tr>
+                                <td>Advanced analytics/ML</td>
+                                <td><span class="tag tag-amber">Both capable</span></td>
+                                <td>Splunk ML Toolkit vs Sentinel Fusion/UEBA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Query Language Comparison -->
+                <h2>Query Language Comparison</h2>
+                
+                <p>The query language you'll use daily - a critical consideration:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>SPL (Splunk)</th>
+                                <th>KQL (Sentinel)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Search events</strong></td>
+                                <td><code>index=security EventCode=4625</code></td>
+                                <td><code>SecurityEvent | where EventID == 4625</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Count by field</strong></td>
+                                <td><code>| stats count by src_ip</code></td>
+                                <td><code>| summarize count() by SourceIP</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Time filter</strong></td>
+                                <td><code>earliest=-24h latest=now</code></td>
+                                <td><code>| where TimeGenerated > ago(24h)</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Join tables</strong></td>
+                                <td><code>| join type=inner [search ...]</code></td>
+                                <td><code>| join kind=inner (Table2) on Key</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Top N</strong></td>
+                                <td><code>| top 10 src_ip</code></td>
+                                <td><code>| top 10 by SourceIP</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Query Language Insight</div>
+                    <p><strong>SPL</strong> is more flexible and powerful for complex transformations. It's pipe-based like Unix.</p>
+                    <p><strong>KQL</strong> is more SQL-like and arguably easier to learn. It's used across all Azure monitoring.</p>
+                    <p>Both are powerful enough for any security use case. The learning curve is manageable for either.</p>
+                </div>
+                
+                <!-- Cost Comparison -->
+                <h2>Cost Comparison Framework</h2>
+                
+                <p>Direct cost comparison is complex because pricing models differ:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cost Factor</th>
+                                <th>Splunk</th>
+                                <th>Microsoft Sentinel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Primary metric</strong></td>
+                                <td>GB/day ingestion (or SVCs)</td>
+                                <td>GB/day ingestion</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Infrastructure</strong></td>
+                                <td>Additional (Enterprise) or included (Cloud)</td>
+                                <td>Included (serverless)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Retention cost</strong></td>
+                                <td>Included in license + storage costs</td>
+                                <td>Included (90d) + archive pricing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SIEM features</strong></td>
+                                <td>Enterprise Security = additional license</td>
+                                <td>Included in base pricing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOAR</strong></td>
+                                <td>SOAR = additional license</td>
+                                <td>Logic Apps = pay per execution</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Free data sources</strong></td>
+                                <td>None - all data counts against license</td>
+                                <td>Some Microsoft data free</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Discounts available</strong></td>
+                                <td>Volume discounts, ELAs</td>
+                                <td>Commitment tiers, Microsoft EA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Cost Reality Check</div>
+                    <p>Neither platform is "cheaper" universally. TCO depends on:</p>
+                    <ul>
+                        <li><strong>Data volume:</strong> High volume favors commitment-tier pricing</li>
+                        <li><strong>Staff costs:</strong> Platform expertise availability</li>
+                        <li><strong>Existing investments:</strong> Microsoft EA discounts, existing Splunk licenses</li>
+                        <li><strong>Infrastructure costs:</strong> On-prem Splunk requires hardware/staff</li>
+                    </ul>
+                    <p>Always model TCO for your specific scenario.</p>
+                </div>
+                
+                <!-- Other SIEM Platforms -->
+                <h2>Other SIEM Platforms</h2>
+                
+                <p>Beyond Splunk and Sentinel, other platforms serve specific niches:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Deployment</th>
+                                <th>Best For</th>
+                                <th>Considerations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IBM QRadar</strong></td>
+                                <td>On-prem, SaaS</td>
+                                <td>Large enterprises, IBM shops</td>
+                                <td>Complex, requires expertise</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Google Chronicle</strong></td>
+                                <td>Cloud (GCP)</td>
+                                <td>GCP-heavy, massive scale</td>
+                                <td>Pricing by data retained</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Elastic Security</strong></td>
+                                <td>Self-managed, Cloud</td>
+                                <td>Open-source preference, ELK stack users</td>
+                                <td>DIY approach to security content</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LogRhythm</strong></td>
+                                <td>On-prem, Cloud</td>
+                                <td>Mid-market, compliance focus</td>
+                                <td>Smaller scale than Splunk/Sentinel</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sumo Logic</strong></td>
+                                <td>Cloud-native</td>
+                                <td>DevOps-oriented, cloud-native apps</td>
+                                <td>Less security-focused than SIEM leaders</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Securonix</strong></td>
+                                <td>Cloud</td>
+                                <td>UEBA focus, insider threat</td>
+                                <td>Strong analytics, niche player</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Migration Considerations -->
+                <h2>Migration Considerations</h2>
+                
+                <p>When migrating from one SIEM to another:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Content Translation</h3>
+                        <p class="card-description">Detection rules must be rewritten. Query logic translates but syntax differs significantly.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🔗</div>
+                        <h3 class="card-title">Data Sources</h3>
+                        <p class="card-description">Log collection methods change. New agents, connectors, and parsers needed.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📚</div>
+                        <h3 class="card-title">Team Retraining</h3>
+                        <p class="card-description">New query language, new UI, new workflows. Budget 2-4 weeks for proficiency.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">⏱️</div>
+                        <h3 class="card-title">Parallel Running</h3>
+                        <p class="card-description">Expect 3-6 months of parallel operation before full cutover.</p>
+                    </div>
+                </div>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "How do you decide between Splunk and Sentinel?"</p>
+                    <p><strong>Good Answer:</strong> "It starts with understanding the environment. For Microsoft-heavy shops with M365 and Azure, Sentinel usually makes sense - native integration, unified security portal, and no infrastructure to manage. For organizations with diverse multi-cloud environments, heavy on-premises footprint, or existing Splunk investment, Splunk's flexibility is valuable. I also consider team skills - transitioning a team from SPL to KQL has a learning curve. Finally, data volume and budget model matter - both platforms scale differently and have different cost optimization strategies."</p>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "What are the main differences between SPL and KQL?"</p>
+                    <p><strong>Good Answer:</strong> "Both are powerful query languages, but they approach problems differently. SPL is pipe-based like Unix commands - you search, then pipe through transformations. It's extremely flexible for complex data manipulation. KQL is more SQL-like with tabular operators - you start with a table, filter with where, aggregate with summarize. KQL is used across all Azure services, so Azure-experienced teams pick it up faster. For security use cases, both can do anything you need. The transition between them takes a few weeks of practice."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Platform Selection Quick Reference</div>
+                    
+                    <h4>Choose Splunk When:</h4>
+                    <ul>
+                        <li>Multi-cloud or cloud-agnostic strategy</li>
+                        <li>Heavy on-premises infrastructure</li>
+                        <li>Need maximum flexibility with log sources</li>
+                        <li>Existing Splunk investment or expertise</li>
+                        <li>Complex correlation and analytics needs</li>
+                    </ul>
+                    
+                    <h4>Choose Sentinel When:</h4>
+                    <ul>
+                        <li>Microsoft M365/Azure environment</li>
+                        <li>Cloud-first, minimize infrastructure</li>
+                        <li>Want integrated Microsoft XDR</li>
+                        <li>Existing Azure/KQL expertise</li>
+                        <li>OpEx model preferred</li>
+                    </ul>
+                    
+                    <h4>Red Flags Either Way:</h4>
+                    <ul>
+                        <li>Choosing based on vendor marketing alone</li>
+                        <li>Ignoring team skill availability</li>
+                        <li>Not modeling TCO for your volume</li>
+                        <li>Underestimating migration effort</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="sentinel-overview.html" class="card-link">← Microsoft Sentinel</a>
+                    <a href="siem-data-flow.html" class="card-link">SIEM Data Flow →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

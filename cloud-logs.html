@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Cloud Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Cloud Logs</h1>
+                    <p class="page-subtitle">AWS, Azure, and GCP security logging</p>
+                </header>
+                
+                
+                <h2>Cloud Logging Overview</h2>
+                
+                <p>Each major cloud provider has its own logging ecosystem. Understanding these is essential for cloud security monitoring.</p>
+                
+                <h2>AWS Logging</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>What It Logs</th>
+                                <th>SIEM Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>CloudTrail</strong></td>
+                                <td>API calls (management events)</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>GuardDuty</strong></td>
+                                <td>Threat detection findings</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VPC Flow Logs</strong></td>
+                                <td>Network traffic metadata</td>
+                                <td><span class="tag tag-blue">Important</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>S3 Access Logs</strong></td>
+                                <td>Bucket access</td>
+                                <td><span class="tag tag-amber">Selective</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Azure Logging</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Log Type</th>
+                                <th>What It Contains</th>
+                                <th>Sentinel Table</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Activity Log</strong></td>
+                                <td>Subscription-level operations</td>
+                                <td>AzureActivity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sign-in Logs</strong></td>
+                                <td>Azure AD authentications</td>
+                                <td>SigninLogs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Diagnostic Logs</strong></td>
+                                <td>Resource-specific events</td>
+                                <td>Various per resource</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Defender for Cloud</strong></td>
+                                <td>Security recommendations, alerts</td>
+                                <td>SecurityAlert</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>GCP Logging</h2>
+                
+                <ul>
+                    <li><strong>Cloud Audit Logs:</strong> Admin Activity, Data Access, System Event</li>
+                    <li><strong>VPC Flow Logs:</strong> Network traffic metadata</li>
+                    <li><strong>Security Command Center:</strong> Findings and recommendations</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Cloud Logging Best Practices</div>
+                    <ul>
+                        <li>Enable CloudTrail/Activity Logs in ALL regions (attackers use obscure regions)</li>
+                        <li>Centralize logs to dedicated logging account/subscription</li>
+                        <li>Enable data event logging selectively (high volume, high cost)</li>
+                        <li>Use cloud-native threat detection (GuardDuty, Defender for Cloud) as a signal</li>
+                    </ul>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "What would you monitor in AWS CloudTrail?"</p>
+                    <p><strong>Answer:</strong> "I focus on high-risk API calls: IAM changes (CreateUser, AttachUserPolicy, CreateAccessKey), security group modifications, S3 bucket policy changes, console logins especially with MFA disabled, root account usage, and AssumeRole events across accounts. I also watch for reconnaissance APIs like DescribeInstances from unusual principals. GuardDuty findings integrate directly with our SIEM for threat detection."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="identity-logs.html" class="card-link">← Identity Logs</a>
+                    <a href="endpoint-logs.html" class="card-link">Endpoint Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

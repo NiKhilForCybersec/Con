@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Metrics & KPIs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">SOC Operations</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="siem-metrics.html" class="nav-item active">SIEM Metrics</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SIEM Metrics & KPIs</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Metrics & KPIs</h1>
+                    <p class="page-subtitle">Measuring SIEM effectiveness requires tracking the right metrics. Good metrics drive improvement; vanity metrics create false confidence. Here's how to measure what matters.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Metric Categories</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">SIEM Metrics Framework</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SIEM METRICS CATEGORIES                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  OPERATIONAL HEALTH            DETECTION EFFECTIVENESS      RESPONSE        │
+│  ┌─────────────────┐          ┌─────────────────┐        ┌──────────────┐  │
+│  │ • Data ingestion│          │ • True positive │        │ • MTTD       │  │
+│  │ • Log source    │          │   rate          │        │ • MTTR       │  │
+│  │   coverage      │          │ • False positive│        │ • Alert      │  │
+│  │ • Query         │          │   rate          │        │   backlog    │  │
+│  │   performance   │          │ • Detection     │        │ • Escalation │  │
+│  │ • Storage       │          │   coverage      │        │   rate       │  │
+│  │   utilization   │          │ • Dwell time    │        │              │  │
+│  └─────────────────┘          └─────────────────┘        └──────────────┘  │
+│                                                                             │
+│  TEAM PRODUCTIVITY             VALUE METRICS             COMPLIANCE         │
+│  ┌─────────────────┐          ┌─────────────────┐        ┌──────────────┐  │
+│  │ • Alerts per    │          │ • Incidents     │        │ • Log        │  │
+│  │   analyst       │          │   prevented     │        │   retention  │  │
+│  │ • Investigation │          │ • Cost per      │        │ • Audit      │  │
+│  │   time          │          │   detection     │        │   findings   │  │
+│  │ • Automation    │          │ • Risk          │        │ • Coverage   │  │
+│  │   rate          │          │   reduction     │        │   gaps       │  │
+│  └─────────────────┘          └─────────────────┘        └──────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Metrics</h2>
+                    
+                    <h3>True Positive Rate</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Formula</th>
+                                    <th>Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>True Positive Rate</strong></td>
+                                    <td>True Positives / Total Alerts</td>
+                                    <td>> 80%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>False Positive Rate</strong></td>
+                                    <td>False Positives / Total Alerts</td>
+                                    <td>< 20%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Detection Rate by Rule</strong></td>
+                                    <td>TPs per rule / Total rule fires</td>
+                                    <td>Varies by rule</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Detection Quality Metrics</div>
+                        <pre><code>index=notable
+| eval disposition = case(
+    status IN ("resolved_true_positive", "closed_true_positive"), "TP",
+    status IN ("resolved_false_positive", "closed_false_positive"), "FP",
+    status IN ("in_progress", "new"), "Pending",
+    true(), "Other"
+)
+| stats count by rule_name, disposition
+| xyseries rule_name, disposition, count
+| fillnull value=0
+| eval total = TP + FP + Pending
+| eval tp_rate = round(TP / (TP + FP) * 100, 1)
+| where total > 10  // Rules with sufficient volume
+| sort -FP
+| table rule_name, TP, FP, tp_rate, total</code></pre>
+                    </div>
+
+                    <h3>MITRE ATT&CK Coverage</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Detection Coverage</div>
+                        <pre><code>| rest /services/saved/searches
+| search is_scheduled=1 disabled=0
+| rex field=description "(?i)(?:T\d{4}(?:\.\d{3})?)" max_match=10
+| mvexpand technique
+| stats dc(title) as rule_count, values(title) as rules by technique
+| lookup mitre_attack technique OUTPUT tactic, technique_name
+| table tactic, technique, technique_name, rule_count, rules
+| sort tactic, technique</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Response Time Metrics</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Definition</th>
+                                    <th>Target</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MTTD (Mean Time to Detect)</strong></td>
+                                    <td>Time from attack start to alert</td>
+                                    <td>< 1 hour (critical), < 24 hours (high)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTA (Mean Time to Acknowledge)</strong></td>
+                                    <td>Time from alert to analyst review</td>
+                                    <td>< 15 minutes (critical)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTI (Mean Time to Investigate)</strong></td>
+                                    <td>Time to complete initial investigation</td>
+                                    <td>< 1 hour (critical)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTR (Mean Time to Respond)</strong></td>
+                                    <td>Time from alert to containment</td>
+                                    <td>< 4 hours (critical)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MTTC (Mean Time to Close)</strong></td>
+                                    <td>Full lifecycle from alert to closure</td>
+                                    <td>Varies by severity</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Response Time Metrics</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(30d)
+| where Status == "Closed"
+| extend 
+    TimeToAcknowledge = datetime_diff('minute', FirstActivityTime, CreatedTime),
+    TimeToClose = datetime_diff('hour', ClosedTime, CreatedTime)
+| summarize 
+    AvgTimeToAcknowledge = avg(TimeToAcknowledge),
+    MedianTimeToAcknowledge = percentile(TimeToAcknowledge, 50),
+    AvgTimeToClose = avg(TimeToClose),
+    MedianTimeToClose = percentile(TimeToClose, 50)
+  by Severity
+| order by Severity</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Operational Health Metrics</h2>
+                    
+                    <h3>Data Ingestion Health</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Ingestion Monitoring</div>
+                        <pre><code>| tstats count WHERE index=* by index, sourcetype, _time span=1h
+| timechart span=1h sum(count) by sourcetype limit=20
+| predict algorithm=LL sum(count) as predicted holdback=0
+
+// Gap detection
+| tstats latest(_time) as last_event WHERE index=* by sourcetype
+| eval hours_since = round((now() - last_event) / 3600, 1)
+| where hours_since > 2
+| sort -hours_since</code></pre>
+                    </div>
+
+                    <h3>Log Source Coverage</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Coverage Tracking</div>
+                        <pre><code>// Compare expected vs actual sources
+| inputlookup expected_log_sources.csv
+| join type=left source_name [
+    | tstats count WHERE index=* by sourcetype
+    | rename sourcetype as source_name
+]
+| eval status = if(isnull(count), "Missing", "Active")
+| stats count by category, status
+| xyseries category, status, count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Analyst Productivity Metrics</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Definition</th>
+                                    <th>Healthy Range</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Alerts per Analyst per Day</strong></td>
+                                    <td>Total alerts / analysts / days</td>
+                                    <td>20-50 alerts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Alert Backlog</strong></td>
+                                    <td>Unreviewed alerts > 24 hours old</td>
+                                    <td>< 10% of daily volume</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Escalation Rate</strong></td>
+                                    <td>Alerts escalated to Tier 2/Incident</td>
+                                    <td>5-15%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Auto-Close Rate</strong></td>
+                                    <td>Alerts closed by automation</td>
+                                    <td>30-50%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Avg Investigation Time</strong></td>
+                                    <td>Time from assignment to disposition</td>
+                                    <td>< 30 minutes (low), < 2 hours (high)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Alert Fatigue Warning Signs</div>
+                        <ul>
+                            <li>> 100 alerts per analyst per day</li>
+                            <li>Growing backlog week over week</li>
+                            <li>Declining investigation quality</li>
+                            <li>High auto-close rate with no review</li>
+                            <li>Same alerts repeatedly closed as FP</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Executive Dashboard Metrics</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Executive KPI Summary</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      SECURITY OPERATIONS KPIs                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  DETECTION                          RESPONSE                                │
+│  ┌─────────────────────────────┐   ┌─────────────────────────────┐         │
+│  │  True Positive Rate: 85%   │   │  MTTR (Critical): 2.4 hrs   │         │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░     │   │  ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░   │         │
+│  │  Target: 80%               │   │  Target: < 4 hrs             │         │
+│  └─────────────────────────────┘   └─────────────────────────────┘         │
+│                                                                             │
+│  COVERAGE                           CAPACITY                                │
+│  ┌─────────────────────────────┐   ┌─────────────────────────────┐         │
+│  │  MITRE Techniques: 68%     │   │  Alert Backlog: 47          │         │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░    │   │  ▓▓▓░░░░░░░░░░░░░░░░░░░░   │         │
+│  │  Target: 70%               │   │  Target: < 100               │         │
+│  └─────────────────────────────┘   └─────────────────────────────┘         │
+│                                                                             │
+│  INCIDENTS THIS MONTH                                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Critical: 2  │  High: 8  │  Medium: 23  │  Low: 45               │   │
+│  │  ▓▓           │  ▓▓▓▓▓▓▓▓│  ▓▓▓▓▓▓▓▓▓▓▓▓│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Metrics Anti-Patterns</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bad Metric</th>
+                                    <th>Problem</th>
+                                    <th>Better Alternative</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Alerts Generated</td>
+                                    <td>Incentivizes noisy rules</td>
+                                    <td>True Positive Rate</td>
+                                </tr>
+                                <tr>
+                                    <td>Number of Rules</td>
+                                    <td>Quantity ≠ quality</td>
+                                    <td>Detection Coverage %</td>
+                                </tr>
+                                <tr>
+                                    <td>Alerts Closed per Hour</td>
+                                    <td>Incentivizes fast, not thorough</td>
+                                    <td>Quality + Time metrics</td>
+                                </tr>
+                                <tr>
+                                    <td>100% Detection Rate</td>
+                                    <td>Impossible to achieve</td>
+                                    <td>Detection for priority threats</td>
+                                </tr>
+                                <tr>
+                                    <td>Zero False Positives</td>
+                                    <td>Leads to under-detection</td>
+                                    <td>Acceptable FP rate per rule type</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What metrics do you use to measure SIEM effectiveness?"</strong></p>
+                        <p><strong>A:</strong> "I focus on metrics that drive real security outcomes:</p>
+                        <ol>
+                            <li><strong>True Positive Rate by rule:</strong> Not overall—per rule. This identifies which rules need tuning. I target >80% TP rate; rules consistently below 50% get fixed or disabled.</li>
+                            <li><strong>Mean Time to Detect (MTTD):</strong> For incidents we do catch, how quickly? I measure from attack start (from forensics) to first alert. This validates detection timing.</li>
+                            <li><strong>MITRE ATT&CK coverage:</strong> What techniques do we have detections for? This shows gaps. I prioritize coverage for techniques used by threats relevant to our industry.</li>
+                            <li><strong>Alert backlog:</strong> Are we keeping up? A growing backlog means we're either understaffed or generating too many alerts. Both need addressing.</li>
+                            <li><strong>Detection gaps from incidents:</strong> For every incident, what should we have detected but didn't? This drives detection improvement.</li>
+                        </ol>
+                        <p>I avoid vanity metrics like 'total alerts'—high volume with low TP rate isn't success, it's alert fatigue. Quality over quantity."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Metrics Quick Reference</div>
+                        <h4>Key Detection Metrics</h4>
+                        <ul>
+                            <li>True Positive Rate: > 80%</li>
+                            <li>False Positive Rate: < 20%</li>
+                            <li>MITRE Coverage: > 60%</li>
+                        </ul>
+                        <h4>Response Time Targets</h4>
+                        <ul>
+                            <li>MTTA (Critical): < 15 min</li>
+                            <li>MTTI (Critical): < 1 hour</li>
+                            <li>MTTR (Critical): < 4 hours</li>
+                        </ul>
+                        <h4>Analyst Capacity</h4>
+                        <ul>
+                            <li>Alerts/analyst/day: 20-50</li>
+                            <li>Backlog: < 10% of daily volume</li>
+                            <li>Escalation rate: 5-15%</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="soc-operations.html" class="card-link">← SOC Operations</a>
+                    <a href="incident-response.html" class="card-link">Incident Response →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

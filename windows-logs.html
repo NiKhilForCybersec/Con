@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Logs | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="deliverables.html" class="nav-item">Project Deliverables</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Sources</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Detection</div>
+                    <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+                    <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Windows Logs</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">Windows Logs</h1>
+                    <p class="page-subtitle">Windows Event Logs for security monitoring</p>
+                </header>
+                
+                
+                <h2>Windows Event Log Architecture</h2>
+                
+                <p>Windows logging is organized into channels, with Security being the most critical for SIEM:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Log Channel</th>
+                                <th>What It Contains</th>
+                                <th>SIEM Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Security</strong></td>
+                                <td>Authentication, authorization, audit events</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>System</strong></td>
+                                <td>OS events, service starts/stops, errors</td>
+                                <td><span class="tag tag-blue">Important</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Application</strong></td>
+                                <td>Application-specific events</td>
+                                <td><span class="tag tag-amber">Selective</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PowerShell</strong></td>
+                                <td>Script execution, commands</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sysmon</strong></td>
+                                <td>Enhanced process/network/file monitoring</td>
+                                <td><span class="tag tag-green">Critical</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Critical Security Event IDs</h2>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 The Top 10 Event IDs Every Analyst Should Know</div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event ID</th>
+                                <th>What It Means</th>
+                                <th>Detection Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>4624</strong></td>
+                                <td>Successful logon</td>
+                                <td>Track all authentication</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4625</strong></td>
+                                <td>Failed logon</td>
+                                <td>Brute force, password spray</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4648</strong></td>
+                                <td>Explicit credential logon</td>
+                                <td>Lateral movement (runas)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4672</strong></td>
+                                <td>Special privileges assigned</td>
+                                <td>Admin logon detection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4688</strong></td>
+                                <td>Process created</td>
+                                <td>Command line auditing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4720</strong></td>
+                                <td>User account created</td>
+                                <td>Persistence detection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4728/4732</strong></td>
+                                <td>Member added to security group</td>
+                                <td>Privilege escalation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4768</strong></td>
+                                <td>Kerberos TGT requested</td>
+                                <td>Authentication tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4769</strong></td>
+                                <td>Kerberos service ticket requested</td>
+                                <td>Kerberoasting detection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4776</strong></td>
+                                <td>NTLM authentication</td>
+                                <td>Legacy auth, pass-the-hash</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h2>Audit Policy Configuration</h2>
+                
+                <p>Windows doesn't log security events by default. You must enable auditing:</p>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Critical Configuration</div>
+                    <p>Enable these audit policies via GPO for security visibility:</p>
+                    <ul>
+                        <li><strong>Logon/Logoff:</strong> Success + Failure</li>
+                        <li><strong>Account Logon:</strong> Success + Failure</li>
+                        <li><strong>Process Creation:</strong> Success (+ command line logging)</li>
+                        <li><strong>Account Management:</strong> Success + Failure</li>
+                        <li><strong>Object Access:</strong> Selective (high volume)</li>
+                    </ul>
+                </div>
+                
+                <h2>Collection Methods</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Platform</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Splunk Universal Forwarder</strong></td>
+                                <td>Splunk</td>
+                                <td>Monitor WinEventLog:Security</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure Monitor Agent (AMA)</strong></td>
+                                <td>Sentinel</td>
+                                <td>Data Collection Rules filter events</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Windows Event Forwarding (WEF)</strong></td>
+                                <td>Any</td>
+                                <td>Native Windows, centralize to collector</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NXLog</strong></td>
+                                <td>Any</td>
+                                <td>Third-party agent, flexible</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Question:</strong> "What Windows events would you collect for detecting lateral movement?"</p>
+                    <p><strong>Answer:</strong> "For lateral movement, I focus on 4624 with Logon Type 3 (network) and Type 10 (RDP), 4648 for explicit credential use like runas, 4688 for process creation with command line to catch PsExec and similar tools, and 4769 for Kerberos service tickets to detect Kerberoasting. I also look at 5140/5145 for share access. On the network side, firewall logs showing SMB (445) and RDP (3389) between workstations are strong indicators."</p>
+                </div>
+
+                
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="log-sources-overview.html" class="card-link">← Log Sources Overview</a>
+                    <a href="linux-logs.html" class="card-link">Linux Logs →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

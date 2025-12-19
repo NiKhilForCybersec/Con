@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Security Monitoring | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Application Security</div>
+                    <a href="application-logs.html" class="nav-item">Application Logs</a>
+                    <a href="api-security.html" class="nav-item active">API Security</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">API Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">API Security Monitoring</h1>
+                    <p class="page-subtitle">APIs are increasingly targeted as they expose business logic and sensitive data. Monitoring API traffic for abuse, authentication failures, and anomalous patterns is essential for modern security.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>API Threat Landscape</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">OWASP API Security Top 10</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    OWASP API SECURITY TOP 10 (2023)                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  API1: Broken Object Level Authorization (BOLA)                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Accessing other users' data by manipulating object IDs              │   │
+│  │ Detection: Compare authenticated user vs resource owner             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  API2: Broken Authentication                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Weak auth, credential stuffing, token leakage                       │   │
+│  │ Detection: Failed auth patterns, token reuse across IPs             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  API3: Broken Object Property Level Authorization                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Modifying properties user shouldn't access (mass assignment)        │   │
+│  │ Detection: Unexpected fields in requests, privilege changes         │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  API4: Unrestricted Resource Consumption                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ DoS through resource exhaustion, rate limit bypass                  │   │
+│  │ Detection: Request volume anomalies, response size spikes           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  API5-10: SSRF, Security Misconfig, Injection, Improper Asset Mgmt...      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>API Log Sources</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Key Fields</th>
+                                    <th>Detection Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>API Gateway</strong></td>
+                                    <td>Endpoint, method, status, latency, client_id</td>
+                                    <td>Rate limiting, auth failures, error rates</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>WAF</strong></td>
+                                    <td>Rules triggered, blocked requests, payloads</td>
+                                    <td>Attack attempts, injection, scanning</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Application Logs</strong></td>
+                                    <td>User_id, resource_id, action, parameters</td>
+                                    <td>BOLA, business logic abuse</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Load Balancer</strong></td>
+                                    <td>Client IP, backend, response time</td>
+                                    <td>DDoS, scraping, geographic anomalies</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Authentication Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: API Auth Failures</div>
+                        <pre><code>// Detect credential stuffing on API
+AppServiceHTTPLogs
+| where TimeGenerated > ago(1h)
+| where ScStatus == 401 or ScStatus == 403
+| where CsUriStem startswith "/api/"
+| summarize 
+    FailureCount = count(),
+    UniqueEndpoints = dcount(CsUriStem),
+    Endpoints = make_set(CsUriStem, 5)
+  by CIp, bin(TimeGenerated, 5m)
+| where FailureCount > 50
+| order by FailureCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Token Anomalies</div>
+                        <pre><code>index=api_gateway
+| where endpoint LIKE "/api/*"
+| where status_code IN (200, 201)
+| stats dc(client_ip) as ip_count, 
+        values(client_ip) as ips,
+        count as request_count
+  by api_key
+| where ip_count > 5  // Same API key from many IPs
+| sort -ip_count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>BOLA Detection</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Unauthorized Resource Access</div>
+                        <pre><code>// Detect users accessing resources they don't own
+AppRequests
+| where TimeGenerated > ago(24h)
+| where Url matches regex @"/api/users/(\d+)/"
+| extend TargetUserId = extract(@"/api/users/(\d+)/", 1, Url)
+| extend AuthenticatedUser = tostring(Properties.userId)
+| where TargetUserId != AuthenticatedUser  // Accessing other user's data
+| where Success == true  // Successfully accessed
+| summarize 
+    AccessCount = count(),
+    TargetUsers = dcount(TargetUserId)
+  by AuthenticatedUser
+| where AccessCount > 10
+| order by AccessCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Sequential ID Enumeration</div>
+                        <pre><code>index=api_gateway method=GET
+| rex field=uri "/api/(?<resource>\w+)/(?<resource_id>\d+)"
+| where isnotnull(resource_id)
+| streamstats count as request_num by user_id, resource
+| eventstats 
+    min(resource_id) as min_id,
+    max(resource_id) as max_id,
+    dc(resource_id) as unique_ids
+  by user_id, resource
+| eval id_range = max_id - min_id
+| where unique_ids > 100 AND id_range / unique_ids < 2  // Sequential access pattern
+| stats values(resource) as enumerated_resources by user_id</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Rate Limit & Abuse</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: API Rate Abuse</div>
+                        <pre><code>AppServiceHTTPLogs
+| where TimeGenerated > ago(1h)
+| where CsUriStem startswith "/api/"
+| summarize 
+    RequestCount = count(),
+    UniqueEndpoints = dcount(CsUriStem),
+    AvgResponseTime = avg(TimeTaken),
+    ErrorRate = countif(ScStatus >= 400) * 100.0 / count()
+  by CIp, bin(TimeGenerated, 1m)
+| where RequestCount > 100  // High volume
+| order by RequestCount desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Data Scraping Detection</div>
+                        <pre><code>index=api_gateway method=GET status_code=200
+| where endpoint LIKE "/api/products*" OR endpoint LIKE "/api/listings*"
+| stats count as requests,
+        sum(response_size) as total_bytes,
+        dc(endpoint) as unique_endpoints
+  by client_ip, user_agent
+| eval avg_response_kb = round(total_bytes / requests / 1024, 2)
+| where requests > 1000 AND unique_endpoints > 50
+| sort -total_bytes</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Injection & Attack Patterns</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: SQL Injection Attempts</div>
+                        <pre><code>AppServiceHTTPLogs
+| where TimeGenerated > ago(24h)
+| where CsUriQuery has_any ("'", "\"", "--", "/*", "*/", "UNION", "SELECT", "DROP", "INSERT")
+   or CsUriQuery matches regex @"(\%27)|(\')|(\-\-)|(\%23)|(#)"
+| extend AttackType = "SQL Injection Attempt"
+| project TimeGenerated, CIp, CsMethod, CsUriStem, CsUriQuery, ScStatus
+| order by TimeGenerated desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: API Fuzzing Detection</div>
+                        <pre><code>index=api_gateway
+| where status_code IN (400, 404, 500)
+| stats count as error_count,
+        dc(endpoint) as unique_endpoints,
+        dc(status_code) as status_variety
+  by client_ip, bin(_time, 5m)
+| where error_count > 100 AND unique_endpoints > 20
+| eval pattern = "API Fuzzing/Scanning"
+| table _time, client_ip, error_count, unique_endpoints, pattern</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>GraphQL Security</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: GraphQL Introspection</div>
+                        <pre><code>// Detect introspection queries (often disabled in production)
+AppRequests
+| where TimeGenerated > ago(24h)
+| where Url has "/graphql"
+| where Properties has "__schema" or Properties has "__type"
+| project TimeGenerated, ClientIP, Properties
+| summarize IntrospectionAttempts = count() by ClientIP
+| where IntrospectionAttempts > 5</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: GraphQL Depth Attack</div>
+                        <pre><code>index=api_gateway endpoint="/graphql" method=POST
+| spath input=request_body
+| eval query_depth = mvcount(split(query, "{"))
+| where query_depth > 10  // Deep nesting may indicate DoS attempt
+| table _time, client_ip, query_depth, query</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you detect API abuse in a SIEM?"</strong></p>
+                        <p><strong>A:</strong> "API security monitoring requires understanding both technical and business context:</p>
+                        <ol>
+                            <li><strong>Authentication patterns:</strong> I monitor for credential stuffing (many failed auths from same IP), token sharing (same token from different IPs/geos), and brute force against auth endpoints.</li>
+                            <li><strong>BOLA detection:</strong> The tricky one. I correlate authenticated user ID with accessed resource IDs. If user 123 accesses /users/456/data, that's suspicious. This requires application-level logging.</li>
+                            <li><strong>Rate anomalies:</strong> Baseline normal API usage per client/endpoint. Deviations indicate scraping, enumeration, or DoS. I watch both volume and error rates.</li>
+                            <li><strong>Sequential access:</strong> Accessing resource IDs 1, 2, 3, 4... indicates enumeration. Statistical analysis of ID patterns catches this.</li>
+                            <li><strong>Business logic:</strong> Some abuse doesn't trigger technical signatures. Buying limited items repeatedly, manipulating prices via API—this requires understanding the application.</li>
+                        </ol>
+                        <p>The challenge is that API attacks often look like legitimate traffic. Behavioral baselines and business context are key."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 API Security Quick Reference</div>
+                        <h4>Key Detection Patterns</h4>
+                        <ul>
+                            <li>High 401/403 rate (auth attacks)</li>
+                            <li>Sequential ID access (BOLA)</li>
+                            <li>High request volume (scraping)</li>
+                            <li>Injection strings in params</li>
+                            <li>Unusual response sizes</li>
+                        </ul>
+                        <h4>Critical Endpoints</h4>
+                        <ul>
+                            <li>/auth, /login, /token</li>
+                            <li>/users/{id}/*</li>
+                            <li>/admin/*</li>
+                            <li>/graphql (introspection)</li>
+                            <li>Endpoints with PII</li>
+                        </ul>
+                        <h4>Baseline Metrics</h4>
+                        <ul>
+                            <li>Requests/minute per client</li>
+                            <li>Unique endpoints per session</li>
+                            <li>Error rate per client</li>
+                            <li>Response time distribution</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="application-logs.html" class="card-link">← Application Logs</a>
+                    <a href="cloud-security-monitoring.html" class="card-link">Cloud Security →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

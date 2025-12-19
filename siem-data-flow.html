@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Data Flow | SIEM Consultant Portfolio</title>
+    <meta name="description" content="Understand how data flows through a SIEM system - from collection through parsing, storage, analysis, and alerting.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">⚡</div>
+                    SIEM Consultant
+                </div>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">SIEM Fundamentals</div>
+                    <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+                    <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+                    <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+                    <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+                    <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+                    <a href="sentinel-overview.html" class="nav-item">Microsoft Sentinel</a>
+                    <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+                    <a href="siem-data-flow.html" class="nav-item active">SIEM Data Flow</a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Log Source Engineering</div>
+                    <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+                    <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+                    <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+                    <a href="network-logs.html" class="nav-item">Network Logs</a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="what-is-siem.html">SIEM Fundamentals</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">SIEM Data Flow</span>
+                </nav>
+                
+                <header class="page-header">
+                    <h1 class="page-title">SIEM Data Flow</h1>
+                    <p class="page-subtitle">Understanding how data moves through a SIEM system</p>
+                </header>
+                
+                <!-- The Data Journey -->
+                <h2>The Data Journey</h2>
+                
+                <p>Every log event takes a journey from its source to becoming actionable security intelligence. Understanding this journey helps you troubleshoot issues, optimize performance, and design better architectures.</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Complete SIEM Data Flow</div>
+                    <pre><code>
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 1: GENERATION                                                       │
+│  ┌─────────────┐                                                           │
+│  │  Something  │  User logs in, firewall blocks traffic, process starts   │
+│  │  Happens    │  → System generates a log entry                          │
+│  └─────────────┘                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 2: COLLECTION                                                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
+│  │   Agent     │  │   Syslog    │  │    API      │  │   File      │      │
+│  │  (on host)  │  │  (network)  │  │   (pull)    │  │  (monitor)  │      │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘      │
+│         │                │                │                │              │
+│         └────────────────┴────────────────┴────────────────┘              │
+│                                    │                                       │
+│                              TRANSPORT                                     │
+│                    (TLS encrypted, compressed)                             │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 3: INGESTION & PARSING                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Raw Log:                                                            │  │
+│  │  "Mar 15 14:23:45 server01 sshd[1234]: Failed password for bob..."  │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+│                                    │                                       │
+│                              PARSING                                       │
+│                      (regex, grok, JSON, etc.)                            │
+│                                    │                                       │
+│                                    ▼                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Parsed Fields:                                                      │  │
+│  │  timestamp: 2024-03-15T14:23:45  │  host: server01                  │  │
+│  │  process: sshd                   │  pid: 1234                       │  │
+│  │  action: Failed password         │  user: bob                       │  │
+│  │  src_ip: 192.168.1.100          │  ...                              │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 4: ENRICHMENT                                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Add Context:                                                        │  │
+│  │  • GeoIP: src_ip → country: China, city: Beijing                    │  │
+│  │  • Asset: host → asset_type: Production Server, owner: IT Ops       │  │
+│  │  • Identity: user → department: Engineering, risk_score: Low        │  │
+│  │  • Threat Intel: src_ip → known_malicious: false                    │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 5: NORMALIZATION                                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Map to Common Schema (CIM/ASIM):                                    │  │
+│  │  • src_ip → src (standard field name)                               │  │
+│  │  • action: "Failed password" → action: "failure"                    │  │
+│  │  • Assign category: "authentication"                                 │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 6: INDEXING & STORAGE                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Create Searchable Index:                                            │  │
+│  │  • Extract keywords for full-text search                            │  │
+│  │  • Build inverted index for fast lookup                             │  │
+│  │  • Write to storage tier (hot → warm → cold)                        │  │
+│  │  • Apply retention policies                                          │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 7: ANALYSIS & CORRELATION                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Detection Rules Run:                                                │  │
+│  │  • "5+ failed logins from same IP in 5 minutes" → MATCH             │  │
+│  │  • Correlation: Failed logins + successful login = suspicious       │  │
+│  │  • UEBA: User behavior anomaly detected                              │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STAGE 8: ALERTING & RESPONSE                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │  Alert Generated:                                                    │  │
+│  │  • Create incident/notable event                                     │  │
+│  │  • Send notification (email, Slack, PagerDuty)                      │  │
+│  │  • Trigger automated playbook                                        │  │
+│  │  • Analyst investigates and responds                                 │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                    </code></pre>
+                </div>
+                
+                <!-- Each Stage Explained -->
+                <h2>Each Stage in Detail</h2>
+                
+                <h3>Stage 1: Generation</h3>
+                
+                <p>Logs are born when something happens. The quality of what you can detect depends on what your sources choose to log:</p>
+                
+                <ul>
+                    <li><strong>Windows Security Log:</strong> Logs based on audit policy settings</li>
+                    <li><strong>Firewall:</strong> Logs connections, blocks, and rules triggered</li>
+                    <li><strong>Application:</strong> Logs whatever developers chose to include</li>
+                    <li><strong>Cloud Service:</strong> Logs API calls, admin actions, authentications</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Key Insight</div>
+                    <p>You can't detect what isn't logged. A critical early step in SIEM deployment is ensuring sources are configured to log security-relevant events. Many Windows attacks are invisible without proper audit policy configuration.</p>
+                </div>
+                
+                <h3>Stage 2: Collection</h3>
+                
+                <p>Getting logs from sources to SIEM. Different methods have different trade-offs:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Latency</th>
+                                <th>Reliability</th>
+                                <th>Complexity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Agent (push)</strong></td>
+                                <td>Low (real-time)</td>
+                                <td>High (queuing)</td>
+                                <td>Medium (deploy to all hosts)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Syslog (push)</strong></td>
+                                <td>Low (real-time)</td>
+                                <td>Medium (UDP lossy)</td>
+                                <td>Low (configure once)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API (pull)</strong></td>
+                                <td>Medium (polling interval)</td>
+                                <td>High (HTTPS)</td>
+                                <td>Medium (auth, rate limits)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>File monitoring</strong></td>
+                                <td>Low-Medium</td>
+                                <td>High</td>
+                                <td>Low (but requires access)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Stage 3: Parsing</h3>
+                
+                <p>Transforming raw text into structured data. This is where most ingestion problems occur:</p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Parsing Example</div>
+                    <pre><code>
+INPUT (raw syslog):
+&lt;134&gt;Mar 15 14:23:45 fw01 %ASA-6-302013: Built outbound TCP connection 
+1234567 for outside:192.168.1.100/443 (192.168.1.100/443) to 
+inside:10.0.0.50/52341 (10.0.0.50/52341)
+
+PARSING RULES APPLIED:
+1. Extract priority: 134
+2. Extract timestamp: Mar 15 14:23:45
+3. Extract hostname: fw01
+4. Extract message ID: ASA-6-302013
+5. Extract connection ID: 1234567
+6. Extract direction: outbound
+7. Extract protocol: TCP
+8. Extract dest_ip: 192.168.1.100
+9. Extract dest_port: 443
+10. Extract src_ip: 10.0.0.50
+11. Extract src_port: 52341
+
+OUTPUT (structured):
+{
+  "timestamp": "2024-03-15T14:23:45",
+  "host": "fw01",
+  "vendor": "cisco",
+  "product": "asa",
+  "action": "built",
+  "direction": "outbound",
+  "protocol": "tcp",
+  "src_ip": "10.0.0.50",
+  "src_port": 52341,
+  "dest_ip": "192.168.1.100",
+  "dest_port": 443
+}
+                    </code></pre>
+                </div>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Common Parsing Problems</div>
+                    <ul>
+                        <li><strong>Timestamp parsing:</strong> Different formats, timezone confusion</li>
+                        <li><strong>Multi-line events:</strong> Stack traces, audit logs split across lines</li>
+                        <li><strong>Encoding issues:</strong> UTF-8 vs ASCII, special characters</li>
+                        <li><strong>Schema changes:</strong> Vendor updates log format in new version</li>
+                    </ul>
+                </div>
+                
+                <h3>Stage 4: Enrichment</h3>
+                
+                <p>Adding context that makes logs actionable:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Enrichment Type</th>
+                                <th>What It Adds</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>GeoIP</strong></td>
+                                <td>Country, city, ASN from IP</td>
+                                <td>Identify foreign access, impossible travel</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Asset Inventory</strong></td>
+                                <td>Asset type, owner, criticality</td>
+                                <td>Prioritize alerts on critical systems</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Identity/HR Data</strong></td>
+                                <td>Department, manager, risk level</td>
+                                <td>Context for user activity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Threat Intelligence</strong></td>
+                                <td>Known bad IPs, domains, hashes</td>
+                                <td>Identify known threats immediately</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DNS Resolution</strong></td>
+                                <td>Hostname from IP</td>
+                                <td>Human-readable identification</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Stage 5: Normalization</h3>
+                
+                <p>Mapping vendor-specific fields to a common schema enables cross-source correlation:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Original Field</th>
+                                <th>Normalized Field</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Windows Security</td>
+                                <td>IpAddress</td>
+                                <td rowspan="3"><code>src_ip</code></td>
+                            </tr>
+                            <tr>
+                                <td>Cisco ASA</td>
+                                <td>src</td>
+                            </tr>
+                            <tr>
+                                <td>Palo Alto</td>
+                                <td>source_ip</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h3>Stage 6: Indexing & Storage</h3>
+                
+                <p>Making data searchable and managing retention:</p>
+                
+                <ul>
+                    <li><strong>Indexing:</strong> Create inverted index for fast keyword searches</li>
+                    <li><strong>Partitioning:</strong> Organize by time (buckets) and source (index/table)</li>
+                    <li><strong>Tiering:</strong> Move data from fast (expensive) to slow (cheap) storage</li>
+                    <li><strong>Retention:</strong> Delete or archive based on policy</li>
+                </ul>
+                
+                <h3>Stage 7: Analysis & Correlation</h3>
+                
+                <p>Where security value is created:</p>
+                
+                <ul>
+                    <li><strong>Scheduled searches:</strong> Run detection rules on schedule</li>
+                    <li><strong>Streaming/Real-time:</strong> Evaluate rules as events arrive</li>
+                    <li><strong>Correlation:</strong> Connect events across sources and time</li>
+                    <li><strong>Behavioral analytics:</strong> ML-based anomaly detection</li>
+                </ul>
+                
+                <h3>Stage 8: Alerting & Response</h3>
+                
+                <p>The output of the SIEM pipeline:</p>
+                
+                <ul>
+                    <li><strong>Alerts/Incidents:</strong> Notify analysts of detected threats</li>
+                    <li><strong>Automated response:</strong> Playbooks take immediate action</li>
+                    <li><strong>Case management:</strong> Track investigation to resolution</li>
+                    <li><strong>Reporting:</strong> Compliance and executive dashboards</li>
+                </ul>
+                
+                <!-- Data Flow Timing -->
+                <h2>Data Flow Timing</h2>
+                
+                <p>Understanding latency at each stage:</p>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Typical Latency</th>
+                                <th>Variables</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Generation → Collection</td>
+                                <td>0-60 seconds</td>
+                                <td>Agent polling interval, syslog delivery</td>
+                            </tr>
+                            <tr>
+                                <td>Collection → SIEM</td>
+                                <td>1-30 seconds</td>
+                                <td>Network latency, queuing</td>
+                            </tr>
+                            <tr>
+                                <td>Parsing + Enrichment</td>
+                                <td>1-5 seconds</td>
+                                <td>Parsing complexity, enrichment lookups</td>
+                            </tr>
+                            <tr>
+                                <td>Indexing</td>
+                                <td>1-10 seconds</td>
+                                <td>Index size, hardware</td>
+                            </tr>
+                            <tr>
+                                <td>Detection Rule</td>
+                                <td>5 seconds - 5 minutes</td>
+                                <td>Real-time vs scheduled rules</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total (Event → Alert)</strong></td>
+                                <td><strong>30 seconds - 10 minutes</strong></td>
+                                <td>Varies widely by architecture</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Interview Preparation -->
+                <h2>Interview Preparation</h2>
+                
+                <div class="info-box interview">
+                    <div class="info-box-title">💼 Interview Tip</div>
+                    <p><strong>Common Question:</strong> "Walk me through how a log event becomes an alert."</p>
+                    <p><strong>Good Answer:</strong> "It starts when something happens - a user logs in, a firewall blocks traffic. The system generates a log. Collection happens via agents, syslog, or API polling. The SIEM receives the raw log and parses it - extracting fields like timestamp, source IP, user, and action. Then enrichment adds context - GeoIP for the source IP, asset information for the host, maybe threat intelligence matches. Normalization maps vendor-specific fields to a common schema so we can correlate across sources. The event gets indexed for search and stored according to retention policy. Detection rules run against incoming events - when conditions match, like 5 failed logins in 5 minutes, an alert is generated. This triggers notification to analysts and possibly automated response playbooks."</p>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="cheatsheet">
+                    <div class="cheatsheet-title">📋 Data Flow Quick Reference</div>
+                    
+                    <h4>The 8 Stages</h4>
+                    <ol>
+                        <li><strong>Generation</strong> - Event occurs, log created</li>
+                        <li><strong>Collection</strong> - Agent/syslog/API gets log to SIEM</li>
+                        <li><strong>Parsing</strong> - Extract fields from raw text</li>
+                        <li><strong>Enrichment</strong> - Add GeoIP, asset, identity context</li>
+                        <li><strong>Normalization</strong> - Map to common schema</li>
+                        <li><strong>Indexing</strong> - Make searchable, store</li>
+                        <li><strong>Analysis</strong> - Run detection rules</li>
+                        <li><strong>Alerting</strong> - Create incident, notify, respond</li>
+                    </ol>
+                    
+                    <h4>Typical End-to-End Latency</h4>
+                    <ul>
+                        <li><strong>Real-time detection:</strong> 30 seconds - 2 minutes</li>
+                        <li><strong>Scheduled detection:</strong> 5 - 15 minutes</li>
+                        <li><strong>Investigation availability:</strong> 1 - 5 minutes</li>
+                    </ul>
+                </div>
+                
+                <!-- Navigation -->
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="platform-comparison.html" class="card-link">← Platform Comparison</a>
+                    <a href="log-sources-overview.html" class="card-link">Log Sources Overview →</a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>

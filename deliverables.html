@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SIEM Consultant Deliverables - Project documentation and artifacts">
+  <title>Deliverables | SIEM Consultant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle navigation">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+  </button>
+  <div class="sidebar-overlay"></div>
+  
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">🛡️</div>
+          <div class="sidebar-logo-text">
+            SIEM Consultant
+            <span>Portfolio & Reference</span>
+          </div>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <!-- Section 1: Foundation -->
+        <div class="nav-section" data-section="1">
+          <div class="nav-section-header">
+            <span>1. Consultant Foundation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="approach.html" class="nav-item">My Approach</a>
+            <a href="deliverables.html" class="nav-item">Deliverables</a>
+            <a href="experience.html" class="nav-item">Experience & Portfolio</a>
+          </div>
+        </div>
+        
+        <!-- Section 2: SIEM Fundamentals -->
+        <div class="nav-section" data-section="2">
+          <div class="nav-section-header">
+            <span>2. SIEM Fundamentals</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="what-is-siem.html" class="nav-item">What is SIEM?</a>
+            <a href="siem-architecture.html" class="nav-item">SIEM Architecture</a>
+            <a href="splunk-overview.html" class="nav-item">Splunk Overview</a>
+            <a href="splunk-cloud.html" class="nav-item">Splunk Cloud</a>
+            <a href="splunk-hybrid.html" class="nav-item">Splunk Hybrid</a>
+            <a href="sentinel-overview.html" class="nav-item">Sentinel Overview</a>
+            <a href="platform-comparison.html" class="nav-item">Platform Comparison</a>
+            <a href="siem-data-flow.html" class="nav-item">SIEM Data Flow</a>
+          </div>
+        </div>
+        
+        <!-- Section 3: Log Source Engineering -->
+        <div class="nav-section" data-section="3">
+          <div class="nav-section-header">
+            <span>3. Log Source Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="log-sources-overview.html" class="nav-item">Log Sources Overview</a>
+            <a href="windows-logs.html" class="nav-item">Windows Logs</a>
+            <a href="linux-logs.html" class="nav-item">Linux Logs</a>
+            <a href="network-logs.html" class="nav-item">Network Logs</a>
+            <a href="identity-logs.html" class="nav-item">Identity Logs</a>
+            <a href="cloud-logs.html" class="nav-item">Cloud Logs</a>
+            <a href="endpoint-logs.html" class="nav-item">Endpoint/EDR Logs</a>
+            <a href="application-logs.html" class="nav-item">Application Logs</a>
+          </div>
+        </div>
+        
+        <!-- Section 4: SIEM Migrations -->
+        <div class="nav-section" data-section="4">
+          <div class="nav-section-header">
+            <span>4. SIEM Migrations</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="migration-methodology.html" class="nav-item">Migration Methodology</a>
+            <a href="discovery-assessment.html" class="nav-item">Discovery & Assessment</a>
+            <a href="log-migration.html" class="nav-item">Log Source Migration</a>
+            <a href="detection-migration.html" class="nav-item">Detection Migration</a>
+            <a href="query-translation.html" class="nav-item">Query Translation</a>
+            <a href="common-migrations.html" class="nav-item">Common Migration Paths</a>
+            <a href="parallel-cutover.html" class="nav-item">Parallel Run & Cutover</a>
+            <a href="migration-challenges.html" class="nav-item">Challenges & Solutions</a>
+          </div>
+        </div>
+        
+        <!-- Section 5: SIEM Deployments -->
+        <div class="nav-section" data-section="5">
+          <div class="nav-section-header">
+            <span>5. SIEM Deployments</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="deployment-approach.html" class="nav-item">Deployment Approach</a>
+            <a href="splunk-cloud-deployment.html" class="nav-item">Splunk Cloud Deployment</a>
+            <a href="splunk-enterprise-deployment.html" class="nav-item">Splunk Enterprise Deployment</a>
+            <a href="sentinel-deployment.html" class="nav-item">Sentinel Deployment</a>
+            <a href="architecture-design.html" class="nav-item">Architecture Design</a>
+            <a href="workspace-design.html" class="nav-item">Workspace Design</a>
+            <a href="initial-onboarding.html" class="nav-item">Initial Onboarding</a>
+            <a href="operationalization.html" class="nav-item">Operationalization</a>
+          </div>
+        </div>
+        
+        <!-- Section 6: Detection Engineering -->
+        <div class="nav-section" data-section="6">
+          <div class="nav-section-header">
+            <span>6. Detection Engineering</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="detection-fundamentals.html" class="nav-item">Detection Fundamentals</a>
+            <a href="use-case-development.html" class="nav-item">Use Case Development</a>
+            <a href="splunk-detections.html" class="nav-item">Splunk Detections</a>
+            <a href="sentinel-detections.html" class="nav-item">Sentinel Detections</a>
+            <a href="tuning-methodology.html" class="nav-item">Tuning Methodology</a>
+            <a href="detection-testing.html" class="nav-item">Detection Testing</a>
+          </div>
+        </div>
+        
+        <!-- Section 7: Threat Frameworks -->
+        <div class="nav-section" data-section="7">
+          <div class="nav-section-header">
+            <span>7. Threat Frameworks</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="mitre-attack-intro.html" class="nav-item">MITRE ATT&CK Intro</a>
+            <a href="mitre-for-detection.html" class="nav-item">ATT&CK for Detection</a>
+            <a href="cyber-kill-chain.html" class="nav-item">Cyber Kill Chain</a>
+            <a href="detection-coverage.html" class="nav-item">Detection Coverage</a>
+            <a href="threat-modeling-basics.html" class="nav-item">Threat Modeling</a>
+          </div>
+        </div>
+        
+        <!-- Section 8: Windows Security -->
+        <div class="nav-section" data-section="8">
+          <div class="nav-section-header">
+            <span>8. Windows Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="windows-security-basics.html" class="nav-item">Windows Security Basics</a>
+            <a href="windows-authentication.html" class="nav-item">Windows Authentication</a>
+            <a href="critical-event-ids.html" class="nav-item">Critical Event IDs</a>
+            <a href="windows-attacks.html" class="nav-item">Windows Attacks</a>
+            <a href="sysmon-basics.html" class="nav-item">Sysmon Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 9: Network Security -->
+        <div class="nav-section" data-section="9">
+          <div class="nav-section-header">
+            <span>9. Network Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="network-fundamentals.html" class="nav-item">Network Fundamentals</a>
+            <a href="network-protocols.html" class="nav-item">Network Protocols</a>
+            <a href="network-attacks.html" class="nav-item">Network Attacks</a>
+            <a href="network-architecture.html" class="nav-item">Network Architecture</a>
+            <a href="visibility-points.html" class="nav-item">Visibility Points</a>
+          </div>
+        </div>
+        
+        <!-- Section 10: Cloud Security -->
+        <div class="nav-section" data-section="10">
+          <div class="nav-section-header">
+            <span>10. Cloud Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="cloud-security-basics.html" class="nav-item">Cloud Security Basics</a>
+            <a href="aws-security.html" class="nav-item">AWS Security</a>
+            <a href="azure-security.html" class="nav-item">Azure Security</a>
+            <a href="cloud-siem-integration.html" class="nav-item">Cloud SIEM Integration</a>
+          </div>
+        </div>
+        
+        <!-- Section 11: Identity Security -->
+        <div class="nav-section" data-section="11">
+          <div class="nav-section-header">
+            <span>11. Identity Security</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="identity-fundamentals.html" class="nav-item">Identity Fundamentals</a>
+            <a href="active-directory.html" class="nav-item">Active Directory</a>
+            <a href="entra-id.html" class="nav-item">Entra ID</a>
+            <a href="identity-attacks.html" class="nav-item">Identity Attacks</a>
+          </div>
+        </div>
+        
+        <!-- Section 12: Scripting & Automation -->
+        <div class="nav-section" data-section="12">
+          <div class="nav-section-header">
+            <span>12. Scripting & Automation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="scripting-overview.html" class="nav-item">Scripting Overview</a>
+            <a href="powershell-for-siem.html" class="nav-item">PowerShell for SIEM</a>
+            <a href="python-for-siem.html" class="nav-item">Python for SIEM</a>
+            <a href="soar-basics.html" class="nav-item">SOAR Basics</a>
+          </div>
+        </div>
+        
+        <!-- Section 13: Query Languages -->
+        <div class="nav-section" data-section="13">
+          <div class="nav-section-header">
+            <span>13. Query Languages</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="spl-fundamentals.html" class="nav-item">SPL Fundamentals</a>
+            <a href="kql-fundamentals.html" class="nav-item">KQL Fundamentals</a>
+            <a href="query-patterns.html" class="nav-item">Query Patterns</a>
+            <a href="query-cheatsheet.html" class="nav-item">Query Cheat Sheet</a>
+          </div>
+        </div>
+        
+        <!-- Section 14: SOC Context -->
+        <div class="nav-section" data-section="14">
+          <div class="nav-section-header">
+            <span>14. SOC Context</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="soc-fundamentals.html" class="nav-item">SOC Fundamentals</a>
+            <a href="alert-lifecycle.html" class="nav-item">Alert Lifecycle</a>
+            <a href="metrics-reporting.html" class="nav-item">Metrics & Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 15: Compliance -->
+        <div class="nav-section" data-section="15">
+          <div class="nav-section-header">
+            <span>15. Compliance & Governance</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="compliance-overview.html" class="nav-item">Compliance Overview</a>
+            <a href="log-retention.html" class="nav-item">Log Retention</a>
+            <a href="audit-reporting.html" class="nav-item">Audit Reporting</a>
+          </div>
+        </div>
+        
+        <!-- Section 16: Interview Prep -->
+        <div class="nav-section" data-section="16">
+          <div class="nav-section-header">
+            <span>16. Interview Preparation</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="nav-items">
+            <a href="common-questions.html" class="nav-item">Common Questions</a>
+            <a href="scenario-questions.html" class="nav-item">Scenario Questions</a>
+            <a href="technical-exercises.html" class="nav-item">Technical Exercises</a>
+            <a href="architecture-diagrams.html" class="nav-item">Architecture Diagrams</a>
+            <a href="your-experience.html" class="nav-item">Your Experience</a>
+          </div>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>SIEM Consultant Portfolio</p>
+        <p>Built for Interview Success</p>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <nav class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span>Deliverables</span>
+        </nav>
+        
+        <header class="page-header">
+          <h1 class="page-title">Project Deliverables</h1>
+          <p class="page-subtitle">What you get from a SIEM migration or deployment project</p>
+        </header>
+        
+        <div class="info-box note">
+          <div class="info-box-title">🎯 Why Deliverables Matter</div>
+          <p>Documentation isn't just paperwork - it's how knowledge stays with your organization after the consultant leaves. Good deliverables mean your team can operate, troubleshoot, and improve the SIEM independently.</p>
+        </div>
+        
+        <h2>Deliverables by Project Phase</h2>
+        
+        <h3>Phase 1: Discovery Deliverables</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Purpose</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Discovery Report</strong></td>
+                <td>Summarize current state and findings</td>
+                <td>Stakeholder interviews, current architecture, pain points, risks</td>
+              </tr>
+              <tr>
+                <td><strong>Log Source Inventory</strong></td>
+                <td>Catalog all data sources</td>
+                <td>Source name, type, volume (EPS/GB), owner, priority</td>
+              </tr>
+              <tr>
+                <td><strong>Detection Content Audit</strong></td>
+                <td>Document existing rules</td>
+                <td>Rule name, logic, severity, MITRE mapping, effectiveness</td>
+              </tr>
+              <tr>
+                <td><strong>Gap Analysis</strong></td>
+                <td>Identify what's missing</td>
+                <td>Missing log sources, detection gaps, integration needs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h3>Phase 2: Design Deliverables</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Purpose</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>High-Level Design (HLD)</strong></td>
+                <td>Architecture overview for stakeholders</td>
+                <td>Architecture diagrams, component selection, integration points, data flows</td>
+              </tr>
+              <tr>
+                <td><strong>Low-Level Design (LLD)</strong></td>
+                <td>Technical implementation details</td>
+                <td>Configurations, naming conventions, RBAC, network requirements</td>
+              </tr>
+              <tr>
+                <td><strong>Migration Plan</strong></td>
+                <td>Phased migration roadmap</td>
+                <td>Timeline, waves, dependencies, rollback strategy, success criteria</td>
+              </tr>
+              <tr>
+                <td><strong>Test Plan</strong></td>
+                <td>Validation approach</td>
+                <td>Test cases, acceptance criteria, parallel running plan</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h3>Phase 3-4: Build & Migrate Deliverables</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Purpose</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Configuration Guide</strong></td>
+                <td>How the SIEM is configured</td>
+                <td>Workspace settings, retention, RBAC roles, integrations</td>
+              </tr>
+              <tr>
+                <td><strong>Data Onboarding Guide</strong></td>
+                <td>How to add new log sources</td>
+                <td>Connector setup, parsing rules, field mappings, validation</td>
+              </tr>
+              <tr>
+                <td><strong>Detection Rule Catalog</strong></td>
+                <td>All detection content</td>
+                <td>Rule name, query, severity, MITRE technique, tuning notes</td>
+              </tr>
+              <tr>
+                <td><strong>Query Translation Catalog</strong></td>
+                <td>Mapping old queries to new</td>
+                <td>Original SPL/AQL → New KQL/SPL, logic changes noted</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h3>Phase 5-6: Validate & Handover Deliverables</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Purpose</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Validation Report</strong></td>
+                <td>Prove system works correctly</td>
+                <td>Test results, coverage comparison, performance benchmarks</td>
+              </tr>
+              <tr>
+                <td><strong>Operational Runbooks</strong></td>
+                <td>Day-to-day procedures</td>
+                <td>Monitoring checks, troubleshooting, maintenance tasks</td>
+              </tr>
+              <tr>
+                <td><strong>Training Materials</strong></td>
+                <td>Team skill development</td>
+                <td>Platform training, query writing, investigation workflows</td>
+              </tr>
+              <tr>
+                <td><strong>Handover Checklist</strong></td>
+                <td>Confirm project complete</td>
+                <td>Sign-off items, open issues, support transition</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Key Document Deep Dives</h2>
+        
+        <h3>High-Level Design (HLD)</h3>
+        <p>The HLD is what you show to management and architects. It answers "what are we building?" without getting into configuration details.</p>
+        
+        <h4>What's in a Good HLD:</h4>
+        <ul>
+          <li><strong>Executive Summary</strong> - One page, business-focused</li>
+          <li><strong>Architecture Diagram</strong> - Visual overview of all components</li>
+          <li><strong>Component Selection</strong> - Why we chose Splunk Cloud vs Enterprise, etc.</li>
+          <li><strong>Data Flow Diagram</strong> - How logs move from source to SIEM</li>
+          <li><strong>Integration Points</strong> - Connections to SOAR, ticketing, threat intel</li>
+          <li><strong>Security Considerations</strong> - Encryption, access control, data residency</li>
+          <li><strong>Sizing Estimates</strong> - Expected volume, storage, licensing</li>
+        </ul>
+        
+        <div class="diagram">
+          <div class="diagram-title">Sample HLD Architecture Diagram</div>
+<pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SIEM ARCHITECTURE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  DATA SOURCES                    COLLECTION              SIEM PLATFORM       │
+│  ┌──────────────┐               ┌──────────┐           ┌──────────────────┐ │
+│  │ Windows/AD   │──┐            │ Forwarder│           │   Splunk Cloud   │ │
+│  ├──────────────┤  │            │ Fleet    │──────────▶│   ┌──────────┐   │ │
+│  │ Linux/Unix   │──┼───────────▶│          │           │   │ Indexers │   │ │
+│  ├──────────────┤  │            └──────────┘           │   └──────────┘   │ │
+│  │ Firewalls    │──┤                                   │   ┌──────────┐   │ │
+│  ├──────────────┤  │            ┌──────────┐           │   │Search HD │   │ │
+│  │ Cloud (AWS)  │──┼───────────▶│ HEC/API  │──────────▶│   └──────────┘   │ │
+│  ├──────────────┤  │            └──────────┘           │   ┌──────────┐   │ │
+│  │ EDR (MDE)    │──┘                                   │   │    ES    │   │ │
+│  └──────────────┘                                      │   └──────────┘   │ │
+│                                                        └────────┬─────────┘ │
+│                                                                 │           │
+│  INTEGRATIONS                                                   ▼           │
+│  ┌──────────────┐    ┌──────────┐    ┌──────────┐    ┌──────────────────┐  │
+│  │ ServiceNow   │◀───│  SOAR    │◀───│  Alerts  │◀───│    Analysts      │  │
+│  └──────────────┘    └──────────┘    └──────────┘    └──────────────────┘  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre>
+        </div>
+        
+        <h3>Operational Runbooks</h3>
+        <p>Runbooks are step-by-step procedures for common tasks. They allow anyone on the team to perform operations consistently.</p>
+        
+        <h4>Example Runbook Structure:</h4>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">Runbook Template</span>
+          </div>
+<pre><code>## Runbook: Daily Health Check
+
+**Purpose:** Verify SIEM is operating correctly
+**Frequency:** Daily (start of shift)
+**Time Required:** 15 minutes
+**Prerequisites:** Read access to monitoring dashboards
+
+### Steps:
+
+1. CHECK INGESTION STATUS
+   - Navigate to: Monitoring > Data Ingestion
+   - Verify: All sources show green status
+   - Action if red: See Troubleshooting section
+
+2. CHECK ALERT QUEUE
+   - Navigate to: Incident Review
+   - Verify: No critical alerts older than 4 hours
+   - Action if backlog: Escalate to shift lead
+
+3. CHECK SEARCH PERFORMANCE
+   - Run: | tstats count where index=* by index
+   - Expected: Query completes in < 30 seconds
+   - Action if slow: Check indexer health
+
+### Troubleshooting:
+
+| Symptom | Possible Cause | Resolution |
+|---------|---------------|------------|
+| Source shows red | Forwarder down | Restart forwarder service |
+| No data for 1+ hours | Network issue | Check firewall rules |
+| Slow searches | Indexer overload | Contact Splunk support |
+
+### Escalation:
+If issues persist > 30 minutes, escalate to: siem-engineering@company.com
+</code></pre>
+        </div>
+        
+        <h3>Detection Rule Catalog</h3>
+        <p>A living document that tracks all detection rules - essential for tuning and coverage analysis.</p>
+        
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Rule ID</th>
+                <th>Name</th>
+                <th>Severity</th>
+                <th>MITRE</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>DET-001</td>
+                <td>Brute Force Authentication</td>
+                <td>Medium</td>
+                <td>T1110</td>
+                <td>Active</td>
+              </tr>
+              <tr>
+                <td>DET-002</td>
+                <td>Suspicious PowerShell Execution</td>
+                <td>High</td>
+                <td>T1059.001</td>
+                <td>Active</td>
+              </tr>
+              <tr>
+                <td>DET-003</td>
+                <td>Lateral Movement via PsExec</td>
+                <td>High</td>
+                <td>T1570</td>
+                <td>Tuning</td>
+              </tr>
+              <tr>
+                <td>DET-004</td>
+                <td>Data Exfiltration to Cloud Storage</td>
+                <td>Critical</td>
+                <td>T1567</td>
+                <td>Active</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <h2>Documentation Best Practices</h2>
+        
+        <ul>
+          <li><strong>Keep it current</strong> - Documentation that's outdated is worse than no documentation</li>
+          <li><strong>Version control</strong> - Use Git or document management system with versioning</li>
+          <li><strong>Make it searchable</strong> - Use consistent naming, tags, and structure</li>
+          <li><strong>Include examples</strong> - Real queries, real screenshots, real scenarios</li>
+          <li><strong>Assign owners</strong> - Someone should be responsible for keeping each doc current</li>
+        </ul>
+        
+        <div class="info-box tip">
+          <div class="info-box-title">💡 Interview Tip</div>
+          <p>"When asked 'What deliverables do you produce?', emphasize that documentation isn't just paperwork - it's how you ensure the client can operate independently after you leave. Mention specific documents like HLD, runbooks, and detection catalogs. This shows you think about the complete project lifecycle, not just the technical implementation."</p>
+        </div>
+        
+        <!-- Page Navigation -->
+        <div class="page-nav">
+          <a href="approach.html" class="page-nav-btn prev">
+            <span class="page-nav-label">Previous</span>
+            <span class="page-nav-title">← My Approach</span>
+          </a>
+          <a href="experience.html" class="page-nav-btn next">
+            <span class="page-nav-label">Next</span>
+            <span class="page-nav-title">Experience & Portfolio →</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>

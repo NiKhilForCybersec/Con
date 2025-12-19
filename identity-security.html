@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Security | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Identity Security</div>
+                    <a href="identity-security.html" class="nav-item active">Identity Monitoring</a>
+                    <a href="active-directory.html" class="nav-item">Active Directory</a>
+                    <a href="azure-security.html" class="nav-item">Azure/Entra ID</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Identity Security</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Identity Security Monitoring</h1>
+                    <p class="page-subtitle">Identity is the new perimeter. Monitoring authentication, authorization, and account changes is critical for detecting credential attacks, privilege escalation, and insider threats.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Identity Attack Surface</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Identity-Based Attacks</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        IDENTITY ATTACK LIFECYCLE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  CREDENTIAL ACCESS           PRIVILEGE ESCALATION       PERSISTENCE         │
+│  ┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐ │
+│  │ • Brute force   │   ──►  │ • Add to admin  │   ──►  │ • Create user   │ │
+│  │ • Password spray│        │   group         │        │ • Add access key│ │
+│  │ • Phishing      │        │ • Modify role   │        │ • OAuth consent │ │
+│  │ • Credential    │        │ • Token theft   │        │ • Service       │ │
+│  │   stuffing      │        │ • Kerberoasting │        │   account       │ │
+│  │ • MFA bypass    │        │ • Silver ticket │        │ • MFA reset     │ │
+│  └─────────────────┘        └─────────────────┘        └─────────────────┘ │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    DETECTION OPPORTUNITIES                           │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │ • Failed authentication patterns (threshold, timing, source)        │   │
+│  │ • Successful auth from unusual location/device                      │   │
+│  │ • Privileged group membership changes                               │   │
+│  │ • Service account interactive logons                                │   │
+│  │ • Password/MFA changes on privileged accounts                       │   │
+│  │ • OAuth application consent for sensitive permissions               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Authentication Monitoring</h2>
+                    
+                    <h3>Brute Force Detection</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Brute Force Detection</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType != 0  // Failed attempts
+| summarize 
+    FailedAttempts = count(),
+    UniqueUsers = dcount(UserPrincipalName),
+    TargetedUsers = make_set(UserPrincipalName, 10),
+    FailureCodes = make_set(ResultType)
+  by IPAddress
+| where FailedAttempts > 20
+| extend AttackType = case(
+    UniqueUsers == 1 and FailedAttempts > 50, "Brute Force",
+    UniqueUsers > 5 and FailedAttempts / UniqueUsers < 5, "Password Spray",
+    "Unknown"
+)
+| order by FailedAttempts desc</code></pre>
+                    </div>
+
+                    <h3>Password Spray Detection</h3>
+                    <p>Password spray attacks try few passwords across many accounts to avoid lockouts:</p>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Password Spray Pattern</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 50126  // Invalid credentials
+| summarize 
+    AttemptCount = count(),
+    UniqueUsers = dcount(UserPrincipalName),
+    Users = make_set(UserPrincipalName, 50)
+  by IPAddress, bin(TimeGenerated, 10m)
+| where UniqueUsers > 10 and AttemptCount / UniqueUsers < 3
+| extend SprayScore = UniqueUsers * 10 + AttemptCount
+| order by SprayScore desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Password Spray</div>
+                        <pre><code>index=windows EventCode=4625
+| bucket _time span=10m
+| stats dc(TargetUserName) as unique_users, count as attempts by src_ip, _time
+| where unique_users > 10 AND attempts / unique_users < 3
+| sort -unique_users</code></pre>
+                    </div>
+
+                    <h3>Impossible Travel</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Impossible Travel Detection</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0  // Successful
+| project TimeGenerated, UserPrincipalName, Location, IPAddress
+| order by UserPrincipalName, TimeGenerated asc
+| serialize
+| extend PrevLocation = prev(Location), PrevTime = prev(TimeGenerated), 
+         PrevUser = prev(UserPrincipalName)
+| where UserPrincipalName == PrevUser
+| where Location != PrevLocation
+| extend TimeDiffMinutes = datetime_diff('minute', TimeGenerated, PrevTime)
+| where TimeDiffMinutes < 120  // Less than 2 hours between different locations
+| project TimeGenerated, UserPrincipalName, 
+          FromLocation = PrevLocation, ToLocation = Location,
+          TimeDiffMinutes</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Privilege Escalation Monitoring</h2>
+                    
+                    <h3>Admin Group Changes</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Group Modification</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName has "member"
+| where OperationName has_any ("Add", "Remove")
+| extend TargetGroup = tostring(TargetResources[0].displayName)
+| where TargetGroup in (
+    "Global Administrators",
+    "Privileged Role Administrator",
+    "Domain Admins",
+    "Enterprise Admins",
+    "Security Administrator",
+    "Exchange Administrator"
+)
+| extend ModifiedUser = tostring(TargetResources[1].displayName)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| project TimeGenerated, OperationName, TargetGroup, ModifiedUser, Actor</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Windows Admin Group Changes</div>
+                        <pre><code>index=windows EventCode IN (4728, 4732, 4756)
+| eval group_type = case(
+    EventCode=4728, "Domain Local",
+    EventCode=4732, "Local",
+    EventCode=4756, "Universal"
+)
+| where TargetUserName IN ("Domain Admins", "Enterprise Admins", 
+                           "Administrators", "Schema Admins")
+| table _time, EventCode, group_type, TargetUserName, MemberName, 
+        SubjectUserName, SubjectDomainName</code></pre>
+                    </div>
+
+                    <h3>Role Assignment Monitoring</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Azure Role Assignments</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName == "Add member to role"
+| extend RoleName = tostring(TargetResources[0].displayName)
+| extend AssignedUser = tostring(TargetResources[1].displayName)
+| extend AssignedBy = tostring(InitiatedBy.user.userPrincipalName)
+| summarize 
+    AssignmentCount = count(),
+    Roles = make_set(RoleName),
+    AssignedUsers = make_set(AssignedUser)
+  by AssignedBy
+| where AssignmentCount > 3
+| order by AssignmentCount desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Service Account Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Service Account Interactive Logon</div>
+                        <pre><code>SecurityEvent
+| where TimeGenerated > ago(24h)
+| where EventID == 4624
+| where LogonType in (2, 10, 11)  // Interactive, RemoteInteractive, CachedInteractive
+| where TargetUserName matches regex @"^(svc|service|app|batch|task).*"
+| project TimeGenerated, TargetUserName, LogonType, 
+          IpAddress, WorkstationName
+| summarize 
+    LogonCount = count(),
+    Workstations = make_set(WorkstationName),
+    IPs = make_set(IpAddress)
+  by TargetUserName</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Service Account Anomalies</div>
+                        <pre><code>index=windows EventCode=4624 Logon_Type IN (2, 10, 11)
+| lookup service_accounts user as TargetUserName OUTPUT is_service_account
+| where is_service_account="true"
+| stats count, values(Workstation_Name) as workstations, 
+        values(Source_Network_Address) as sources 
+  by TargetUserName
+| sort -count</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Account Lifecycle Monitoring</h2>
+                    
+                    <h3>Account Creation</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: New Account Creation</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName == "Add user"
+| extend NewUser = tostring(TargetResources[0].userPrincipalName)
+| extend Creator = tostring(InitiatedBy.user.userPrincipalName)
+| extend CreatorApp = tostring(InitiatedBy.app.displayName)
+| project TimeGenerated, NewUser, Creator, CreatorApp
+
+// Combine with Windows
+union (
+    SecurityEvent
+    | where TimeGenerated > ago(24h)
+    | where EventID == 4720
+    | project TimeGenerated, NewUser = TargetUserName, 
+              Creator = SubjectUserName
+)</code></pre>
+                    </div>
+
+                    <h3>Password/MFA Changes on Privileged Accounts</h3>
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Privileged Account Credential Changes</div>
+                        <pre><code>AuditLogs
+| where TimeGenerated > ago(7d)
+| where OperationName in (
+    "Reset password (by admin)",
+    "Change password (self-service)",
+    "User registered security info",
+    "User deleted security info"
+)
+| extend TargetUser = tostring(TargetResources[0].userPrincipalName)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+// Check if target is privileged
+| join kind=inner (
+    IdentityInfo
+    | where AssignedRoles has_any ("Global", "Admin", "Privileged")
+    | project TargetUser = AccountUPN
+) on TargetUser
+| project TimeGenerated, OperationName, TargetUser, Actor</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>MFA Monitoring</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: MFA Bypass Attempts</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0  // Successful
+| where AuthenticationRequirement == "singleFactorAuthentication"
+| where ConditionalAccessStatus != "success"  // CA didn't enforce MFA
+| summarize 
+    Count = count(),
+    Apps = make_set(AppDisplayName)
+  by UserPrincipalName, IPAddress, Location
+| where Count > 5</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: MFA Fatigue Attack</div>
+                        <pre><code>SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 50074  // MFA required but not completed
+| summarize 
+    MFAPrompts = count(),
+    TimeSpan = max(TimeGenerated) - min(TimeGenerated)
+  by UserPrincipalName, IPAddress
+| where MFAPrompts > 10
+| extend PromptsPerMinute = MFAPrompts / (TimeSpan / 1m)
+| where PromptsPerMinute > 2
+| order by MFAPrompts desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "What identity-based attacks do you prioritize detecting?"</strong></p>
+                        <p><strong>A:</strong> "I focus on the identity attack chain:</p>
+                        <ol>
+                            <li><strong>Credential compromise:</strong> Password spray (many users, few attempts each), brute force (single user, many attempts), and credential stuffing. I look at failure patterns—spray attacks have high unique user counts with low attempts per user.</li>
+                            <li><strong>Post-compromise access:</strong> Impossible travel (logins from distant locations within impossible timeframes), new device/location for sensitive accounts, and successful auth after many failures.</li>
+                            <li><strong>Privilege escalation:</strong> Any modification to privileged groups (Domain Admins, Global Admins), role assignments, and service account permission changes. These should be rare and always investigated.</li>
+                            <li><strong>Persistence:</strong> New user creation outside normal provisioning, service account creation, OAuth app consent with mail/file access, and MFA method changes on privileged accounts.</li>
+                            <li><strong>MFA attacks:</strong> MFA fatigue (repeated push notifications), MFA bypass through legacy protocols, and successful single-factor auth where MFA should apply.</li>
+                        </ol>
+                        <p>I prioritize privileged accounts—any anomaly on a Global Admin is higher priority than the same anomaly on a regular user."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Identity Security Quick Reference</div>
+                        <h4>Key Windows Event IDs</h4>
+                        <table>
+                            <tr><th>Event</th><th>Description</th></tr>
+                            <tr><td>4624</td><td>Successful logon</td></tr>
+                            <tr><td>4625</td><td>Failed logon</td></tr>
+                            <tr><td>4720</td><td>User created</td></tr>
+                            <tr><td>4728/4732/4756</td><td>Group membership change</td></tr>
+                            <tr><td>4724</td><td>Password reset</td></tr>
+                        </table>
+                        <h4>Attack Patterns</h4>
+                        <ul>
+                            <li>Brute Force: 1 user, many attempts</li>
+                            <li>Password Spray: Many users, few attempts each</li>
+                            <li>Credential Stuffing: Leaked credentials tested</li>
+                            <li>MFA Fatigue: Repeated push notifications</li>
+                        </ul>
+                        <h4>High-Priority Alerts</h4>
+                        <ul>
+                            <li>Admin group changes</li>
+                            <li>Service account interactive logon</li>
+                            <li>MFA changes on privileged accounts</li>
+                            <li>OAuth consent for sensitive permissions</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="identity-logs.html" class="card-link">← Identity Logs</a>
+                    <a href="active-directory.html" class="card-link">Active Directory →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

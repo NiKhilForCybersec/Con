@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Design | SIEM Consultant Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation"><span></span></button>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <div class="sidebar-logo"><div class="sidebar-logo-icon">⚡</div>SIEM Consultant</div>
+                </a>
+                <div class="sidebar-subtitle">Knowledge Portfolio</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Foundation</div>
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="approach.html" class="nav-item">Consulting Approach</a>
+                    <a href="experience.html" class="nav-item">Experience</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Operations</div>
+                    <a href="soc-operations.html" class="nav-item">SOC Operations</a>
+                    <a href="dashboard-design.html" class="nav-item active">Dashboard Design</a>
+                    <a href="runbook-development.html" class="nav-item">Runbooks</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Dashboard Design</span>
+                </nav>
+
+                <header class="page-header">
+                    <h1 class="page-title">Security Dashboard Design</h1>
+                    <p class="page-subtitle">Effective dashboards surface the right information to the right audience. SOC analysts need operational detail; executives need trends and risk posture. Good dashboard design drives better security decisions.</p>
+                </header>
+
+                <section class="content-section">
+                    <h2>Dashboard Hierarchy</h2>
+                    
+                    <div class="diagram">
+                        <div class="diagram-title">Dashboard Audience Tiers</div>
+                        <pre><code>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       DASHBOARD HIERARCHY                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  EXECUTIVE (CISO, Board)                                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Purpose: Risk posture, trends, compliance status                     │   │
+│  │ Refresh: Daily/Weekly                                                │   │
+│  │ Metrics: Risk scores, incident trends, SLA compliance               │   │
+│  │ Format: Single page, high-level KPIs, traffic light status          │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  SOC MANAGER                                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Purpose: Team performance, queue health, resource allocation         │   │
+│  │ Refresh: Hourly                                                      │   │
+│  │ Metrics: Alert backlog, MTTD/MTTR, analyst workload, escalations    │   │
+│  │ Format: Operational summary with drill-down capability               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  SOC ANALYST                                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Purpose: Work queue, alert details, investigation context            │   │
+│  │ Refresh: Real-time                                                   │   │
+│  │ Metrics: My alerts, priority queue, enrichment data, related events │   │
+│  │ Format: Actionable lists with one-click investigation               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  THREAT HUNTER / DETECTION ENGINEER                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ Purpose: Detection coverage, rule performance, hunting leads         │   │
+│  │ Refresh: On-demand                                                   │   │
+│  │ Metrics: Rule TP/FP rates, MITRE coverage, anomaly feeds            │   │
+│  │ Format: Exploratory with custom filtering                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Executive Dashboard Elements</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Executive Risk Summary</div>
+                        <pre><code>// Overall security posture
+| stats count as total_incidents by severity
+| eval severity_order = case(
+    severity="Critical", 1,
+    severity="High", 2,
+    severity="Medium", 3,
+    severity="Low", 4,
+    5
+)
+| sort severity_order
+| appendpipe [
+    stats sum(total_incidents) as total_incidents
+    | eval severity="TOTAL"
+]</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Monthly Trend Visualization</div>
+                        <pre><code>SecurityIncident
+| where TimeGenerated > ago(90d)
+| summarize IncidentCount = count() by 
+    bin(TimeGenerated, 1d), Severity
+| render timechart with (
+    title="Daily Incident Trend by Severity"
+)</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Executive Dashboard Best Practices</div>
+                        <ul>
+                            <li><strong>Single page:</strong> Executives won't scroll—everything on one screen</li>
+                            <li><strong>Traffic lights:</strong> Red/Yellow/Green status indicators at a glance</li>
+                            <li><strong>Trends over absolutes:</strong> "Incidents down 20%" beats "47 incidents"</li>
+                            <li><strong>Comparison periods:</strong> This month vs last month, this quarter vs last</li>
+                            <li><strong>Business context:</strong> Link security metrics to business impact</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>SOC Operations Dashboard</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: Alert Queue Health</div>
+                        <pre><code>index=alerts status=open
+| eval age_hours = round((now() - _time) / 3600, 1)
+| eval age_bucket = case(
+    age_hours < 1, "< 1 hour",
+    age_hours < 4, "1-4 hours",
+    age_hours < 24, "4-24 hours",
+    "Over 24 hours"
+)
+| stats count by age_bucket, severity
+| xyseries age_bucket, severity, count</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Analyst Workload Distribution</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(7d)
+| where Status == "InProgress"
+| summarize 
+    OpenAlerts = count(),
+    CriticalCount = countif(Severity == "High"),
+    AvgAgeHours = avg(datetime_diff('hour', now(), TimeGenerated))
+  by AssignedTo = Owner
+| extend WorkloadStatus = case(
+    OpenAlerts > 50, "🔴 Overloaded",
+    OpenAlerts > 30, "🟡 Heavy",
+    "🟢 Normal"
+)
+| order by OpenAlerts desc</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: MTTD/MTTR Tracking</div>
+                        <pre><code>index=incidents status=closed
+| eval time_to_detect = detected_time - event_time
+| eval time_to_respond = closed_time - detected_time
+| stats 
+    avg(time_to_detect) as avg_mttd,
+    avg(time_to_respond) as avg_mttr,
+    perc90(time_to_detect) as p90_mttd,
+    perc90(time_to_respond) as p90_mttr
+  by severity
+| eval avg_mttd_hours = round(avg_mttd / 3600, 1)
+| eval avg_mttr_hours = round(avg_mttr / 3600, 1)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Analyst Investigation Dashboard</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Alert Context Panel</div>
+                        <pre><code>// Single alert with full context
+let AlertId = "ALERT-12345";
+let AlertData = SecurityAlert | where SystemAlertId == AlertId;
+let TargetIP = toscalar(AlertData | extend IP = tostring(parse_json(ExtendedProperties).["Destination IP"]) | project IP);
+let TargetUser = toscalar(AlertData | extend User = tostring(parse_json(ExtendedProperties).User) | project User);
+// Alert details
+AlertData
+| project TimeGenerated, AlertName, Description, Severity,
+          Tactics, Techniques
+| extend Section = "Alert Details"
+| union (
+    // Related alerts for same entity
+    SecurityAlert
+    | where TimeGenerated > ago(7d)
+    | where ExtendedProperties has TargetIP or ExtendedProperties has TargetUser
+    | summarize RelatedAlerts = count(), AlertTypes = make_set(AlertName)
+    | extend Section = "Related Alerts"
+)
+| union (
+    // Asset information
+    _GetWatchlist('AssetInventory')
+    | where IPAddress == TargetIP
+    | project Hostname, Owner, Criticality, Department
+    | extend Section = "Asset Info"
+)</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Detection Coverage Dashboard</h2>
+                    
+                    <div class="info-box tip">
+                        <div class="info-box-title">SPL: MITRE ATT&CK Coverage</div>
+                        <pre><code>| inputlookup detection_rules.csv
+| stats count as rule_count by mitre_tactic, mitre_technique
+| join type=left mitre_technique [
+    | inputlookup mitre_techniques.csv
+    | table technique_id, technique_name
+    | rename technique_id as mitre_technique
+]
+| eval coverage_status = case(
+    rule_count >= 3, "Good",
+    rule_count >= 1, "Partial",
+    "Gap"
+)
+| table mitre_tactic, mitre_technique, technique_name, rule_count, coverage_status</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">KQL: Rule Performance Analysis</div>
+                        <pre><code>SecurityAlert
+| where TimeGenerated > ago(30d)
+| summarize 
+    TotalFires = count(),
+    TruePositives = countif(Status == "Resolved" and Classification == "TruePositive"),
+    FalsePositives = countif(Classification == "FalsePositive")
+  by AlertName = ProductName
+| extend TPRate = round(TruePositives * 100.0 / TotalFires, 1)
+| extend FPRate = round(FalsePositives * 100.0 / TotalFires, 1)
+| extend Health = case(
+    TPRate >= 80, "🟢 Healthy",
+    TPRate >= 50, "🟡 Needs Tuning",
+    "🔴 Review"
+)
+| order by TotalFires desc</code></pre>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <h2>Design Principles</h2>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Principle</th>
+                                    <th>Good Practice</th>
+                                    <th>Anti-Pattern</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Actionability</strong></td>
+                                    <td>Each panel drives a decision or action</td>
+                                    <td>Vanity metrics that look impressive but aren't useful</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Context</strong></td>
+                                    <td>Show thresholds, baselines, comparisons</td>
+                                    <td>Raw numbers without reference points</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hierarchy</strong></td>
+                                    <td>Most important info top-left, largest</td>
+                                    <td>All panels same size, random placement</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Drill-down</strong></td>
+                                    <td>Click panel to see underlying data</td>
+                                    <td>Dead-end visualizations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Performance</strong></td>
+                                    <td>Panels load in < 5 seconds</td>
+                                    <td>Heavy queries that timeout</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="info-box interview">
+                        <div class="info-box-title">💼 Interview Tip</div>
+                        <p><strong>Q: "How do you design effective security dashboards?"</strong></p>
+                        <p><strong>A:</strong> "I start with the audience and their decisions:</p>
+                        <ol>
+                            <li><strong>Know the audience:</strong> Executives need risk posture in 30 seconds. Analysts need actionable queues. Same data, different presentations.</li>
+                            <li><strong>Action-oriented:</strong> Every panel should answer 'so what?' If it doesn't drive a decision, remove it. A panel showing total events is useless; one showing events exceeding baseline is actionable.</li>
+                            <li><strong>Context is king:</strong> Numbers without context are meaningless. '500 alerts' means nothing. '500 alerts vs 200 baseline' tells a story. I always include thresholds, trends, or comparisons.</li>
+                            <li><strong>Performance matters:</strong> A dashboard that takes 60 seconds to load won't be used. I optimize queries, use summary indexes, and cache where possible.</li>
+                            <li><strong>Iterate with users:</strong> I deploy a draft, watch how people actually use it, then refine. Often what I think is important isn't what analysts need day-to-day.</li>
+                        </ol>
+                        <p>The best dashboard is one people actually look at every day because it helps them do their job better."</p>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="cheatsheet">
+                        <div class="cheatsheet-title">📋 Dashboard Design Quick Reference</div>
+                        <h4>Panel Types by Use Case</h4>
+                        <ul>
+                            <li>Single value: KPIs, totals</li>
+                            <li>Gauge: Progress toward target</li>
+                            <li>Line chart: Trends over time</li>
+                            <li>Bar chart: Category comparison</li>
+                            <li>Table: Detailed data, queues</li>
+                            <li>Heat map: Coverage, patterns</li>
+                        </ul>
+                        <h4>Refresh Rates</h4>
+                        <ul>
+                            <li>Real-time: Alert queues (30s-1m)</li>
+                            <li>Operational: SOC metrics (5-15m)</li>
+                            <li>Executive: Trends (1h-24h)</li>
+                        </ul>
+                        <h4>Color Usage</h4>
+                        <ul>
+                            <li>🔴 Red: Critical, action needed</li>
+                            <li>🟡 Yellow: Warning, attention</li>
+                            <li>🟢 Green: Normal, healthy</li>
+                            <li>🔵 Blue: Informational</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-default);">
+                    <a href="siem-metrics.html" class="card-link">← SIEM Metrics</a>
+                    <a href="runbook-development.html" class="card-link">Runbooks →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
